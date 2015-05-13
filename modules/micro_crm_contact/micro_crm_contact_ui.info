@@ -1,0 +1,7 @@
+name = Micro CRM Contact UI
+description = Provides UI for module
+core = 7.x
+
+dependencies[] = micro_crm_contact
+dependencies[] = micro_crm_ui
+dependencies[] = fast_filters

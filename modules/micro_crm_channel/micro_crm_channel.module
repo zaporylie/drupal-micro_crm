@@ -1,0 +1,177 @@
+<?php
+
+/**
+ * @file
+ *
+ */
+
+define('MICRO_CRM_CHANNEL_STATUS_REGISTERED', 'registered');
+define('MICRO_CRM_CHANNEL_STATUS_UNREGISTERED', 'unregistered');
+define('MICRO_CRM_CHANNEL_STATE_ACTIVE', 'active');
+define('MICRO_CRM_CHANNEL_STATE_DISABLED', 'disabled');
+
+module_load_include('inc', 'micro_crm_channel', 'micro_crm_channel.entity');
+
+/**
+ * Implements hook_hook_info().
+ */
+function micro_crm_channel_hook_info() {
+  $hooks = array(
+    'micro_crm_channel_state_info' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_channel_state_info_alter' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_channel_status_info' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_channel_status_info_alter' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_channel_view' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_channel_presave' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_channel_update' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_channel_insert' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_channel_delete' => array(
+      'group' => 'micro_crm',
+    ),
+  );
+  return $hooks;
+}
+
+/**
+ * Implements hook_micro_crm_channel_state_info().
+ */
+function micro_crm_channel_micro_crm_channel_state_info() {
+  $states = array();
+
+  $states[MICRO_CRM_CHANNEL_STATE_DISABLED] = array(
+    'title' => t('Disabled'),
+    'description' => t('Disabled channel, we can track it but we cannot communicate.'),
+    'weight' => -1,
+  );
+  $states[MICRO_CRM_CHANNEL_STATE_ACTIVE] = array(
+    'title' => t('Active'),
+    'description' => t('Active channel, we can track it and communicate.'),
+    'weight' => 1,
+  );
+
+  return $states;
+}
+
+/**
+ * Returns all statuses contact declared by modules.
+ *
+ * @return array
+ *   List of statuses
+ */
+function micro_crm_channel_states() {
+  // First check the static cache for an order states array.
+  $states = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the statuses now.
+  if (empty($states)) {
+    $states = module_invoke_all('micro_crm_channel_state_info');
+
+    // Give other modules a chance to alter the order states.
+    drupal_alter('micro_crm_channel_state_info', $states);
+
+    uasort($states, 'drupal_sort_weight');
+  }
+
+  return $states;
+}
+
+/**
+ * Implements hook_micro_crm_channel_status_info().
+ */
+function micro_crm_channel_micro_crm_channel_status_info() {
+  $status = array();
+
+  $status[MICRO_CRM_CHANNEL_STATUS_UNREGISTERED] = array(
+    'title' => t('Unregistered'),
+    'state' => MICRO_CRM_CHANNEL_STATE_DISABLED,
+    'weight' => -99,
+  );
+
+  $status[MICRO_CRM_CHANNEL_STATUS_REGISTERED] = array(
+    'title' => t('Registered'),
+    'description' => t('Registered, unprocessed channel'),
+    'state' => MICRO_CRM_CHANNEL_STATE_ACTIVE,
+    'weight' => -99,
+  );
+
+  return $status;
+}
+
+/**
+ * Returns all statuses contact declared by modules.
+ *
+ * @return array
+ *   List of statuses
+ */
+function micro_crm_channel_statuses() {
+  // First check the static cache for an order states array.
+  $statuses = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the statuses now.
+  if (empty($statuses)) {
+    $statuses = module_invoke_all('micro_crm_channel_status_info');
+
+    // Give other modules a chance to alter the order states.
+    drupal_alter('micro_crm_channel_status_info', $statuses);
+
+    uasort($statuses, 'drupal_sort_weight');
+  }
+
+  return $statuses;
+}
+
+/**
+ *
+ */
+function micro_crm_channel_status_option_list() {
+  $states = micro_crm_channel_states();
+  $statuses = micro_crm_channel_statuses();
+  $options = array();
+  foreach ($states as $k => $state) {
+    foreach ($statuses as $j => $status) {
+      if ($status['state'] == $k) {
+        $options[$state['title']][$j] = $status['title'];
+      }
+    }
+  }
+  return $options;
+}
+
+/**
+ * @return array
+ */
+function micro_crm_channel_types() {
+  // First check the static cache for a product types array.
+  $channel_types = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the types now.
+  if (!isset($channel_types)) {
+    $channel_types = array();
+
+    $entity = entity_get_info('micro_crm_channel');
+    if (isset($entity['bundles'])) {
+      foreach ($entity['bundles'] as $key => $bundle) {
+        // @todo: add something here or simplify it.
+        $channel_types[$key] = $bundle['label'];
+      }
+    }
+  }
+
+  return $channel_types;
+}

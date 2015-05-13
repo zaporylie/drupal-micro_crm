@@ -1,0 +1,10 @@
+name = Micro CRM Contact Channel
+description = Allows you to add custom comunication channels
+core = 7.x
+
+files[] = includes/MicroCRMChannelController.class.php
+files[] = includes/MicroCRMChannelInlineFormController.class.php
+
+dependencies[] = micro_crm_contact
+dependencies[] = inline_entity_form
+dependencies[] = entityreference

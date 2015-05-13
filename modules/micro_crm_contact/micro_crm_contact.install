@@ -1,0 +1,146 @@
+<?php
+
+/**
+ * @file
+ * Holds Contact Entity schema.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function micro_crm_contact_schema() {
+
+  $schema['micro_crm_contact'] = array(
+    'description' => 'Contact entity',
+    'fields' => array(
+      'contact_id' => array(
+        'description' => 'The primary identifier for a table.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'revision_id' => array(
+        'description' => 'The current {micro_crm_contact_revision}.revision_id version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'created' => array(
+        'description' => 'Modification date',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'Modification date',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'description' => 'Plain text record status',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => MICRO_CRM_CONTACT_STATUS_REGISTERED,
+      ),
+      'token' => array(
+        'description' => 'One-time token.',
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => FALSE,
+      ),
+      'token_created' => array(
+        'description' => 'When the token has been generated',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'language' => array(
+        'description' => 'The {languages}.language of this record.',
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('contact_id'),
+    'unique keys' => array(
+      'revision_id' => array('revision_id'),
+      'token' => array('token'),
+    ),
+    'foreign keys' => array(
+      'micro_crm_contact_revision' => array(
+        'table' => 'micro_crm_contact_revision',
+        'columns' => array('revision_id' => 'revision_id'),
+      ),
+    ),
+    'indexes' => array(
+      'micro_crm_contact_id' => array('contact_id'),
+      'micro_crm_status' => array('status'),
+      'language' => array('language'),
+    ),
+  );
+  
+  $schema['micro_crm_contact_revision'] = array(
+    'description' => 'Contact entity revision',
+    'fields' => array(
+      'revision_id' => array(
+        'description' => 'The primary identifier for a table.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'contact_id' => array(
+        'description' => 'Parent {micro_crm_contact}.contact_id contact identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'status' => array(
+        'description' => 'Plain text record status',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => MICRO_CRM_CONTACT_STATUS_REGISTERED,
+      ),
+      'language' => array(
+        'description' => 'The {languages}.language of this record.',
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'revision_uid' => array(
+        'description' => 'Revision author {users}.uid',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'revision_timestamp' => array(
+        'description' => 'Revision date of creation',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'log' => array(
+        'description' => 'The log entry explaining the changes in this version.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'big',
+      ),
+    ),
+    'primary key' => array('revision_id'),
+    'foreign keys' => array(
+      'micro_crm_contact' => array(
+        'table' => 'micro_crm_contact',
+        'columns' => array('contact_id' => 'contact_id'),
+      ),
+    ),
+    'indexes' => array(
+      'contact_id' => array('contact_id'),
+    ),
+  );
+  
+  return $schema;
+}

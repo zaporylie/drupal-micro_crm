@@ -1,0 +1,6 @@
+name = Micro CRM Contact
+description = Creates CRM Contact Base Entity
+core = 7.x
+dependencies[] = micro_crm
+
+files[] = includes/MicroCRMContactController.class.php

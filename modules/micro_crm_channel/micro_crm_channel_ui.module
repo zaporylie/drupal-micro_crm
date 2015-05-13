@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * @file
+ * Implements some hooks to create admin interface for contact channels.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function micro_crm_channel_ui_menu() {
+  $items = array();
+
+  $items['admin/people/micro_crm/config/channel'] = array(
+    'title' => 'Channel',
+    'page callback' => 'micro_crm_index',
+    'page arguments' => array(),
+    'access arguments' => array('micro crm manage'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  foreach (micro_crm_channel_types() as $type => $bundle) {
+    $type_arg = strtr($type, '_', '-');
+    $items['admin/people/micro_crm/config/channel/' . $type_arg] = array(
+      'title' => $bundle,
+      'page callback' => 'micro_crm_index',
+      'page arguments' => array(),
+      'access arguments' => array('micro crm manage'),
+      'type' => MENU_NORMAL_ITEM,
+    );
+  }
+
+  return $items;
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function micro_crm_channel_ui_entity_info_alter(&$entity_info) {
+  // Expose the admin UI for product fields.
+  foreach ($entity_info['micro_crm_channel']['bundles'] as $type => &$bundle) {
+    $bundle['admin'] = array(
+      'path' => 'admin/people/micro_crm/config/channel/' . strtr($type, '_', '-'),
+      'access arguments' => array('micro crm manage'),
+    );
+  }
+}

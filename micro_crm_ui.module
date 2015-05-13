@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ *
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function micro_crm_ui_menu() {
+  $items = array();
+
+  $items['admin/people/micro_crm'] = array(
+    'title' => 'CRM',
+    'page callback' => 'micro_crm_index',
+    'page arguments' => array(),
+    'access arguments' => array('micro crm manage'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/people/micro_crm/config'] = array(
+    'title' => 'Config',
+    'page callback' => 'micro_crm_index',
+    'page arguments' => array(),
+    'access arguments' => array('micro crm manage'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Renders index based on current parent element.
+ *
+ * @return array
+ *   Returns renderable array.
+ */
+function micro_crm_index() {
+  $build = array();
+
+  return $build;
+}
