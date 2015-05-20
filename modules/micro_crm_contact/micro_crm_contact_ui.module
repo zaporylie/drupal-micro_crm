@@ -23,12 +23,36 @@ function micro_crm_contact_ui_menu() {
   $items['admin/people/micro_crm/contact/%micro_crm_contact'] = array(
     'title callback' => 'micro_crm_contact_label',
     'title arguments' => array(4),
+    'page callback' => 'micro_crm_contact_view',
+    'page arguments' => array(4),
+    'access callback' => 'micro_crm_contact_access',
+    'access arguments' => array('view', 4),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/micro_crm_contact_ui.list.inc',
+  );
+
+  $items['admin/people/micro_crm/contact/%micro_crm_contact/view'] = array(
+    'title' => 'View',
+    'page callback' => 'micro_crm_contact_view',
+    'page arguments' => array(4),
+    'access callback' => 'micro_crm_contact_access',
+    'access arguments' => array('view', 4),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/micro_crm_contact_ui.list.inc',
+    'weight' => -2,
+  );
+
+  $items['admin/people/micro_crm/contact/%micro_crm_contact/edit'] = array(
+    'title' => 'Edit',
     'page callback' => 'micro_crm_contact_ui_form_wrapper',
     'page arguments' => array(4),
     'access callback' => 'micro_crm_contact_access',
-    'access arguments' => array('edit', 4),
-    'type' => MENU_CALLBACK,
+    'access arguments' => array('update', 4),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'file' => 'includes/micro_crm_contact_ui.form.inc',
+    'weight' => -1,
   );
 
   $items['admin/people/micro_crm/contact/add'] = array(

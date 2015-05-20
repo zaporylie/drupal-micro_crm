@@ -63,7 +63,7 @@ class MicroCRMContactController extends EntityAPIController {
   /**
    * Overrides EntityAPIController::view().
    */
-  public function view($entities, $view_mode = 'summary', $langcode = NULL, $page = NNULL) {
+  public function view($entities, $view_mode = 'administrator', $langcode = NULL, $page = NULL) {
     return parent::view($entities, $view_mode, $langcode, $page);
   }
   /**

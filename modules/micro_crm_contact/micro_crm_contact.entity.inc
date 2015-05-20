@@ -68,6 +68,17 @@ function micro_crm_contact_load($id) {
 }
 
 /**
+ * @param $id
+ * @return bool|mixed
+ */
+function micro_crm_contact_view($contact, $view_mode = 'administrator') {
+  if (!is_array($contact)) {
+    $contact = array($contact->contact_id => $contact);
+  }
+  return entity_get_controller('micro_crm_contact')->view($contact, $view_mode);
+}
+
+/**
  * @param $ids
  * @return mixed
  */
