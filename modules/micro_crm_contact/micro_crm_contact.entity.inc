@@ -15,7 +15,6 @@ function micro_crm_contact_entity_info() {
     'base table' => 'micro_crm_contact',
     'revision table' => 'micro_crm_contact_revision',
     'load hook' => 'micro_crm_contact_load',
-    'uri callback' => 'micro_crm_contact_uri',
     'label callback' => 'micro_crm_contact_label',
     'fieldable' => TRUE,
     'entity keys' => array(

@@ -10,7 +10,7 @@
 function micro_crm_contact_views_data() {
   $data = array();
 
-  $data['micro_crm_contact']['table']['group']  = t('Micro CRM');
+  $data['micro_crm_contact']['table']['group']  = t('Contact');
 
   $data['micro_crm_contact']['table']['base'] = array(
     'field' => 'contact_id',
@@ -43,7 +43,7 @@ function micro_crm_contact_views_data() {
       'handler' => 'views_handler_argument_numeric',
       'name field' => 'contact_id',
       'numeric' => TRUE,
-      'validate type' => 'order_id',
+      'validate type' => 'contact_id',
     ),
   );
 

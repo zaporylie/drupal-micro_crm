@@ -5,7 +5,20 @@
  * Default entity form.
  */
 
-function micro_crm_contact_ui_form_wrapper($contact = array()) {
+/**
+ * Form wrapper for create, update and delete.
+ *
+ * @param array $contact
+ *   Contact object or array of default values.
+ * @param bool $delete
+ *   Boolean indicator if create/edit or delete form should be displayed.
+ *
+ * @return array
+ */
+function micro_crm_contact_ui_form_wrapper($contact = array(), $delete = FALSE) {
+  if ($delete == TRUE && isset($contact->contact_id)) {
+    return drupal_get_form('micro_crm_contact_ui_delete_form', $contact);
+  }
   if (empty($contact))  {
     $contact = entity_create('micro_crm_contact', array());
   }
@@ -90,4 +103,29 @@ function micro_crm_contact_ui_form_submit($form, $form_state) {
   $uri = entity_uri('micro_crm_contact', $contact);
   $form_state['redirect'] = $uri['path'];
   drupal_set_message(t('Contact has been saved'));
+}
+
+/**
+ * Delete confirmation form.
+ */
+function micro_crm_contact_ui_delete_form($form, &$form_state, $contact) {
+  $form['contact'] = array(
+    '#type' => 'value',
+    '#value' => $contact,
+  );
+  return confirm_form(
+    $form,
+    t('Do you want to delete contact?'),
+    'admin/people/micro_crm/contact'
+  );
+}
+
+/**
+ * Delete form submit handler.
+ */
+function micro_crm_contact_ui_delete_form_submit($form, &$form_state) {
+  $contact_id = entity_id('micro_crm_contact', $form_state['values']['contact']);
+  if (entity_delete('micro_crm_contact', $contact_id) !== FALSE) {
+    drupal_set_message(t('Contact @contact has been deleted', array('@contact' => $contact_id)));
+  }
 }

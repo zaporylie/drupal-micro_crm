@@ -55,6 +55,18 @@ function micro_crm_contact_ui_menu() {
     'weight' => -1,
   );
 
+  $items['admin/people/micro_crm/contact/%micro_crm_contact/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'micro_crm_contact_ui_form_wrapper',
+    'page arguments' => array(4, TRUE),
+    'access callback' => 'micro_crm_contact_access',
+    'access arguments' => array('delete', 4),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/micro_crm_contact_ui.form.inc',
+    'weight' => 99,
+  );
+
   $items['admin/people/micro_crm/contact/add'] = array(
     'title' => 'Add contact',
     'page callback' => 'micro_crm_contact_ui_form_wrapper',
@@ -91,6 +103,9 @@ function micro_crm_contact_ui_views_api() {
  */
 function micro_crm_contact_ui_entity_info_alter(&$entity_info) {
 
+  // Uri callback.
+  $entity_info['micro_crm_contact']['uri callback'] = 'micro_crm_contact_ui_uri';
+
   // Expose the order UI for order fields.
   $entity_info['micro_crm_contact']['bundles']['micro_crm_contact']['admin'] = array(
     'path' => 'admin/people/micro_crm/config/contact',
@@ -99,3 +114,26 @@ function micro_crm_contact_ui_entity_info_alter(&$entity_info) {
   );
 }
 
+/**
+ *
+ *
+ * @param $contact
+ */
+function micro_crm_contact_ui_uri($contact) {
+//  // First look for a return value in the default entity uri callback.
+//  $uri = commerce_order_uri($order);
+//
+//  // If a value was found, return it now.
+//  if (!empty($uri)) {
+//    return $uri;
+//  }
+
+  // Only return a value if the user has permission to view the order.
+  if (micro_crm_contact_access('view', $contact)) {
+    return array(
+      'path' => 'admin/people/micro_crm/contact/' . entity_id('micro_crm_contact', $contact),
+    );
+  }
+
+  return NULL;
+}

@@ -178,7 +178,12 @@ function micro_crm_channel_install() {
       'active' => 1,
       'settings' => array(
         'fields' => array(),
-        'type_settings' => array(),
+        'type_settings' => array(
+          'allow_existing' => 0,
+          'match_operator' => 'CONTAINS',
+          'delete_references' => 1,
+          'override_labels' => 0,
+        ),
       ),
     ),
     'settings' => array(
@@ -189,6 +194,7 @@ function micro_crm_channel_install() {
         'label' => 'above',
         'type' => 'entityreference_label',
         'settings' => array(
+          'view_mode' => 'default',
           'link' => FALSE,
         ),
         'module' => 'entityreference',
