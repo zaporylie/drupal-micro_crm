@@ -12,5 +12,4 @@ function micro_crm_email_entity_info_alter(&$entity_info) {
   $entity_info['micro_crm_channel']['bundles']['email'] = array(
     'label' => t('E-mail'),
   );
-  dpm('sub');
 }

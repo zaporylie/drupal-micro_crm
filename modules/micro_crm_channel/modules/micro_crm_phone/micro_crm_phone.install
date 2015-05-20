@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @file
+ *
+ */
+
+/**
+ * Implements hook_install().
+ */
+function micro_crm_phone_install() {
+
+  $t = get_t();
+  $field = array(
+    'settings' => array(),
+    'field_name' => 'field_micro_crm_phone',
+    'type' => 'telephone',
+    'module' => 'telephone',
+    'active' => 1,
+    'locked' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+  );
+  field_create_field($field);
+
+  $instance = array(
+    'label' => $t('Phone'),
+    'widget' => array(
+      'weight' => '1',
+      'type' => 'telephone_default',
+      'module' => 'telephone',
+      'active' => 1,
+      'settings' => array(
+        'placeholder' => '',
+      ),
+    ),
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'text_plain',
+        'settings' => array(),
+        'module' => 'text',
+        'weight' => 0,
+      ),
+    ),
+    'required' => 1,
+    'description' => '',
+    'default_value' => NULL,
+    'field_name' => 'field_micro_crm_phone',
+    'entity_type' => 'micro_crm_channel',
+    'bundle' => 'phone',
+    'deleted' => 0,
+  );
+  field_create_instance($instance);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function micro_crm_phone_uninstall() {
+  $instance = array(
+    'entity_type' => 'micro_crm_channel',
+    'bundle' => 'phone',
+    'field_name' => 'field_micro_crm_phone',
+  );
+  field_delete_instance($instance);
+}

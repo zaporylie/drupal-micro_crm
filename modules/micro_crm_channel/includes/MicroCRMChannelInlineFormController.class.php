@@ -26,11 +26,6 @@ class MicroCRMChannelInlineFormController extends EntityInlineEntityFormControll
   public function tableFields($bundles) {
     $fields = parent::tableFields($bundles);
 
-    $fields['field_micro_crm_email'] = array(
-      'type' => 'field',
-      'label' => t('E-mail'),
-      'weight' => 10,
-    );
     $fields['type'] = array(
       'type' => 'property',
       'label' => t('Type'),
@@ -55,6 +50,7 @@ class MicroCRMChannelInlineFormController extends EntityInlineEntityFormControll
     $entity_form['status'] = array(
       '#type' => 'select',
       '#title' => t('Status'),
+      '#weight' => 99,
       '#default_value' => $entity->status,
       '#required' => TRUE,
       '#options' => micro_crm_channel_status_option_list(),

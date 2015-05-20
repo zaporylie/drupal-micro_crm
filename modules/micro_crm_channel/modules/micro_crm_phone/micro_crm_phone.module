@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ *
+ */
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function micro_crm_phone_entity_info_alter(&$entity_info) {
+  $entity_info['micro_crm_channel']['bundles']['phone'] = array(
+    'label' => t('Phone'),
+  );
+}

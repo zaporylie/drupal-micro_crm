@@ -32,7 +32,7 @@ function micro_crm_contact_ui_views_default_views() {
   $handler->display->display_options['pager']['options']['items_per_page'] = '25';
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
-    'contact_id' => 'contact_id',
+    'contact_id' => 'conta  ct_id',
     'created' => 'created',
     'changed' => 'changed',
   );
