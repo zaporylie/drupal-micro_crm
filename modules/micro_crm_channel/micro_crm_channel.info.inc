@@ -16,6 +16,12 @@ function micro_crm_channel_entity_property_info() {
     'type' => 'boolean',
     'description' => t('Whether the entity is new and not saved to the database yet.'),
   ) + $default_properties;
+  $properties['channel'] = array(
+    'label' => t('Channel'),
+    'type' => 'text',
+    'description' => t('General value.'),
+    'getter callback' => 'micro_crm_channel_channel',
+  );
 //  $properties['created'] = array(
 //      'label' => t('Date created'),
 //      'type' => 'date',

@@ -11,5 +11,17 @@
 function micro_crm_phone_entity_info_alter(&$entity_info) {
   $entity_info['micro_crm_channel']['bundles']['phone'] = array(
     'label' => t('Phone'),
+    'module' => 'micro_crm_phone',
   );
+}
+
+/**
+ * Implements hook_micro_crm_channel_channel().
+ */
+function micro_crm_phone_micro_crm_channel_channel($channel) {
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+  if (!$wrapper->__isset('field_micro_crm_phone')) {
+    return NULL;
+  }
+  return $wrapper->field_micro_crm_phone->value();
 }

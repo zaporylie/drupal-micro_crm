@@ -11,5 +11,17 @@
 function micro_crm_email_entity_info_alter(&$entity_info) {
   $entity_info['micro_crm_channel']['bundles']['email'] = array(
     'label' => t('E-mail'),
+    'module' => 'micro_crm_email',
   );
+}
+
+/**
+ * Implements hook_micro_crm_channel_channel().
+ */
+function micro_crm_email_micro_crm_channel_channel($channel) {
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+  if (!$wrapper->__isset('field_micro_crm_email')) {
+    return NULL;
+  }
+  return $wrapper->field_micro_crm_email->value();
 }

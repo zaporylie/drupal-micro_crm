@@ -175,3 +175,23 @@ function micro_crm_channel_types() {
 
   return $channel_types;
 }
+
+/**
+ * @param $data
+ * @param array $options
+ * @param $name
+ * @param $type
+ * @param $info
+ * @return string
+ */
+function micro_crm_channel_channel($data, array $options, $name, $type, $info) {
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($data->type) || !isset($entity['bundles'][$data->type]['module'])) {
+    return NULL;
+  }
+  $module = $entity['bundles'][$data->type]['module'];
+  if ($value = module_invoke($module, 'micro_crm_channel_channel', $data)) {
+    return $value;
+  }
+  return NULL;
+}
