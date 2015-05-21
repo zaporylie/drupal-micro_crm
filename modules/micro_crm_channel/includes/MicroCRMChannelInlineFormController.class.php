@@ -32,6 +32,12 @@ class MicroCRMChannelInlineFormController extends EntityInlineEntityFormControll
       'weight' => 2,
     );
 
+    $fields['status'] = array(
+      'type' => 'property',
+      'label' => t('Status'),
+      'weight' => 98,
+    );
+
     $fields['type'] = array(
       'type' => 'property',
       'label' => t('Type'),

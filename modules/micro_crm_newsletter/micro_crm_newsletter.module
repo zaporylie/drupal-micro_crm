@@ -1,0 +1,152 @@
+<?php
+
+/**
+ * @file
+ * Blocks and logic behind newsletter intetgration.
+ */
+
+define('MICRO_CRM_NEWSLETTER_CHANNEL_STATUS', 'newsletter');
+
+/**
+ * Implements hook_menu().
+ */
+function micro_crm_newsletter_menu() {
+  $items = array();
+  $items['admin/people/micro_crm/config/newsletter'] = array(
+    'title' => 'Newsletter',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('micro_crm_newsletter_settings'),
+    'access arguments' => array('micro crm manage'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'micro_crm_newsletter.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function micro_crm_newsletter_block_info() {
+  return array(
+    'newsletter' => array(
+      'info' => t('Newsletter'),
+      'cache' => DRUPAL_NO_CACHE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_micro_crm_channel_status_info().
+ */
+function micro_crm_newsletter_micro_crm_channel_status_info() {
+  $statuses[MICRO_CRM_NEWSLETTER_CHANNEL_STATUS] = array(
+    'title' => t('Newsletter'),
+    'state' => MICRO_CRM_CHANNEL_STATE_ACTIVE,
+  );
+  return $statuses;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function micro_crm_newsletter_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'newsletter':
+      $block['subject'] = t('Newsletter');
+      $block['content'] = drupal_get_form('micro_crm_newsletter_form');
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Newsletter form.
+ */
+function micro_crm_newsletter_form($form, &$form_state) {
+  $form['#tree'] = TRUE;
+
+  if (!isset($form['#parents'])) {
+    $form['#parents'] = array();
+  }
+  $form['bundles']['#tree'] = TRUE;
+  foreach (_micro_crm_newsletter_get_channels() as $channel) {
+    $form['bundles'][$channel] = array(
+      '#tree' => TRUE,
+    );
+    $entity = entity_create('micro_crm_channel', array('type' => $channel));
+    field_attach_form('micro_crm_channel', $entity, $form['bundles'][$channel], $form_state);
+  }
+
+  foreach (variable_get('micro_crm_newsletter_custom_fields', array()) as $field) {
+    $form['fields'] = array();
+    $instance = field_info_instance('micro_crm_contact', $field, 'micro_crm_contact');
+    $field = field_info_field($field);
+    $form['fields'] += field_default_form('micro_crm_contact', NULL, $field, $instance, $GLOBALS['language']->language, NULL, $form, $form_state);
+  }
+
+  $form['actions'] = array('#type' => 'actions');
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Subscribe'),
+  );
+
+  return $form;
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ */
+function micro_crm_newsletter_form_validate($form, &$form_state) {
+  foreach (_micro_crm_newsletter_get_channels() as $channel) {
+    $entity = entity_create('micro_crm_channel', array('type' => $channel));
+    field_attach_form_validate('micro_crm_channel', $entity, $form, $form_state);
+  }
+}
+
+/**
+ * Newsletter form submit callback.
+ */
+function micro_crm_newsletter_form_submit($form, &$form_state) {
+  $channels = array();
+  foreach (_micro_crm_newsletter_get_channels() as $channel) {
+    if (!($entity = micro_crm_channel_load_by_form_values($channel, $form, $form_state))) {
+      $entity = entity_create('micro_crm_channel', array('type' => $channel));
+      field_attach_submit('micro_crm_channel', $entity, $form, $form_state);
+    }
+    $entity->status = MICRO_CRM_NEWSLETTER_CHANNEL_STATUS;
+    $entity->log = 'Channel wants to receive newsletter';
+    entity_save('micro_crm_channel', $entity);
+    $channels[$entity->channel_id] = $entity->channel_id;
+  }
+
+  if (!($entity = micro_crm_channel_load_contact(array_keys($channels)))) {
+    $entity = entity_create('micro_crm_contact', array());
+  }
+  if (is_array($entity)) {
+    // @todo: do something, merge or whatever.
+    $entity = reset($entity);
+  }
+  $entity->status = MICRO_CRM_CONTACT_STATUS_REGISTERED;
+  // @todo: save all fields here;
+  foreach ($form_state['values']['fields'] as $key => $field) {
+    $entity->{$key} = $field;
+  }
+  entity_save('micro_crm_contact', $entity);
+}
+
+/**
+ * @return array
+ *   Array of channels in key => key format.
+ */
+function _micro_crm_newsletter_get_channels() {
+  $channels = array();
+  foreach (variable_get('micro_crm_newsletter_channels', array()) as $channel) {
+    if ($channel === 0) {
+      continue;
+    }
+    $channels[$channel] = $channel;
+  }
+  return $channels;
+}

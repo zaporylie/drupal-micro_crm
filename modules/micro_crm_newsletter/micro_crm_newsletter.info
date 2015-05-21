@@ -1,0 +1,6 @@
+name = Micro CRM Newsletter
+description = Newsletter extension to Micro CRM
+core = 7.x
+
+dependencies[] = micro_crm_channel
+dependencies[] = micro_crm_ui

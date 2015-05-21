@@ -25,3 +25,14 @@ function micro_crm_email_micro_crm_channel_channel($channel) {
   }
   return $wrapper->field_micro_crm_email->value();
 }
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function micro_crm_email_query_micro_crm_channel_load_email_by_values_alter(QueryAlterableInterface $query) {
+  $form = $query->getMetaData('form');
+  $form_state = $query->getMetaData('form_state');
+  $query->rightJoin('field_data_field_micro_crm_email', 'field_micro_crm_email', 'micro_crm_channel.channel_id = field_micro_crm_email.entity_id && field_micro_crm_email.entity_type = :entity_type');
+  $query->condition('field_micro_crm_email.field_micro_crm_email_email', $form_state['values']['field_micro_crm_email'][$form['bundles']['email']['field_micro_crm_email']['#language']][0]['email'], '=');
+  $query->range(0, 1);
+}

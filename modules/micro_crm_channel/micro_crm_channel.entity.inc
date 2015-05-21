@@ -91,3 +91,45 @@ function micro_crm_channel_uri($channel) {
 function micro_crm_channel_label($channel) {
 
 }
+
+/**
+ * Load channel by form values.
+ *
+ * @param $bundle
+ * @param $form
+ * @param $form_state
+ * @return mixed|null
+ */
+function micro_crm_channel_load_by_form_values($bundle, $form, $form_state) {
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'micro_crm_channel')
+    ->entityCondition('bundle', $bundle)
+    ->addTag('micro_crm_channel_load_' . $bundle . '_by_values')
+    ->range(0, 0)
+    ->addMetaData('form', $form)
+    ->addMetaData('form_state', $form_state);
+
+  $result = $query->execute();
+  if (!empty($result['micro_crm_channel'])) {
+    $entity = entity_load('micro_crm_channel', array_keys($result['micro_crm_channel']));
+    return reset($entity);
+  }
+  return NULL;
+}
+
+/**
+ * @param $ids
+ * @return null
+ */
+function micro_crm_channel_load_contact($ids) {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'micro_crm_contact')
+    ->fieldCondition('field_micro_crm_channel', 'target_id', $ids, 'IN');
+  $result = $query->execute();
+
+  if (!empty($result['micro_crm_contact'])) {
+    return entity_load('micro_crm_contact', array_keys($result['micro_crm_contact']));
+  }
+  return NULL;
+}
