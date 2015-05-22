@@ -96,3 +96,50 @@ function micro_crm_contact_label($contact) {
   }
   return '';
 }
+
+/**
+ * @param array $contacts
+ *   Array of contact entities to merge.
+ */
+function micro_crm_contact_merge($contacts) {
+  if (!is_array($contacts)) {
+    return FALSE;
+  }
+
+  // Oldest contact should be taken as a base.
+  ksort($contacts);
+  $entity = array_shift($contacts);
+  $wrapper = entity_metadata_wrapper('micro_crm_contact', $entity);
+
+  // Get all current channels ids to flat array.
+  $tmp = array();
+  foreach ($wrapper->field_micro_crm_channel->getIterator() as $channel) {
+    $tmp[] = $channel->getIdentifier();
+  }
+
+  // Iterate all contacts...
+  foreach ($contacts as $contact_id => $contact) {
+    $contact_wrapper = entity_metadata_wrapper('micro_crm_contact', $contact);
+
+    // ...and channels and add it to contact we are merging to.
+    foreach ($contact_wrapper->field_micro_crm_channel->getIterator() as $channel_wrapper) {
+      if (!in_array($channel_wrapper->getIdentifier(), $tmp)) {
+        $wrapper->field_micro_crm_channel[] = $channel_wrapper->getIdentifier();
+      }
+    }
+    // Reset channel field in deprecated contact.
+    $contact_wrapper->field_micro_crm_channel->set(NULL);
+
+    // Add deprecated contact to parent one.
+    $wrapper->field_micro_crm_deprecated[] = $contact_wrapper->getIdentifier();
+
+    // Save changed contact.
+    $contact_wrapper->log->set('Contact has been deprecated after merging to ' . $wrapper->getIdentifier());
+    $contact_wrapper->save();
+  }
+
+  // Save and return.
+  $wrapper->log->set('Contacts has been merged into this one.');
+  $wrapper->save();
+  return $entity;
+}

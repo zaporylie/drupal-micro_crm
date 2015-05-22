@@ -80,6 +80,10 @@ class MicroCRMChannelController extends EntityAPIController {
    */
   public function save($entity) {
     if (isset($entity->is_new) && $entity->is_new == TRUE && !isset($entity->order_id)) {
+      // Throw exception if new but not unique channel is going to be save.
+      if (!micro_crm_channel_is_unique($entity->type, $entity)) {
+        throw new Exception('Channel already exists');
+      }
       $entity->created = REQUEST_TIME;
     }
     $entity->changed = REQUEST_TIME;

@@ -27,12 +27,93 @@ function micro_crm_email_micro_crm_channel_channel($channel) {
 }
 
 /**
- * Implements hook_query_TAG_alter().
+ * Implements hook_micro_crm_channel_is_unique().
  */
-function micro_crm_email_query_micro_crm_channel_load_email_by_values_alter(QueryAlterableInterface $query) {
-  $form = $query->getMetaData('form');
-  $form_state = $query->getMetaData('form_state');
-  $query->rightJoin('field_data_field_micro_crm_email', 'field_micro_crm_email', 'micro_crm_channel.channel_id = field_micro_crm_email.entity_id && field_micro_crm_email.entity_type = :entity_type');
-  $query->condition('field_micro_crm_email.field_micro_crm_email_email', $form_state['values']['field_micro_crm_email'][$form['bundles']['email']['field_micro_crm_email']['#language']][0]['email'], '=');
-  $query->range(0, 1);
+function micro_crm_email_micro_crm_channel_is_unique($channel, $new = TRUE) {
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+
+  if (!$wrapper->__isset('field_micro_crm_email')) {
+    return FALSE;
+  }
+  if (!($value = $wrapper->field_micro_crm_email->value())) {
+    return FALSE;
+  }
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'micro_crm_channel')
+    ->entityCondition('bundle', 'email')
+    ->fieldCondition('field_micro_crm_email', 'email', $value, '=');
+
+  $result = $query->execute();
+  if (!isset($result['micro_crm_channel'])) {
+    return TRUE;
+  }
+  elseif (isset($result['micro_crm_channel']) && count($result['micro_crm_channel']) == 0 && $new == TRUE) {
+    return TRUE;
+  }
+  elseif (isset($result['micro_crm_channel']) && count($result['micro_crm_channel']) == 1 && $new == FALSE) {
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
 }
+
+/**
+ * Implements hook_micro_crm_channel_is_empty().
+ */
+function micro_crm_email_micro_crm_channel_is_empty($channel) {
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+  if (!$wrapper->__isset('field_micro_crm_email')) {
+    return TRUE;
+  }
+  if (!($value = $wrapper->field_micro_crm_email->value())) {
+    return TRUE;
+  }
+  if (!$value) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Implements hook_micro_crm_channel_load_by_values().
+ */
+function micro_crm_email_micro_crm_channel_load_by_values($channel) {
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+
+  if (!$wrapper->__isset('field_micro_crm_email')) {
+    return NULL;
+  }
+  if (!($value = $wrapper->field_micro_crm_email->value())) {
+    return NULL;
+  }
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'micro_crm_channel')
+    ->entityCondition('bundle', 'email')
+    ->fieldCondition('field_micro_crm_email', 'email', $value, '=');
+
+  $result = $query->execute();
+  if (!isset($result['micro_crm_channel'])) {
+    return NULL;
+  }
+  elseif (isset($result['micro_crm_channel']) && count($result['micro_crm_channel']) <> 1) {
+    return NULL;
+  }
+  else {
+    $entity = entity_load('micro_crm_channel', array_keys($result['micro_crm_channel']));
+    return reset($entity);
+  }
+}
+
+///**
+// * Implements hook_micro_crm_channel_send().
+// */
+//function micro_crm_email_micro_crm_channel_send($channel, $message) {
+//  if (micro_crm_channel_is_empty($channel->type, $channel)) {
+//    return FALSE;
+//  }
+//  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+//
+//}

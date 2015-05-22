@@ -93,32 +93,6 @@ function micro_crm_channel_label($channel) {
 }
 
 /**
- * Load channel by form values.
- *
- * @param $bundle
- * @param $form
- * @param $form_state
- * @return mixed|null
- */
-function micro_crm_channel_load_by_form_values($bundle, $form, $form_state) {
-  $query = new EntityFieldQuery();
-
-  $query->entityCondition('entity_type', 'micro_crm_channel')
-    ->entityCondition('bundle', $bundle)
-    ->addTag('micro_crm_channel_load_' . $bundle . '_by_values')
-    ->range(0, 0)
-    ->addMetaData('form', $form)
-    ->addMetaData('form_state', $form_state);
-
-  $result = $query->execute();
-  if (!empty($result['micro_crm_channel'])) {
-    $entity = entity_load('micro_crm_channel', array_keys($result['micro_crm_channel']));
-    return reset($entity);
-  }
-  return NULL;
-}
-
-/**
  * @param $ids
  * @return null
  */
@@ -132,4 +106,42 @@ function micro_crm_channel_load_contact($ids) {
     return entity_load('micro_crm_contact', array_keys($result['micro_crm_contact']));
   }
   return NULL;
+}
+
+/**
+ * @param $bundle
+ * @param $channel
+ * @return mixed|null
+ */
+function micro_crm_channel_load_by_values($bundle, $channel) {
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($entity['bundles'][$bundle]['module'])) {
+    return NULL;
+  }
+  $module = $entity['bundles'][$bundle]['module'];
+  if (!function_exists($module . '_micro_crm_channel_load_by_values')) {
+    return NULL;
+  }
+  return module_invoke($module, 'micro_crm_channel_load_by_values', $channel);
+}
+
+/**
+ * Send message callback, module independent.
+ *
+ * @param $bundle
+ * @param $channel
+ */
+function micro_crm_channel_send($channel) {
+  if (!isset($channel->type)) {
+    return FALSE;
+  }
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($entity['bundles'][$channel->type]['module'])) {
+    return FALSE;
+  }
+  $module = $entity['bundles'][$channel->type]['module'];
+  if (!function_exists($module . '_micro_crm_channel_send')) {
+    return FALSE;
+  }
+  return module_invoke($module, 'micro_crm_channel_send', $channel);
 }

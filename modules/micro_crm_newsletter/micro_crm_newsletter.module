@@ -80,7 +80,7 @@ function micro_crm_newsletter_form($form, &$form_state) {
   }
 
   $form['fields'] = array();
-  foreach (variable_get('micro_crm_newsletter_custom_fields', array()) as $field) {
+  foreach (_micro_crm_newsletter_get_custom_fields() as $field) {
     $instance = field_info_instance('micro_crm_contact', $field, 'micro_crm_contact');
     // Make all custom fields not required.
     $instance['required'] = FALSE;
@@ -123,32 +123,66 @@ function micro_crm_newsletter_form_validate($form, &$form_state) {
 function micro_crm_newsletter_form_submit($form, &$form_state) {
   $channels = array();
   foreach (_micro_crm_newsletter_get_channels() as $channel) {
-    // @todo: replace load function by hook_micro_crm_channel_is_unique or
-    // something.
-    if (!($entity = micro_crm_channel_load_by_form_values($channel, $form, $form_state))) {
-      $entity = entity_create('micro_crm_channel', array('type' => $channel));
-      field_attach_submit('micro_crm_channel', $entity, $form, $form_state);
+
+    // Creates dummy entity.
+    $entity = entity_create('micro_crm_channel', array('type' => $channel));
+
+    // Attach all fields to entity.
+    field_attach_submit('micro_crm_channel', $entity, $form, $form_state);
+
+    if (micro_crm_channel_is_empty($channel, $entity)) {
+      // Skip if channel is empty.
+      continue;
     }
+
+    if (!micro_crm_channel_is_unique($channel, $entity)) {
+      // Load channel if it already exists.
+      $entity = micro_crm_channel_load_by_values($channel, $entity);
+      if (!is_object($entity)) {
+        watchdog('micro_crm_newsletter', 'Unable to load channel', array(), WATCHDOG_WARNING);
+        return;
+      }
+    }
+
+    // Save channel as a newsletter ready.
     $entity->status = MICRO_CRM_NEWSLETTER_CHANNEL_STATUS;
-    $entity->log = 'Channel wants to receive newsletter';
-    entity_save('micro_crm_channel', $entity);
+    $entity->log = 'Channel claimed to receive newsletter messages';
+    try {
+      entity_save('micro_crm_channel', $entity);
+    }
+    catch (Exception $e) {
+      watchdog_exception('micro_crm_newsletter', $e);
+      drupal_set_message(t('Unable to submit form. Please try again or contact administrator'), 'error');
+      $form_state['redirect'] = TRUE;
+      return;
+    }
+
+    // Add to channels array to attach it later to contact.
     $channels[$entity->channel_id] = $entity->channel_id;
   }
 
   if (count($channels)) {
+    // Process entity only if there is something to process.
     if (!($entity = micro_crm_channel_load_contact(array_keys($channels)))) {
+      // If contact doesn't exist yet, create it.
       $entity = entity_create('micro_crm_contact', array());
     }
-    if (is_array($entity)) {
-      // @todo: do something, merge or whatever, when there is more than one
-      // matching contact.
+    if (is_array($entity) && count($entity) > 1) {
+      // If more than one contact found - merge it together.
+      $entity = micro_crm_contact_merge($entity);
+    }
+    elseif (is_array($entity)) {
+      // If array contains only one
       $entity = reset($entity);
     }
+
+    // If contact status was in disabled state, bump it to registered.
     $entity->status = MICRO_CRM_CONTACT_STATUS_REGISTERED;
-    // @todo: save all fields here; check if value is not empty before save.
+
     foreach ($form_state['values']['fields'] as $key => $field) {
       $info = field_info_field($key);
       $entity->{$key} = $field;
+      // Check if field is empty and, if so, skip it.
       if (module_invoke($info['module'], 'field_is_empty', $entity->{$key}[LANGUAGE_NONE][0], $info)) {
         unset($entity->{$key});
       }
@@ -166,7 +200,15 @@ function micro_crm_newsletter_form_submit($form, &$form_state) {
     }
 
     $entity->log = t('Contact modified by newsletter form.');
-    entity_save('micro_crm_contact', $entity);
+    try {
+      entity_save('micro_crm_contact', $entity);
+    }
+    catch (Exception $e) {
+      watchdog_exception('micro_crm_newsletter', $e);
+      drupal_set_message(t('Unable to submit form. Please try again or contact administrator'), 'error');
+      $form_state['redirect'] = TRUE;
+      return;
+    }
   }
 }
 
@@ -183,4 +225,19 @@ function _micro_crm_newsletter_get_channels() {
     $channels[$channel] = $channel;
   }
   return $channels;
+}
+
+/**
+ * @return array
+ *   Array of channels in key => key format.
+ */
+function _micro_crm_newsletter_get_custom_fields() {
+  $custom_fields = array();
+  foreach (variable_get('micro_crm_newsletter_custom_fields', array()) as $custom_field) {
+    if ($custom_field === 0) {
+      continue;
+    }
+    $custom_fields[$custom_field] = $custom_field;
+  }
+  return $custom_fields;
 }

@@ -88,7 +88,10 @@ function micro_crm_contact_ui_form_validate($form, &$form_state) {
   field_attach_form_validate('micro_crm_contact', $form_state['values']['contact'], $form, $form_state);
 }
 
-function micro_crm_contact_ui_form_submit($form, $form_state) {
+/**
+ * Contact form submit callback.
+ */
+function micro_crm_contact_ui_form_submit($form, &$form_state) {
   $contact = $form_state['values']['contact'];
 
   $contact->status = $form_state['values']['status'];
@@ -97,12 +100,19 @@ function micro_crm_contact_ui_form_submit($form, $form_state) {
   if (!isset($contact->revision)) {
     $contact->revision = TRUE;
   }
-  field_attach_submit('micro_crm_contact', $contact, $form, $form_state);
-  entity_save('micro_crm_contact', $contact);
+  try {
+    field_attach_submit('micro_crm_contact', $contact, $form, $form_state);
+    entity_save('micro_crm_contact', $contact);
+    $uri = entity_uri('micro_crm_contact', $contact);
+    $form_state['redirect'] = $uri['path'];
+    drupal_set_message(t('Contact has been saved'));
+  }
+  catch (Exception $e) {
+    watchdog_exception('micro_crm_channel', $e);
+    $form_state['rebuild'] = TRUE;
+    drupal_set_message(t('Unable to save contact'), 'error');
+  }
 
-  $uri = entity_uri('micro_crm_contact', $contact);
-  $form_state['redirect'] = $uri['path'];
-  drupal_set_message(t('Contact has been saved'));
 }
 
 /**

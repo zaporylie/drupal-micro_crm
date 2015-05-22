@@ -44,6 +44,15 @@ function micro_crm_channel_hook_info() {
     'micro_crm_channel_delete' => array(
       'group' => 'micro_crm',
     ),
+    'micro_crm_channel_channel' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_channel_is_unique' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_channel_is_empty' => array(
+      'group' => 'micro_crm',
+    ),
   );
   return $hooks;
 }
@@ -137,7 +146,9 @@ function micro_crm_channel_statuses() {
 }
 
 /**
+ * Returns list of available statuses in #options format.
  *
+ * @see hook_options_list()
  */
 function micro_crm_channel_status_option_list() {
   $states = micro_crm_channel_states();
@@ -154,6 +165,8 @@ function micro_crm_channel_status_option_list() {
 }
 
 /**
+ * Returns list of types (bundles) in key => title format.
+ *
  * @return array
  */
 function micro_crm_channel_types() {
@@ -177,6 +190,8 @@ function micro_crm_channel_types() {
 }
 
 /**
+ * Getter function which returns channel independent value.
+ *
  * @param $data
  * @param array $options
  * @param $name
@@ -194,4 +209,42 @@ function micro_crm_channel_channel($data, array $options, $name, $type, $info) {
     return $value;
   }
   return NULL;
+}
+
+/**
+ * Checks if channel is unique.
+ *
+ * @param $bundle
+ * @param $channel
+ * @return bool|mixed
+ */
+function micro_crm_channel_is_unique($bundle, $channel, $new = TRUE) {
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($entity['bundles'][$bundle]['module'])) {
+    return FALSE;
+  }
+  $module = $entity['bundles'][$bundle]['module'];
+  if (!function_exists($module . '_micro_crm_channel_is_unique')) {
+    return FALSE;
+  }
+  return module_invoke($module, 'micro_crm_channel_is_unique', $channel, $new = TRUE);
+}
+
+/**
+ * Checks if channel is empty.
+ *
+ * @param $bundle
+ * @param $channel
+ * @return bool|mixed
+ */
+function micro_crm_channel_is_empty($bundle, $channel, $message) {
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($entity['bundles'][$bundle]['module'])) {
+    return FALSE;
+  }
+  $module = $entity['bundles'][$bundle]['module'];
+  if (!function_exists($module . '_micro_crm_channel_is_empty')) {
+    return FALSE;
+  }
+  return module_invoke($module, 'micro_crm_channel_is_empty', $channel, $message);
 }

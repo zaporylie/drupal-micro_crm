@@ -4,6 +4,9 @@
  * @file
  */
 
+/**
+ * Implements hook_entity_property_info().
+ */
 function micro_crm_channel_entity_property_info() {
   $info = array();
   $properties = &$info['micro_crm_channel']['properties'];
@@ -21,6 +24,12 @@ function micro_crm_channel_entity_property_info() {
     'type' => 'text',
     'description' => t('General value.'),
     'getter callback' => 'micro_crm_channel_channel',
+  );
+  $properties['log'] = array(
+    'label' => t("Revision log message"),
+    'type' => 'text',
+    'description' => t("In case a new revision is to be saved, the log entry explaining the changes for this version."),
+    'setter callback' => 'entity_property_verbatim_set',
   );
 //  $properties['created'] = array(
 //      'label' => t('Date created'),
