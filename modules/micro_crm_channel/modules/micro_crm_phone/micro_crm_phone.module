@@ -25,3 +25,14 @@ function micro_crm_phone_micro_crm_channel_channel($channel) {
   }
   return $wrapper->field_micro_crm_phone->value();
 }
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function micro_crm_phone_query_micro_crm_channel_load_phone_by_values_alter(QueryAlterableInterface $query) {
+  $form = $query->getMetaData('form');
+  $form_state = $query->getMetaData('form_state');
+  $query->rightJoin('field_data_field_micro_crm_phone', 'field_micro_crm_phone', 'micro_crm_channel.channel_id = field_micro_crm_phone.entity_id && field_micro_crm_phone.entity_type = :entity_type');
+  $query->condition('field_micro_crm_phone.field_micro_crm_phone_value', $form_state['values']['field_micro_crm_phone'][$form['bundles']['phone']['field_micro_crm_phone']['#language']][0]['value'], '=');
+  $query->range(0, 1);
+}

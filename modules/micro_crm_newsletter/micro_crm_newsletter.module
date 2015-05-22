@@ -76,15 +76,17 @@ function micro_crm_newsletter_form($form, &$form_state) {
     );
     $entity = entity_create('micro_crm_channel', array('type' => $channel));
     field_attach_form('micro_crm_channel', $entity, $form['bundles'][$channel], $form_state);
+    array_walk_recursive($form['bundles'][$channel], '_micro_crm_reset_required');
   }
 
+  $form['fields'] = array();
   foreach (variable_get('micro_crm_newsletter_custom_fields', array()) as $field) {
-    $form['fields'] = array();
     $instance = field_info_instance('micro_crm_contact', $field, 'micro_crm_contact');
+    // Make all custom fields not required.
+    $instance['required'] = FALSE;
     $field = field_info_field($field);
-    $form['fields'] += field_default_form('micro_crm_contact', NULL, $field, $instance, $GLOBALS['language']->language, NULL, $form, $form_state);
+    $form['fields'] += field_default_form('micro_crm_contact', NULL, $field, $instance, LANGUAGE_NONE, NULL, $form, $form_state);
   }
-
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] = array(
     '#type' => 'submit',
@@ -92,6 +94,16 @@ function micro_crm_newsletter_form($form, &$form_state) {
   );
 
   return $form;
+}
+
+/**
+ * Resets required property so none field is required.
+ */
+function _micro_crm_reset_required(&$value, $key) {
+  if (($key === '#required') && ($value == TRUE)) {
+    $value = FALSE;
+  }
+  // @todo: Check if at least one channel has value.
 }
 
 /**
@@ -111,6 +123,8 @@ function micro_crm_newsletter_form_validate($form, &$form_state) {
 function micro_crm_newsletter_form_submit($form, &$form_state) {
   $channels = array();
   foreach (_micro_crm_newsletter_get_channels() as $channel) {
+    // @todo: replace load function by hook_micro_crm_channel_is_unique or
+    // something.
     if (!($entity = micro_crm_channel_load_by_form_values($channel, $form, $form_state))) {
       $entity = entity_create('micro_crm_channel', array('type' => $channel));
       field_attach_submit('micro_crm_channel', $entity, $form, $form_state);
@@ -121,19 +135,39 @@ function micro_crm_newsletter_form_submit($form, &$form_state) {
     $channels[$entity->channel_id] = $entity->channel_id;
   }
 
-  if (!($entity = micro_crm_channel_load_contact(array_keys($channels)))) {
-    $entity = entity_create('micro_crm_contact', array());
+  if (count($channels)) {
+    if (!($entity = micro_crm_channel_load_contact(array_keys($channels)))) {
+      $entity = entity_create('micro_crm_contact', array());
+    }
+    if (is_array($entity)) {
+      // @todo: do something, merge or whatever, when there is more than one
+      // matching contact.
+      $entity = reset($entity);
+    }
+    $entity->status = MICRO_CRM_CONTACT_STATUS_REGISTERED;
+    // @todo: save all fields here; check if value is not empty before save.
+    foreach ($form_state['values']['fields'] as $key => $field) {
+      $info = field_info_field($key);
+      $entity->{$key} = $field;
+      if (module_invoke($info['module'], 'field_is_empty', $entity->{$key}[LANGUAGE_NONE][0], $info)) {
+        unset($entity->{$key});
+      }
+    }
+    $wrapper = entity_metadata_wrapper('micro_crm_contact', $entity);
+
+    $tmp = array();
+    foreach ($wrapper->field_micro_crm_channel->getIterator() as $channel) {
+      $tmp[] = $channel->getIdentifier();
+    }
+    foreach ($channels as $channel) {
+      if (!in_array($channel, $tmp)) {
+        $wrapper->field_micro_crm_channel[] = $channel;
+      }
+    }
+
+    $entity->log = t('Contact modified by newsletter form.');
+    entity_save('micro_crm_contact', $entity);
   }
-  if (is_array($entity)) {
-    // @todo: do something, merge or whatever.
-    $entity = reset($entity);
-  }
-  $entity->status = MICRO_CRM_CONTACT_STATUS_REGISTERED;
-  // @todo: save all fields here;
-  foreach ($form_state['values']['fields'] as $key => $field) {
-    $entity->{$key} = $field;
-  }
-  entity_save('micro_crm_contact', $entity);
 }
 
 /**
