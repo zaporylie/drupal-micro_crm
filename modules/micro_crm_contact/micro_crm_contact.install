@@ -144,3 +144,19 @@ function micro_crm_contact_schema() {
   
   return $schema;
 }
+
+/**
+ * Implements hook_install().
+ */
+function micro_crm_contact_install() {
+
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function micro_crm_contact_uninstall() {
+
+  $results = db_query('SELECT {contact_id} FROM micro_crm_contact')->fetchCol();
+  micro_crm_contact_delete_multiple($results);
+}

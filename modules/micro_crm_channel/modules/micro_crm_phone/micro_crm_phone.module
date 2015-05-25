@@ -11,5 +11,98 @@
 function micro_crm_phone_entity_info_alter(&$entity_info) {
   $entity_info['micro_crm_channel']['bundles']['phone'] = array(
     'label' => t('Phone'),
+    'module' => 'micro_crm_phone',
   );
+}
+
+/**
+ * Implements hook_micro_crm_channel_channel().
+ */
+function micro_crm_phone_micro_crm_channel_channel($channel) {
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+  if (!$wrapper->__isset('field_micro_crm_phone')) {
+    return NULL;
+  }
+  return $wrapper->field_micro_crm_phone->value();
+}
+
+/**
+ * Implements hook_micro_crm_channel_is_unique().
+ */
+function micro_crm_phone_micro_crm_channel_is_unique($channel, $new = TRUE) {
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+
+  if (!$wrapper->__isset('field_micro_crm_phone')) {
+    return FALSE;
+  }
+  if (!($value = $wrapper->field_micro_crm_phone->value())) {
+    return FALSE;
+  }
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'micro_crm_channel')
+    ->entityCondition('bundle', 'phone')
+    ->fieldCondition('field_micro_crm_phone', 'value', $value, '=');
+
+  $result = $query->execute();
+  if (!isset($result['micro_crm_channel'])) {
+    return TRUE;
+  }
+  elseif (isset($result['micro_crm_channel']) && count($result['micro_crm_channel']) == 0 && $new == TRUE) {
+    return TRUE;
+  }
+  elseif (isset($result['micro_crm_channel']) && count($result['micro_crm_channel']) == 1 && $new == FALSE) {
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Implements hook_micro_crm_channel_is_empty().
+ */
+function micro_crm_phone_micro_crm_channel_is_empty($channel) {
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+  if (!$wrapper->__isset('field_micro_crm_phone')) {
+    return TRUE;
+  }
+  if (!($value = $wrapper->field_micro_crm_phone->value())) {
+    return TRUE;
+  }
+  if (!$value) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Implements hook_micro_crm_channel_values_load().
+ */
+function micro_crm_phone_micro_crm_channel_values_load($channel) {
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+
+  if (!$wrapper->__isset('field_micro_crm_phone')) {
+    return NULL;
+  }
+  if (!($value = $wrapper->field_micro_crm_phone->value())) {
+    return NULL;
+  }
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'micro_crm_channel')
+    ->entityCondition('bundle', 'phone')
+    ->fieldCondition('field_micro_crm_phone', 'value', $value, '=');
+
+  $result = $query->execute();
+  if (!isset($result['micro_crm_channel'])) {
+    return NULL;
+  }
+  elseif (isset($result['micro_crm_channel']) && count($result['micro_crm_channel']) <> 1) {
+    return NULL;
+  }
+  else {
+    $entity = entity_load('micro_crm_channel', array_keys($result['micro_crm_channel']));
+    return reset($entity);
+  }
 }

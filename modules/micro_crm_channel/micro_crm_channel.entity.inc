@@ -72,6 +72,20 @@ function micro_crm_channel_load_multiple($ids) {
 }
 
 /**
+ * @param $ids
+ */
+function micro_crm_channel_delete($id) {
+  micro_crm_channel_delete(array($id));
+}
+
+/**
+ * @param $ids
+ */
+function micro_crm_channel_delete_multiple($ids) {
+  entity_delete_multiple('micro_crm_channel', $ids);
+}
+
+/**
  *
  */
 function micro_crm_channel_view($channel) {
@@ -90,4 +104,79 @@ function micro_crm_channel_uri($channel) {
  */
 function micro_crm_channel_label($channel) {
 
+}
+
+/**
+ * @param $ids
+ * @return null
+ */
+function micro_crm_channel_load_contact($ids) {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'micro_crm_contact')
+    ->fieldCondition('field_micro_crm_channel', 'target_id', $ids, 'IN');
+  $result = $query->execute();
+
+  if (!empty($result['micro_crm_contact'])) {
+    return entity_load('micro_crm_contact', array_keys($result['micro_crm_contact']));
+  }
+  return NULL;
+}
+
+/**
+ * @param $channel
+ * @return mixed|null
+ */
+function micro_crm_channel_values_load($channel) {
+  if (!isset($channel->type)) {
+    return NULL;
+  }
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($entity['bundles'][$channel->type]['module'])) {
+    return NULL;
+  }
+  $module = $entity['bundles'][$channel->type]['module'];
+  if (!function_exists($module . '_micro_crm_channel_values_load')) {
+    return NULL;
+  }
+  return module_invoke($module, 'micro_crm_channel_values_load', $channel);
+}
+
+/**
+ * @param $token
+ */
+function micro_crm_channel_token_load($token) {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'micro_crm_channel')
+    ->propertyCondition('token', $token, '=');
+  $result = $query->execute();
+  if (!isset($result['micro_crm_channel'])) {
+    return NULL;
+  }
+  $entity = entity_load('micro_crm_channel', array_keys($result['micro_crm_channel']));
+
+  if (count($entity) <> 1) {
+    return NULL;
+  }
+  return reset($entity);
+}
+
+/**
+ * Send message callback, module independent.
+ *
+ * @param $bundle
+ * @param $channel
+ */
+function micro_crm_channel_send($channel) {
+  if (!isset($channel->type)) {
+    return FALSE;
+  }
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($entity['bundles'][$channel->type]['module'])) {
+    return FALSE;
+  }
+  $module = $entity['bundles'][$channel->type]['module'];
+  if (!function_exists($module . '_micro_crm_channel_send')) {
+    return FALSE;
+  }
+  return module_invoke($module, 'micro_crm_channel_send', $channel);
 }

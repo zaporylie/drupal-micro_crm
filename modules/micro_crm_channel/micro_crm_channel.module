@@ -9,6 +9,7 @@ define('MICRO_CRM_CHANNEL_STATUS_REGISTERED', 'registered');
 define('MICRO_CRM_CHANNEL_STATUS_UNREGISTERED', 'unregistered');
 define('MICRO_CRM_CHANNEL_STATE_ACTIVE', 'active');
 define('MICRO_CRM_CHANNEL_STATE_DISABLED', 'disabled');
+define('MICRO_CRM_CHANNEL_TOKEN_VALIDATION_INTERVAL', 86400);
 
 module_load_include('inc', 'micro_crm_channel', 'micro_crm_channel.entity');
 
@@ -42,6 +43,15 @@ function micro_crm_channel_hook_info() {
       'group' => 'micro_crm',
     ),
     'micro_crm_channel_delete' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_channel_channel' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_channel_is_unique' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_channel_is_empty' => array(
       'group' => 'micro_crm',
     ),
   );
@@ -137,7 +147,9 @@ function micro_crm_channel_statuses() {
 }
 
 /**
+ * Returns list of available statuses in #options format.
  *
+ * @see hook_options_list()
  */
 function micro_crm_channel_status_option_list() {
   $states = micro_crm_channel_states();
@@ -154,6 +166,8 @@ function micro_crm_channel_status_option_list() {
 }
 
 /**
+ * Returns list of types (bundles) in key => title format.
+ *
  * @return array
  */
 function micro_crm_channel_types() {
@@ -174,4 +188,87 @@ function micro_crm_channel_types() {
   }
 
   return $channel_types;
+}
+
+/**
+ * Getter function which returns channel independent value.
+ *
+ * @param $channel
+ * @return string
+ *
+ * @deprecated Use entity label instead.
+ */
+function micro_crm_channel_channel($channel) {
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($channel->type) || !isset($entity['bundles'][$channel->type]['module'])) {
+    return NULL;
+  }
+  $module = $entity['bundles'][$channel->type]['module'];
+  if ($value = module_invoke($module, 'micro_crm_channel_channel', $channel)) {
+    return $value;
+  }
+  return NULL;
+}
+
+/**
+ * Checks if channel is unique.
+ *
+ * @param $bundle
+ * @param $channel
+ * @return bool|mixed
+ */
+function micro_crm_channel_is_unique($bundle, $channel, $new = TRUE) {
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($entity['bundles'][$bundle]['module'])) {
+    return FALSE;
+  }
+  $module = $entity['bundles'][$bundle]['module'];
+  if (!function_exists($module . '_micro_crm_channel_is_unique')) {
+    return FALSE;
+  }
+  return module_invoke($module, 'micro_crm_channel_is_unique', $channel, $new = TRUE);
+}
+
+/**
+ * Checks if channel is empty.
+ *
+ * @param $bundle
+ * @param $channel
+ * @return bool|mixed
+ */
+function micro_crm_channel_is_empty($bundle, $channel) {
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($entity['bundles'][$bundle]['module'])) {
+    return FALSE;
+  }
+  $module = $entity['bundles'][$bundle]['module'];
+  if (!function_exists($module . '_micro_crm_channel_is_empty')) {
+    return FALSE;
+  }
+  return module_invoke($module, 'micro_crm_channel_is_empty', $channel);
+}
+
+/**
+ * @param $channel
+ */
+function micro_crm_channel_token_access_callback($channel) {
+  if (isset($channel->token) && isset($channel->token_created) && (REQUEST_TIME - $channel->token_created < MICRO_CRM_CHANNEL_TOKEN_VALIDATION_INTERVAL)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Implements hook_micro_crm_channel_presave().
+ */
+function micro_crm_channel_micro_crm_channel_presave($channel) {
+
+}
+
+/**
+ * Generates unique token.
+ */
+function _micro_crm_channel_generate_token($channel) {
+  $channel->token_created = REQUEST_TIME;
+  $channel->token = drupal_hash_base64(drupal_random_bytes(64));
 }

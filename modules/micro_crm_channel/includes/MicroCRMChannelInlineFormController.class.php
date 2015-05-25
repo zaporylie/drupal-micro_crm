@@ -26,6 +26,18 @@ class MicroCRMChannelInlineFormController extends EntityInlineEntityFormControll
   public function tableFields($bundles) {
     $fields = parent::tableFields($bundles);
 
+    $fields['channel'] = array(
+      'type' => 'property',
+      'label' => t('Channel'),
+      'weight' => 2,
+    );
+
+    $fields['status'] = array(
+      'type' => 'property',
+      'label' => t('Status'),
+      'weight' => 98,
+    );
+
     $fields['type'] = array(
       'type' => 'property',
       'label' => t('Type'),

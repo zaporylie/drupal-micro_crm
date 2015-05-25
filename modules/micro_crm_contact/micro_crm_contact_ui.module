@@ -137,3 +137,12 @@ function micro_crm_contact_ui_uri($contact) {
 
   return NULL;
 }
+
+/**
+ * Implements hook_field_widget_form_alter().
+ */
+function micro_crm_contact_ui_field_widget_form_alter(&$element, &$form_state, $context) {
+  if (isset($element['#field_name']) && $element['#field_name'] == 'field_micro_crm_deprecated') {
+    $element['#access'] = FALSE;
+  }
+}
