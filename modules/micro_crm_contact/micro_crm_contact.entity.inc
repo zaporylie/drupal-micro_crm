@@ -68,6 +68,20 @@ function micro_crm_contact_load($id) {
 
 /**
  * @param $id
+ */
+function micro_crm_contact_delete($id) {
+  micro_crm_contact_delete_multiple(array($id));
+}
+
+/**
+ * @param $ids
+ */
+function micro_crm_contact_delete_multiple($ids) {
+  entity_delete_multiple('micro_crm_contact', $ids);
+}
+
+/**
+ * @param $id
  * @return bool|mixed
  */
 function micro_crm_contact_view($contact, $view_mode = 'administrator') {

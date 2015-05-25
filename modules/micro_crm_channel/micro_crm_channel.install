@@ -214,6 +214,10 @@ function micro_crm_channel_install() {
  * Implements hook_uninstall().
  */
 function micro_crm_channel_uninstall() {
+
+  $results = db_query('SELECT {channel_id} FROM micro_crm_channel')->fetchCol();
+  micro_crm_channel_delete_multiple($results);
+
   $instance = array(
     'entity_type' => 'micro_crm_contact',
     'bundle' => 'micro_crm_contact',

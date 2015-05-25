@@ -5,7 +5,11 @@
  * Defines contact channel entity controller.
  */
 
+/**
+ * Class MicroCRMChannelController
+ */
 class MicroCRMChannelController extends EntityAPIController {
+
   /**
    * Overrides EntityAPIController::buildQuery().
    */
@@ -23,20 +27,21 @@ class MicroCRMChannelController extends EntityAPIController {
   public function buildContent($entity, $view_mode = 'customer', $langcode = NULL) {
     return parent::buildContent($entity, $view_mode, $langcode);
   }
+
   /**
    * Overrides EntityAPIController::attachLoad().
-   *
-   * @todo Check if it should be unserialized.
    */
   public function attachLoad(&$queried_entities, $revision_id = FALSE) {
     parent::attachLoad($queried_entities, $revision_id);
   }
+
   /**
    * Overrides EntityAPIController::load().
    */
   public function load($ids = array(), $conditions = array()) {
     return parent::load($ids, $conditions);
   }
+
   /**
    * Overrides EntityAPIController::access().
    */
@@ -60,12 +65,14 @@ class MicroCRMChannelController extends EntityAPIController {
     }
     return FALSE;
   }
+
   /**
    * Overrides EntityAPIController::view().
    */
   public function view($entities, $view_mode = 'summary', $langcode = NULL, $page = NNULL) {
     return parent::view($entities, $view_mode, $langcode, $page);
   }
+
   /**
    * Overrides EntityAPIController::create().
    */
@@ -75,23 +82,38 @@ class MicroCRMChannelController extends EntityAPIController {
     );
     return parent::create($values);
   }
+
   /**
    * Overrides EntityAPIController::save().
    */
   public function save($entity) {
+
+    // If we are going to save new channel data needs to be validated against
+    // uniqueness.
     if (isset($entity->is_new) && $entity->is_new == TRUE && !isset($entity->order_id)) {
       // Throw exception if new but not unique channel is going to be save.
       if (!micro_crm_channel_is_unique($entity->type, $entity)) {
         throw new Exception('Channel already exists');
       }
+      // Add timestamp.
       $entity->created = REQUEST_TIME;
     }
+    // Set changed time arbitrary.
     $entity->changed = REQUEST_TIME;
+
+    // Create new revision by default.
     if (!isset($entity->revision)) {
       $entity->revision = TRUE;
     }
+
+    // Reset token on channel save.
+    $entity->token = NULL;
+    $entity->token_created = 0;
+
+    // Save channel.
     return parent::save($entity);
   }
+
   /**
    * Overrides DrupalDefaultEntityController::saveRevision().
    */
@@ -100,6 +122,7 @@ class MicroCRMChannelController extends EntityAPIController {
     $entity->revision_uid = $GLOBALS['user']->uid;
     return parent::saveRevision($entity);
   }
+
   /**
    * Overrides DrupalDefaultEntityController::delete().
    */
