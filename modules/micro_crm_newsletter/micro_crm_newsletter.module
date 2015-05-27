@@ -65,7 +65,7 @@ function micro_crm_newsletter_permission() {
   return array(
     'micro crm newsletter subscription' => array(
       'title' => t('Subscribe / unsubscribe newsletter'),
-    )
+    ),
   );
 }
 
