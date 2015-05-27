@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function micro_crm_campaignmonitor_menu() {
+  $items = array();
+
+  $items['admin/people/micro_crm/config/newsletter/campaignmonitor'] = array(
+    'title' => 'Campaign Monitor',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('micro_crm_campaignmonitor_settings'),
+    'access arguments' => array('micro crm manage'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'micro_crm_campaignmonitor.admin.inc',
+  );
+
+  $items['micro_crm/newsletter/campaignmonitor'] = array(
+    'page callback' => 'micro_crm_campaignmonitor_webhook',
+    'access callback' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_micro_crm_channel_update().
+ */
+function micro_crm_campaignmonitor_micro_crm_channel_update($channel) {
+  // @todo process date and send to campaign monitor.
+}
+
+/**
+ * Implements hook_micro_crm_contact_update().
+ */
+function micro_crm_campaignmonitor_micro_crm_contact_update($contact) {
+  // @todo process date and send to campaign monitor.
+}
+
+/**
+ *
+ */
+function micro_crm_campaignmonitor_webhook() {
+  // @todo load channel and update.
+  // @todo load contact and update.
+}
