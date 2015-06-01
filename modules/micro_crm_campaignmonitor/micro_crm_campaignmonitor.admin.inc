@@ -48,6 +48,8 @@ function micro_crm_campaignmonitor_settings($form, &$form_state) {
       $form['micro_crm_campaignmonitor'][$list_id] = array(
         '#type' => 'fieldset',
         '#title' => $lists_options[$list_id],
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
       );
 
       $values = variable_get('micro_crm_campaignmonitor_list_' . $list_id, array());

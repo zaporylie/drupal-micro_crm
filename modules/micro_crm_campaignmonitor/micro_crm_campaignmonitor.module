@@ -19,9 +19,10 @@ function micro_crm_campaignmonitor_menu() {
     'file' => 'micro_crm_campaignmonitor.admin.inc',
   );
 
-  $items['micro_crm/newsletter/campaignmonitor'] = array(
+  $items['micro_crm/newsletter/campaignmonitor/%'] = array(
     'page callback' => 'micro_crm_campaignmonitor_webhook',
-    'access callback' => array('access content'),
+    'page arguments' => array(3),
+    'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
 
@@ -33,13 +34,43 @@ function micro_crm_campaignmonitor_menu() {
  */
 function micro_crm_campaignmonitor_micro_crm_channel_update($channel) {
   // @todo process data and send to campaign monitor.
+  if ($channel->type == 'email' && ((isset($channel->unsubscribe) && $channel->unsubscribe == TRUE) || $channel->status == MICRO_CRM_NEWSLETTER_CHANNEL_STATUS)) {
+    $queue = DrupalQueue::get('micro_crm_campaignmonitor');
+    $queue->createQueue();
+    $queue->createItem($channel);
+  }
 }
 
 /**
- * Implements hook_micro_crm_contact_update().
+ * Implements hook_cron_queue_info().
  */
-function micro_crm_campaignmonitor_micro_crm_contact_update($contact) {
-  // @todo process data and send to campaign monitor.
+function micro_crm_campaignmonitor_cron_queue_info() {
+  $queues['micro_crm_campaignmonitor'] = array(
+    'worker callback' => 'micro_crm_campaignmonitor_sync',
+    'time' => '30',
+  );
+  return $queues;
+}
+
+/**
+ *
+ */
+function micro_crm_campaignmonitor_sync($channel) {
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+  $contact = micro_crm_channel_load_contact(array($channel->channel_id));
+  $cm = CampaignMonitor::getConnector();
+  $email = $wrapper->field_micro_crm_email->value();
+  foreach (_micro_crm_campaignmonitor_get_lists() as $list_id) {
+    $custom_fields = _micro_crm_campaignmonitor_prepare_custom_fields($list_id, $channel);
+    if ($cm->isSubscribed($list_id, $email)) {
+
+    }
+    else {
+      if (!isset($channel->unsubscribe) || !$channel->unsubscribe) {
+        $cm->subscribe($list_id, $email, $custom_fields);
+      }
+    }
+  }
 }
 
 /**
@@ -48,4 +79,51 @@ function micro_crm_campaignmonitor_micro_crm_contact_update($contact) {
 function micro_crm_campaignmonitor_webhook() {
   // @todo load channel and update.
   // @todo load contact and update.
+}
+
+/**
+ *
+ */
+function _micro_crm_campaignmonitor_get_lists() {
+  $lists = array();
+
+  foreach(variable_get('micro_crm_campaignmonitor_lists', array()) as $list_id => $list) {
+    if ($list != 0) {
+      $lists[$list_id] = $list_id;
+    }
+  }
+
+  return $lists;
+}
+
+/**
+ *
+ */
+function _micro_crm_campaignmonitor_get_list($list_id) {
+  $list = array();
+  foreach (variable_get('micro_crm_campaignmonitor_list_' . $list_id, array()) as $field_name => $field) {
+    if (!$field['field_name']) {
+      continue;
+    }
+    $list[$field_name] = $field;
+  }
+  return $list;
+}
+
+/**
+ * @param $list_id
+ * @param $channel
+ * @return array
+ */
+function _micro_crm_campaignmonitor_prepare_custom_fields($list_id, $channel) {
+  $output = array();
+
+  $cm = CampaignMonitor::getConnector();
+  $list = $cm->getExtendedList($list_id);
+
+  foreach (_micro_crm_campaignmonitor_get_list($list_id) as $field) {
+
+  }
+
+  return $output;
 }
