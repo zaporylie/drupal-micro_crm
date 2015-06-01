@@ -5,12 +5,9 @@
  */
 
 /**
- * @param $form
- * @param $form_state
+ * Settings form.
  */
 function micro_crm_campaignmonitor_settings($form, &$form_state) {
-  $form['#prefix'] = '<div id="micro-crm-campiagnmonitor-settings-form">';
-  $form['#suffix'] = '</div>';
   $form['#tree'] = TRUE;
 
   // Create a block for each list.
@@ -30,7 +27,7 @@ function micro_crm_campaignmonitor_settings($form, &$form_state) {
     '#title' => t('Lists'),
     '#description' => t('Choose available lists'),
     '#options' => $lists_options,
-    '#default_values' => variable_get('micro_crm_campaignmonitor_lists', NULL),
+    '#default_value' => variable_get('micro_crm_campaignmonitor_lists', array()),
     '#ajax' => array(
       'callback' => 'micro_crm_campaignmonitor_list_callback',
       'method' => 'replace',
@@ -41,22 +38,74 @@ function micro_crm_campaignmonitor_settings($form, &$form_state) {
     $available_lists = array_values($form_state['values']['micro_crm_campaignmonitor_lists']);
   }
   else {
-    $available_lists = array();
+    $available_lists = variable_get('micro_crm_campaignmonitor_lists', array());
   }
+  $form['micro_crm_campaignmonitor']['#prefix'] = '<div id="micro-crm-campiagnmonitor-settings-form">';
+  $form['micro_crm_campaignmonitor']['#suffix'] = '</div>';
   foreach ($lists as $list_id => $list) {
-    $list = $cm->getExtendedList($list_id);
-    if (in_array($list_id, $available_lists)) {
-      $form['micro_crm_campaign_monitor'][$list_id] = array(
+    if (in_array($list_id, $available_lists, TRUE)) {
+      $list = $cm->getExtendedList($list_id);
+      $form['micro_crm_campaignmonitor'][$list_id] = array(
         '#type' => 'fieldset',
         '#title' => $lists_options[$list_id],
       );
+
+      $values = variable_get('micro_crm_campaignmonitor_list_' . $list_id, array());
+      $form['micro_crm_campaignmonitor'][$list_id]['Name']['field'] = array(
+        '#type' => 'select',
+        '#title' => 'Name',
+        '#description' => 'Text',
+        '#default_value' => isset($values['Name']['field']) ? $values['Name']['field'] : NULL,
+        '#options' => array(NULL => t('- Choose -')) + _micro_crm_newsletter_get_custom_fields(),
+      );
       foreach ($list['CustomFields'] as $custom_field) {
-        $form['micro_crm_campaign_monitor'][$list_id][$custom_field['Key']] = array(
+        $form['micro_crm_campaignmonitor'][$list_id][urlencode($custom_field['Key'])] = array(
+          '#type' => 'container',
+          '#attributes' => array(),
+        );
+        $form['micro_crm_campaignmonitor'][$list_id][urlencode($custom_field['Key'])]['field'] = array(
           '#type' => 'select',
           '#title' => $custom_field['FieldName'],
           '#description' => $custom_field['DataType'],
-          '#options' => array('_none' => t('- Choose -')) + _micro_crm_newsletter_get_custom_fields(),
+          '#default_value' => isset($values[urlencode($custom_field['Key'])]['field']) ? $values[urlencode($custom_field['Key'])]['field'] : NULL,
+          '#options' => array(NULL => t('- Choose -')) + _micro_crm_newsletter_get_custom_fields(),
         );
+        if (in_array($custom_field['DataType'], array('MultiSelectMany', 'MultiSelectOne')) && (isset($form_state['values']['micro_crm_campaignmonitor'][$list_id][urlencode($custom_field['Key'])]['field']) || isset($values[urlencode($custom_field['Key'])]['field']))) {
+
+          if (isset($form_state['values']['micro_crm_campaignmonitor'][$list_id][urlencode($custom_field['Key'])])) {
+            $field = field_info_field($form_state['values']['micro_crm_campaignmonitor'][$list_id][urlencode($custom_field['Key'])]['field']);
+          }
+          else {
+            $field = field_info_field($values[urlencode($custom_field['Key'])]['field']);
+          }
+
+          if (!in_array($field['module'], array('list', 'taxonomy'))) {
+            continue;
+          }
+
+          $instance = field_info_instance('micro_crm_contact', $field['field_name'], 'micro_crm_contact');
+          $type = str_replace('options_', '', $instance['widget']['type']);
+          $multiple = $field['cardinality'] > 1 || $field['cardinality'] == FIELD_CARDINALITY_UNLIMITED;
+          $required = FALSE;
+          $has_value = FALSE;
+          $properties = _options_properties($type, $multiple, $required, $has_value);
+
+          $form['micro_crm_campaignmonitor'][$list_id][urlencode($custom_field['Key'])]['map'] = array(
+            '#type' => 'fieldset',
+            '#title' => t('@field: Values map', array('@field' => $custom_field['FieldName'])),
+            '#attributes' => array(
+              'id' => 'micro_crm_campaignmonitor_list_' . $list_id . '_field_' . urlencode($custom_field['Key']),
+            ),
+          );
+          foreach ($custom_field['FieldOptions'] as $option) {
+            $form['micro_crm_campaignmonitor'][$list_id][urlencode($custom_field['Key'])]['map'][urlencode($option)] = array(
+              '#type' => 'select',
+              '#title' => $option,
+              '#default_value' => isset($values[urlencode($custom_field['Key'])]['map'][urlencode($option)]) ? $values[urlencode($custom_field['Key'])]['map'][urlencode($option)] : NULL,
+              '#options' => array(NULL => t('- Choose -')) + _options_get_options($field, $instance, $properties, 'micro_crm_contact', NULL),
+            );
+          }
+        }
       }
     }
   }
@@ -70,15 +119,20 @@ function micro_crm_campaignmonitor_settings($form, &$form_state) {
 }
 
 /**
- * Regenerates form if something will change.
+ * Settings form submit callback.
  */
-function micro_crm_campaignmonitor_list_callback($form, $form_state) {
-  return $form;
+function micro_crm_campaignmonitor_settings_submit($form, &$form_state) {
+  variable_set('micro_crm_campaignmonitor_lists', $form_state['values']['micro_crm_campaignmonitor_lists']);
+  foreach ($form_state['values']['micro_crm_campaignmonitor_lists'] as $list) {
+    if ($list !== 0) {
+      variable_set('micro_crm_campaignmonitor_list_' . $list, $form_state['values']['micro_crm_campaignmonitor'][$list]);
+    }
+  }
 }
 
 /**
- *
+ * Regenerates form if something will change.
  */
-function micro_crm_campaignmonitor_settigns_submit($form, &$form_state) {
-  variable_set('micro_crm_campaignmonitor_settings', $form_state['values']);
+function micro_crm_campaignmonitor_list_callback($form, $form_state) {
+  return $form['micro_crm_campaignmonitor'];
 }

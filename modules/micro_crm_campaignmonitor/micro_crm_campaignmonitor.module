@@ -32,14 +32,14 @@ function micro_crm_campaignmonitor_menu() {
  * Implements hook_micro_crm_channel_update().
  */
 function micro_crm_campaignmonitor_micro_crm_channel_update($channel) {
-  // @todo process date and send to campaign monitor.
+  // @todo process data and send to campaign monitor.
 }
 
 /**
  * Implements hook_micro_crm_contact_update().
  */
 function micro_crm_campaignmonitor_micro_crm_contact_update($contact) {
-  // @todo process date and send to campaign monitor.
+  // @todo process data and send to campaign monitor.
 }
 
 /**
