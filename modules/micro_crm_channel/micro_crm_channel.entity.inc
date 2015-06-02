@@ -116,8 +116,12 @@ function micro_crm_channel_load_contact($ids) {
     ->fieldCondition('field_micro_crm_channel', 'target_id', $ids, 'IN');
   $result = $query->execute();
 
-  if (!empty($result['micro_crm_contact'])) {
+  if (!empty($result['micro_crm_contact']) && count($result['micro_crm_contact']) > 1) {
     return entity_load('micro_crm_contact', array_keys($result['micro_crm_contact']));
+  }
+  elseif (!empty($result['micro_crm_contact']) && count($result['micro_crm_contact']) == 1) {
+    $entity = entity_load('micro_crm_contact', array_keys($result['micro_crm_contact']));
+    return reset($entity);
   }
   return NULL;
 }
