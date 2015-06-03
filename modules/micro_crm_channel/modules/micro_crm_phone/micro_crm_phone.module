@@ -77,6 +77,18 @@ function micro_crm_phone_micro_crm_channel_is_empty($channel) {
 }
 
 /**
+ * Implements hook_micro_crm_channel_set_value().
+ */
+function micro_crm_phone_micro_crm_channel_set_value(&$channel, $value) {
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+  if (!$wrapper->__isset('field_micro_crm_phone')) {
+    return FALSE;
+  }
+  $wrapper->field_micro_crm_phone->set($value);
+  return TRUE;
+}
+
+/**
  * Implements hook_micro_crm_channel_values_load().
  */
 function micro_crm_phone_micro_crm_channel_values_load($channel) {

@@ -107,6 +107,18 @@ function micro_crm_email_micro_crm_channel_values_load($channel) {
   }
 }
 
+/**
+ * Implements hook_micro_crm_channel_set_value().
+ */
+function micro_crm_email_micro_crm_channel_set_value(&$channel, $value) {
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+  if (!$wrapper->__isset('field_micro_crm_email')) {
+    return FALSE;
+  }
+  $wrapper->field_micro_crm_email->set($value);
+  return TRUE;
+}
+
 ///**
 // * Implements hook_micro_crm_channel_send().
 // */

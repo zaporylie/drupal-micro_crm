@@ -108,7 +108,7 @@ function micro_crm_channel_label($channel) {
 
 /**
  * @param $ids
- * @return null
+ * @return bool|mixed
  */
 function micro_crm_channel_load_contact($ids) {
   $query = new EntityFieldQuery();
@@ -123,7 +123,7 @@ function micro_crm_channel_load_contact($ids) {
     $entity = entity_load('micro_crm_contact', array_keys($result['micro_crm_contact']));
     return reset($entity);
   }
-  return NULL;
+  return entity_create('micro_crm_contact', array());
 }
 
 /**

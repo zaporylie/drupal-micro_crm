@@ -117,3 +117,23 @@ function micro_crm_contact_status_options_list() {
 
   return $options;
 }
+
+/**
+ * @param $contact
+ * @return bool
+ */
+function micro_crm_contact_get_channels($contact) {
+  if (!module_exists('micro_crm_channel')) {
+    return FALSE;
+  }
+  $wrapper = entity_metadata_wrapper('micro_crm_contact', $contact);
+  if (!$wrapper->__isset('field_micro_crm_channel')) {
+    return FALSE;
+  }
+
+  $tmp = array();
+  foreach ($wrapper->field_micro_crm_channel->getIterator() as $channel) {
+    $tmp[] = $channel->getIdentifier();
+  }
+  return $tmp;
+}

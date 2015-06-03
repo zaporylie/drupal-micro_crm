@@ -211,6 +211,30 @@ function micro_crm_channel_channel($channel) {
 }
 
 /**
+ * @param $channel
+ * @param $value
+ * @return bool
+ */
+function micro_crm_channel_set_value(&$channel, $value) {
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($channel->type) || !isset($entity['bundles'][$channel->type]['module'])) {
+    return FALSE;
+  }
+  // Getting module name.
+  $module = $entity['bundles'][$channel->type]['module'];
+  // Check if module implements hook.
+  $function = $module . '_micro_crm_channel_set_value';
+  if (!function_exists($function)) {
+    return FALSE;
+  }
+  // Avoide module_invoke to pass arguments by reference.
+  if ($return = $function($channel, $value)) {
+    return $return;
+  }
+  return FALSE;
+}
+
+/**
  * Checks if channel is unique.
  *
  * @param $bundle
