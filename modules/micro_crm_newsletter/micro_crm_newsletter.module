@@ -89,6 +89,7 @@ function micro_crm_newsletter_block_view($delta = '') {
     case 'newsletter':
       $block['subject'] = t('Newsletter');
       $block['content'] = drupal_get_form('micro_crm_newsletter_form');
+      $block['content']['#attached']['css'][] = drupal_get_path('module', 'micro_crm_newsletter') . '/micro_crm_newsletter.css';
       break;
   }
   return $block;
@@ -143,10 +144,19 @@ function _micro_crm_reset_required(&$value, $key) {
  * @param $form
  * @param $form_state
  */
-function micro_crm_newsletter_form_validate($form, &$form_state) {
-  foreach (_micro_crm_newsletter_get_channels() as $channel) {
+function micro_crm_newsletter_form_validate(&$form, &$form_state) {
+  $empty = 0;
+  $channels = _micro_crm_newsletter_get_channels();
+  foreach ($channels as $channel) {
     $entity = entity_create('micro_crm_channel', array('type' => $channel));
     field_attach_form_validate('micro_crm_channel', $entity, $form, $form_state);
+//    field_attach_submit('micro_crm_channel', $entity, $form, $form_state);
+    if (micro_crm_channel_is_empty($channel, $entity)) {
+      $empty += 1;
+    }
+  }
+    form_set_error(NULL, t('At least one channel field has to be filled'));
+  if ($empty == count(_micro_crm_newsletter_get_channels())) {
   }
 }
 

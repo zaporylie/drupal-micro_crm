@@ -2,25 +2,32 @@
 
 /**
  * @file
- * Holds Contact Entity schema.
+ * Holds Message Entity schema.
  */
 
 /**
  * Implements hook_schema().
  */
-function micro_crm_contact_schema() {
+function micro_crm_message_schema() {
 
-  $schema['micro_crm_contact'] = array(
-    'description' => 'Contact entity',
+  $schema['micro_crm_message'] = array(
+    'description' => 'message entity',
     'fields' => array(
-      'contact_id' => array(
+      'message_id' => array(
         'description' => 'The primary identifier for a table.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
+      'type' => array(
+        'description' => 'The type of this message.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
       'revision_id' => array(
-        'description' => 'The current {micro_crm_contact_revision}.revision_id version identifier.',
+        'description' => 'The current {micro_crm_message_revision}.revision_id version identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
@@ -42,7 +49,7 @@ function micro_crm_contact_schema() {
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
-        'default' => MICRO_CRM_CONTACT_STATUS_REGISTERED,
+        'default' => MICRO_CRM_MESSAGE_STATUS_REGISTERED,
       ),
       'token' => array(
         'description' => 'One-time token.',
@@ -64,26 +71,26 @@ function micro_crm_contact_schema() {
         'default' => '',
       ),
     ),
-    'primary key' => array('contact_id'),
+    'primary key' => array('message_id'),
     'unique keys' => array(
       'revision_id' => array('revision_id'),
       'token' => array('token'),
     ),
     'foreign keys' => array(
-      'micro_crm_contact_revision' => array(
-        'table' => 'micro_crm_contact_revision',
+      'micro_crm_message_revision' => array(
+        'table' => 'micro_crm_message_revision',
         'columns' => array('revision_id' => 'revision_id'),
       ),
     ),
     'indexes' => array(
-      'micro_crm_contact_id' => array('contact_id'),
+      'micro_crm_message_id' => array('message_id'),
       'micro_crm_status' => array('status'),
       'language' => array('language'),
     ),
   );
-  
-  $schema['micro_crm_contact_revision'] = array(
-    'description' => 'Contact entity revision',
+
+  $schema['micro_crm_message_revision'] = array(
+    'description' => 'message entity revision',
     'fields' => array(
       'revision_id' => array(
         'description' => 'The primary identifier for a table.',
@@ -91,8 +98,8 @@ function micro_crm_contact_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'contact_id' => array(
-        'description' => 'Parent {micro_crm_contact}.contact_id contact identifier.',
+      'message_id' => array(
+        'description' => 'Parent {micro_crm_message}.message_id message identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
@@ -132,31 +139,31 @@ function micro_crm_contact_schema() {
     ),
     'primary key' => array('revision_id'),
     'foreign keys' => array(
-      'micro_crm_contact' => array(
-        'table' => 'micro_crm_contact',
-        'columns' => array('contact_id' => 'contact_id'),
+      'micro_crm_message' => array(
+        'table' => 'micro_crm_message',
+        'columns' => array('message_id' => 'message_id'),
       ),
     ),
     'indexes' => array(
-      'contact_id' => array('contact_id'),
+      'message_id' => array('message_id'),
     ),
   );
-  
+
   return $schema;
 }
 
 /**
  * Implements hook_install().
  */
-function micro_crm_contact_install() {
+function micro_crm_message_install() {
 
 }
 
 /**
  * Implements hook_uninstall().
  */
-function micro_crm_contact_uninstall() {
+function micro_crm_message_uninstall() {
 
-  $results = db_query('SELECT {contact_id} FROM micro_crm_contact')->fetchCol();
-  micro_crm_contact_delete_multiple($results);
+  $results = db_query('SELECT {message_id} FROM micro_crm_message')->fetchCol();
+  micro_crm_message_delete_multiple($results);
 }

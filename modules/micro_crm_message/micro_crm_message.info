@@ -1,0 +1,3 @@
+name = Micro CRM Message module
+description = Allows to create and send message via channel
+core = 7.x
