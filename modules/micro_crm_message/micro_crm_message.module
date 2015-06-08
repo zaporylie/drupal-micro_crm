@@ -1,0 +1,141 @@
+<?php
+
+/**
+ * @file
+ *
+ */
+
+define('MICRO_CRM_MESSAGE_STATUS_REGISTERED', 'registered');
+define('MICRO_CRM_MESSAGE_STATUS_SENT', 'sent');
+
+module_load_include('inc', 'micro_crm_message', 'micro_crm_message.entity');
+
+/**
+ * Implements hook_views_api().
+ */
+function micro_crm_message_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'micro_crm_message') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_hook_info().
+ */
+function micro_crm_message_hook_info() {
+  $hooks = array(
+    'micro_crm_message_status_info' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_message_status_info_alter' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_message_uri' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_message_view' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_message_presave' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_message_update' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_message_insert' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_message_delete' => array(
+      'group' => 'micro_crm',
+    ),
+    'micro_crm_message_send' => array(
+      'group' => 'micro_crm',
+    ),
+  );
+  return $hooks;
+}
+
+/**
+ * Implements hook_micro_crm_message_status_info().
+ */
+function micro_crm_message_micro_crm_message_status_info() {
+  $status = array();
+
+  $status[MICRO_CRM_MESSAGE_STATUS_REGISTERED] = array(
+    'title' => t('Registered'),
+    'description' => t('Registered, unprocessed message'),
+    'weight' => -99,
+  );
+
+  $status[MICRO_CRM_MESSAGE_STATUS_SENT] = array(
+    'title' => t('Sent'),
+    'description' => t('Message has been sent'),
+    'weight' => -99,
+  );
+
+  return $status;
+}
+
+/**
+ * Returns all statuses message declared by modules.
+ *
+ * @return array
+ *   List of statuses
+ */
+function micro_crm_message_statuses() {
+  // First check the static cache for an order states array.
+  $statuses = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the statuses now.
+  if (empty($statuses)) {
+    $statuses = module_invoke_all('micro_crm_message_status_info');
+
+    // Give other modules a chance to alter the order states.
+    drupal_alter('micro_crm_message_status_info', $statuses);
+
+    uasort($statuses, 'drupal_sort_weight');
+  }
+
+  return $statuses;
+}
+
+/**
+ * Returns list of available statuses.
+ */
+function micro_crm_message_status_options_list() {
+
+  $options = array();
+
+  foreach (micro_crm_message_statuses() as $key => $status) {
+    $options[$key] = $status['title'];
+  }
+
+  return $options;
+}
+
+/**
+ * @param $message
+ */
+function micro_crm_message_send($message) {
+  if (!isset($message->type)) {
+    return FALSE;
+  }
+  $type = $message->type;
+  $entity = entity_get_info('micro_crm_message');
+  if (!isset($type) || !isset($entity['bundles'][$type]['module'])) {
+    return FALSE;
+  }
+  $module = $entity['bundles'][$type]['module'];
+  if ($value = module_invoke($module, 'micro_crm_message_send', $message)) {
+    // @todo change status and save.
+    if ($value == TRUE) {
+      $message->status = MICRO_CRM_MESSAGE_STATUS_SENT;
+      $message->revision = TRUE;
+      $message->log = 'Message ' . $message->message_id . ' has been sent';
+      entity_save('micro_crm_message', $message);
+    }
+    return $value;
+  }
+  return FALSE;
+}

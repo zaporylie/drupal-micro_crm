@@ -48,7 +48,7 @@ function micro_crm_channel_entity_info() {
  *
  */
 function micro_crm_channel_access($op, $entity = NULL, $account = NULL) {
-  return entity_get_controller('micro_crm_contact')->access($op, $entity, $account);
+  return entity_get_controller('micro_crm_channel')->access($op, $entity, $account);
 }
 
 /**
@@ -96,14 +96,24 @@ function micro_crm_channel_view($channel) {
  *
  */
 function micro_crm_channel_uri($channel) {
-
+  return array(
+    'path' => 'admin/people/micro_crm/channel/' . $channel->channel_id,
+  );
 }
 
 /**
  *
  */
 function micro_crm_channel_label($channel) {
-
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($channel->type) || !isset($entity['bundles'][$channel->type]['module'])) {
+    return NULL;
+  }
+  $module = $entity['bundles'][$channel->type]['module'];
+  if ($value = module_invoke($module, 'micro_crm_channel_label', $channel)) {
+    return $value;
+  }
+  return NULL;
 }
 
 /**

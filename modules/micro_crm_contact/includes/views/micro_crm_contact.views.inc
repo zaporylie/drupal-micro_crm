@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Export crm contact to Views.
+ * Export CRM Contact to Views.
  */
 
 /**

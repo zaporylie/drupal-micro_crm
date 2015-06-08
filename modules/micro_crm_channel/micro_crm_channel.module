@@ -45,6 +45,9 @@ function micro_crm_channel_hook_info() {
     'micro_crm_channel_delete' => array(
       'group' => 'micro_crm',
     ),
+    'micro_crm_channel_label' => array(
+      'group' => 'micro_crm',
+    ),
     'micro_crm_channel_channel' => array(
       'group' => 'micro_crm',
     ),
@@ -204,7 +207,7 @@ function micro_crm_channel_channel($channel) {
     return NULL;
   }
   $module = $entity['bundles'][$channel->type]['module'];
-  if ($value = module_invoke($module, 'micro_crm_channel_channel', $channel)) {
+  if ($value = module_invoke($module, 'micro_crm_channel_label', $channel)) {
     return $value;
   }
   return NULL;
