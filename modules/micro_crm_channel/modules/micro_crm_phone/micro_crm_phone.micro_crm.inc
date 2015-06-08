@@ -5,7 +5,7 @@
  *
  * @see micro_crm_message_send().
  */
-function micro_crm_email_micro_crm_message_send($message) {
+function micro_crm_phone_micro_crm_message_send($message) {
   $wrapper = entity_metadata_wrapper('micro_crm_message', $message);
   if (!$wrapper->__isset('crm_message_phone') || !$wrapper->crm_message_phone->value()) {
     return FALSE;
