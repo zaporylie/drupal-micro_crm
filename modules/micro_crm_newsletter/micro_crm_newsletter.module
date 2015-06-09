@@ -59,6 +59,17 @@ function micro_crm_newsletter_block_info() {
 }
 
 /**
+ * Implements hook_hook_info().
+ */
+function micro_crm_newsletter_hook_info() {
+  return array(
+    'micro_crm_newsletter_prepare_message' => array(
+      'group' => 'micro_crm',
+    ),
+  );
+}
+
+/**
  * Implements hook_permission().
  */
 function micro_crm_newsletter_permission() {
@@ -377,9 +388,35 @@ function micro_crm_newsletter_micro_crm_channel_update($channel) {
     }
     elseif ($method == MICRO_CRM_NEWSLETTER_UNSUBSCRIBE_DOUBLE_OPT_IN) {
       // @todo: send message here
-      drupal_set_message(t('!channel: Message has been sent. Click on the confirmation link to complete.', array('!channel' => micro_crm_channel_channel($channel))), 'warning');
+      if (($message = micro_crm_newsletter_prepare_message($channel)) && micro_crm_message_send($message)) {
+        drupal_set_message(t('!channel: Message has been sent. Click on the confirmation link to complete.', array('!channel' => micro_crm_channel_label($channel))), 'warning');
+      }
+      else {
+        drupal_set_message(t('!channel: Unable to send message. Try again.', array('!channel' => micro_crm_channel_label($channel))), 'error');
+      }
     }
   }
+}
+
+/**
+ *
+ */
+function micro_crm_newsletter_prepare_message($channel) {
+  if (!isset($channel->type)) {
+    return FALSE;
+  }
+  $type = $channel->type;
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($type) || !isset($entity['bundles'][$type]['module'])) {
+    return FALSE;
+  }
+  $module = $entity['bundles'][$type]['module'];
+  if ($message = module_invoke($module, 'micro_crm_newsletter_prepare_message', $channel)) {
+    $message->log = 'Channel unsubscribe request';
+    entity_save('micro_crm_message', $message);
+    return $message;
+  }
+  return FALSE;
 }
 
 /**

@@ -137,9 +137,14 @@ function micro_crm_message_ui_send($form, &$form_state, $message) {
  */
 function micro_crm_message_ui_send_submit($form, &$form_state) {
   $message_id = entity_id('micro_crm_message', $form_state['values']['message']);
+  $uri = entity_uri('micro_crm_message', $form_state['values']['message']);
   if (micro_crm_message_send($form_state['values']['message']) !== FALSE) {
-    drupal_set_message(t('Message @message has been sent', array('@message' => $message_id)));
+    drupal_set_message(t('Message (@message) has been sent', array('@message' => $message_id)));
   }
+  else {
+    drupal_set_message(t('Unable to send message (@message)', array('@message' => $message_id)), 'error');
+  }
+  $form_state['redirect'] = $uri['path'];
 }
 
 /**

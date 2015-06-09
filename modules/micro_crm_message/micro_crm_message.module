@@ -57,6 +57,18 @@ function micro_crm_message_hook_info() {
 }
 
 /**
+ * Implements hook_micro_crm_message_update().
+ */
+function micro_crm_message_micro_crm_message_update($message) {
+  if (isset($message->original->status) && $message->original->status == MICRO_CRM_MESSAGE_STATUS_REGISTERED && $message->status == MICRO_CRM_MESSAGE_STATUS_SENT) {
+    watchdog('micro_crm_message', 'Message (message_id: @message) has been sent', array('@message' => $message->message_id), WATCHDOG_NOTICE, l('view', 'admin/people/micro_crm/message/' . $message->message_id));
+  }
+  else {
+    watchdog('micro_crm_message', 'Message (message_id: @message) has been saved', array('@message' => $message->message_id), WATCHDOG_NOTICE, l('view', 'admin/people/micro_crm/message/' . $message->message_id));
+  }
+}
+
+/**
  * Implements hook_micro_crm_message_status_info().
  */
 function micro_crm_message_micro_crm_message_status_info() {

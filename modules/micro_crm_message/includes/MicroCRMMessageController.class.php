@@ -49,7 +49,7 @@ class MicroCRMMessageController extends EntityAPIController {
     if ($op !== 'create' && !$entity) {
       return FALSE;
     }
-    if ($op == 'send' && $entity->status == MICRO_CRM_MESSAGE_STATUS_SENT) {
+    if (!in_array($op, array('create', 'view')) && $entity->status == MICRO_CRM_MESSAGE_STATUS_SENT) {
       return FALSE;
     }
     // The administer permission is a blanket override.
@@ -74,7 +74,7 @@ class MicroCRMMessageController extends EntityAPIController {
   /**
    * Overrides EntityAPIController::view().
    */
-  public function view($entities, $view_mode = 'summary', $langcode = NULL, $page = NNULL) {
+  public function view($entities, $view_mode = 'customer', $langcode = NULL, $page = NULL) {
     return parent::view($entities, $view_mode, $langcode, $page);
   }
 

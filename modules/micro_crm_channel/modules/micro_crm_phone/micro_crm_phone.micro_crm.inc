@@ -10,12 +10,16 @@ function micro_crm_phone_micro_crm_message_send($message) {
   if (!$wrapper->__isset('crm_message_phone') || !$wrapper->crm_message_phone->value()) {
     return FALSE;
   }
-  if (!$wrapper->__isset('crm_message_phone_body') || !($body = $wrapper->crm_message_phone_body->value())) {
+  if (!$wrapper->__isset('crm_message_phone_body') || !($message = $wrapper->crm_message_phone_body->value())) {
     return FALSE;
   }
-  // @todo: Send message here.
-
-  return FALSE;
+  if (!$wrapper->__isset('crm_message_phone_body') || !($number = $wrapper->crm_message_phone->field_micro_crm_phone->value())) {
+    return FALSE;
+  }
+  if (!function_exists('sms_send')) {
+    return FALSE;
+  }
+  return sms_send($number, $message, array('message_id' => $wrapper->getIdentifier()));
 }
 
 /**
@@ -27,4 +31,21 @@ function micro_crm_phone_micro_crm_channel_label($channel) {
     return NULL;
   }
   return $wrapper->field_micro_crm_phone->value();
+}
+
+/**
+ * Implements hook_micro_crm_newsletter_prepare_message().
+ */
+function micro_crm_phone_micro_crm_newsletter_prepare_message($channel) {
+  $message = entity_create('micro_crm_message', array('type' => 'phone'));
+  $wrapper = entity_metadata_wrapper('micro_crm_message', $message);
+  if (!$wrapper->__isset('crm_message_phone')) {
+    return FALSE;
+  }
+  if (!$wrapper->__isset('crm_message_phone_body')) {
+    return FALSE;
+  }
+  $wrapper->crm_message_phone->set($channel);
+  $wrapper->crm_message_phone_body->set(t("Thank you for being with us. Click to confirm @button", array('@button' => url('micro_crm/newsletter/unsubscribe/' . $channel->token, array('absolute' => TRUE)))));
+  return $message;
 }

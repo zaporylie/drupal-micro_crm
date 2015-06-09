@@ -90,15 +90,15 @@ function micro_crm_message_view($message, $view_mode = 'customer') {
   if (!is_array($message)) {
     $message = array($message->message_id => $message);
   }
-  return entity_get_controller('micro_crm_contact')->view($message, $view_mode);
+  return entity_get_controller('micro_crm_message')->view($message, $view_mode);
 }
 
 /**
- *
+ * @todo: Move uri to UI module.
  */
 function micro_crm_message_uri($message) {
   return array(
-    'path' => 'admin/people/micro_crm/message/' . $message->message_id,
+    'path' => 'admin/people/micro_crm/message/' . $message->message_id . '/view',
   );
 }
 
