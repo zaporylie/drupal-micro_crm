@@ -62,6 +62,17 @@ function micro_crm_channel_hook_info() {
 }
 
 /**
+ * Implements hook_views_api().
+ */
+function micro_crm_channel_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'micro_crm_channel') . '/includes/views',
+  );
+}
+
+
+/**
  * Implements hook_micro_crm_channel_state_info().
  */
 function micro_crm_channel_micro_crm_channel_state_info() {

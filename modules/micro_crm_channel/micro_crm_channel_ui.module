@@ -19,6 +19,14 @@ function micro_crm_channel_ui_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['admin/people/micro_crm/channel'] = array(
+    'title' => 'Channel',
+    'page callback' => 'micro_crm_index',
+    'page arguments' => array(),
+    'access arguments' => array('micro crm manage'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   foreach (micro_crm_channel_types() as $type => $bundle) {
     $type_arg = strtr($type, '_', '-');
     $items['admin/people/micro_crm/config/channel/' . $type_arg] = array(
