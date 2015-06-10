@@ -61,10 +61,17 @@ function micro_crm_phone_install() {
  * Implements hook_uninstall().
  */
 function micro_crm_phone_uninstall() {
-  $instance = array(
-    'entity_type' => 'micro_crm_channel',
-    'bundle' => 'phone',
-    'field_name' => 'field_micro_crm_phone',
-  );
-  field_delete_instance($instance);
+  if ($instance = field_info_instance('micro_crm_channel', 'field_micro_crm_phone', 'phone')) {
+    field_delete_instance($instance);
+  }
+
+  if ($instance = field_info_instance('micro_crm_message', 'crm_message_phone', 'phone')) {
+    field_delete_instance($instance);
+  }
+
+  if ($instance = field_info_instance('micro_crm_message', 'crm_message_phone_body', 'phone')) {
+    field_delete_instance($instance);
+  }
+
+  variable_del('micro_crm_channel_ui_phone_newsletter');
 }

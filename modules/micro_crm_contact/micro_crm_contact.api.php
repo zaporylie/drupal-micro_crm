@@ -61,3 +61,10 @@ function hook_micro_crm_contact_uri($contact) {
 function hook_micro_crm_contact_presave($contact) {
   // No example.
 }
+
+/**
+ * @param $contact
+ */
+function hook_micro_crm_contact_update($contact) {
+  // No example.
+}

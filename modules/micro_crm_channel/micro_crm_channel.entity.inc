@@ -48,7 +48,7 @@ function micro_crm_channel_entity_info() {
  *
  */
 function micro_crm_channel_access($op, $entity = NULL, $account = NULL) {
-  return entity_get_controller('micro_crm_contact')->access($op, $entity, $account);
+  return entity_get_controller('micro_crm_channel')->access($op, $entity, $account);
 }
 
 /**
@@ -96,19 +96,29 @@ function micro_crm_channel_view($channel) {
  *
  */
 function micro_crm_channel_uri($channel) {
-
+  return array(
+    'path' => 'admin/people/micro_crm/channel/' . $channel->channel_id,
+  );
 }
 
 /**
  *
  */
 function micro_crm_channel_label($channel) {
-
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($channel->type) || !isset($entity['bundles'][$channel->type]['module'])) {
+    return NULL;
+  }
+  $module = $entity['bundles'][$channel->type]['module'];
+  if ($value = module_invoke($module, 'micro_crm_channel_label', $channel)) {
+    return $value;
+  }
+  return NULL;
 }
 
 /**
  * @param $ids
- * @return null
+ * @return bool|mixed
  */
 function micro_crm_channel_load_contact($ids) {
   $query = new EntityFieldQuery();
@@ -116,10 +126,14 @@ function micro_crm_channel_load_contact($ids) {
     ->fieldCondition('field_micro_crm_channel', 'target_id', $ids, 'IN');
   $result = $query->execute();
 
-  if (!empty($result['micro_crm_contact'])) {
+  if (!empty($result['micro_crm_contact']) && count($result['micro_crm_contact']) > 1) {
     return entity_load('micro_crm_contact', array_keys($result['micro_crm_contact']));
   }
-  return NULL;
+  elseif (!empty($result['micro_crm_contact']) && count($result['micro_crm_contact']) == 1) {
+    $entity = entity_load('micro_crm_contact', array_keys($result['micro_crm_contact']));
+    return reset($entity);
+  }
+  return entity_create('micro_crm_contact', array());
 }
 
 /**

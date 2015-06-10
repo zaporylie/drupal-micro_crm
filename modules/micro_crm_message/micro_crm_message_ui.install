@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_install().
+ */
+function micro_crm_message_ui_install() {
+  db_update('system')
+    ->fields(array('weight' => 1001))
+    ->condition('name', 'micro_crm_message_ui', '=')
+    ->execute();
+}

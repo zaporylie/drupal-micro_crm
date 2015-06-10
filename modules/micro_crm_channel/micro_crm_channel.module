@@ -45,6 +45,9 @@ function micro_crm_channel_hook_info() {
     'micro_crm_channel_delete' => array(
       'group' => 'micro_crm',
     ),
+    'micro_crm_channel_label' => array(
+      'group' => 'micro_crm',
+    ),
     'micro_crm_channel_channel' => array(
       'group' => 'micro_crm',
     ),
@@ -57,6 +60,17 @@ function micro_crm_channel_hook_info() {
   );
   return $hooks;
 }
+
+/**
+ * Implements hook_views_api().
+ */
+function micro_crm_channel_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'micro_crm_channel') . '/includes/views',
+  );
+}
+
 
 /**
  * Implements hook_micro_crm_channel_state_info().
@@ -204,10 +218,34 @@ function micro_crm_channel_channel($channel) {
     return NULL;
   }
   $module = $entity['bundles'][$channel->type]['module'];
-  if ($value = module_invoke($module, 'micro_crm_channel_channel', $channel)) {
+  if ($value = module_invoke($module, 'micro_crm_channel_label', $channel)) {
     return $value;
   }
   return NULL;
+}
+
+/**
+ * @param $channel
+ * @param $value
+ * @return bool
+ */
+function micro_crm_channel_set_value(&$channel, $value) {
+  $entity = entity_get_info('micro_crm_channel');
+  if (!isset($channel->type) || !isset($entity['bundles'][$channel->type]['module'])) {
+    return FALSE;
+  }
+  // Getting module name.
+  $module = $entity['bundles'][$channel->type]['module'];
+  // Check if module implements hook.
+  $function = $module . '_micro_crm_channel_set_value';
+  if (!function_exists($function)) {
+    return FALSE;
+  }
+  // Avoide module_invoke to pass arguments by reference.
+  if ($return = $function($channel, $value)) {
+    return $return;
+  }
+  return FALSE;
 }
 
 /**
@@ -255,6 +293,7 @@ function micro_crm_channel_token_access_callback($channel) {
   if (isset($channel->token) && isset($channel->token_created) && (REQUEST_TIME - $channel->token_created < MICRO_CRM_CHANNEL_TOKEN_VALIDATION_INTERVAL)) {
     return TRUE;
   }
+  drupal_set_message(t('One-time link expired.'), 'warning', FALSE);
   return FALSE;
 }
 

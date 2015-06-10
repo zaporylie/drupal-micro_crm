@@ -77,6 +77,23 @@ function micro_crm_channel_views_data() {
     ),
   );
 
+  $data['micro_crm_channel']['label'] = array(
+    'title' => t('Label'),
+    'help' => t('Provides a rendered channel label.'),
+    'field' => array(
+      'handler' => 'micro_crm_channel_handler_field_channel_label',
+    ),
+  );
+
+  // Expose links to operate on the product.
+  $data['micro_crm_channel']['operations'] = array(
+    'title' => t('Operations links'),
+    'help' => t('Display all the available operations links for the contact.'),
+    'field' => array(
+      'handler' => 'micro_crm_channel_handler_field_channel_operations',
+    ),
+  );
+
   /**
    * Integrate the channel revision table.
    */

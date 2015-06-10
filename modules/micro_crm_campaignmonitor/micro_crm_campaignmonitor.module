@@ -1,0 +1,438 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function micro_crm_campaignmonitor_menu() {
+  $items = array();
+
+  $items['admin/people/micro_crm/config/newsletter/campaignmonitor'] = array(
+    'title' => 'Campaign Monitor',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('micro_crm_campaignmonitor_settings'),
+    'access arguments' => array('micro crm manage'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'micro_crm_campaignmonitor.admin.inc',
+  );
+
+  $items['admin/people/micro_crm/config/newsletter/campaignmonitor/settings'] = array(
+    'title' => 'Campaign Monitor',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('micro_crm_campaignmonitor_settings'),
+    'access arguments' => array('micro crm manage'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'micro_crm_campaignmonitor.admin.inc',
+  );
+
+  $items['admin/people/micro_crm/config/newsletter/campaignmonitor/webhooks'] = array(
+    'title' => 'Webhooks',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('micro_crm_campaignmonitor_webhooks'),
+    'access arguments' => array('micro crm manage'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'micro_crm_campaignmonitor.admin.inc',
+  );
+
+  $items['micro_crm/newsletter/campaignmonitor/%'] = array(
+    'page callback' => 'micro_crm_campaignmonitor_webhook',
+    'page arguments' => array(3),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function micro_crm_campaignmonitor_libraries_info() {
+  $libraries['campaignmonitor'] = array(
+    'name' => 'Campaign Monitor',
+    'vendor url' => 'http://campaignmonitor.com',
+    'download url' => 'https://github.com/campaignmonitor/createsend-php/zipball/master',
+    'version' => 'master',
+    'files' => array(
+      'php' => array('csrest_general.php', 'csrest_clients.php', 'csrest_subscribers.php', 'csrest_lists.php'),
+    ),
+  );
+  return $libraries;
+}
+
+/**
+ * Implements hook_micro_crm_channel_update().
+ */
+function micro_crm_campaignmonitor_micro_crm_channel_update($channel) {
+  if ($channel->type == 'email' && ((isset($channel->unsubscribe) && $channel->unsubscribe == TRUE) || (isset($channel->subscribe) && $channel->subscribe == TRUE) || (isset($channel->newsletter_confirmation) && $channel->newsletter_confirmation == TRUE))) {
+    $queue = DrupalQueue::get('micro_crm_campaignmonitor');
+    $queue->createQueue();
+    $queue->createItem($channel);
+    watchdog('micro_crm_campaignmonitor', 'Channel (@channel) has been added to Campaign Monitor sync queue.', array('@channel' => $channel->channel_id), WATCHDOG_NOTICE);
+  }
+}
+
+/**
+ * Implements hook_cron_queue_info().
+ */
+function micro_crm_campaignmonitor_cron_queue_info() {
+  $queues['micro_crm_campaignmonitor'] = array(
+    'worker callback' => 'micro_crm_campaignmonitor_sync',
+    'time' => '30',
+  );
+  return $queues;
+}
+
+/**
+ * Sync callback.
+ */
+function micro_crm_campaignmonitor_sync($channel_old) {
+
+  if (isset($channel_old->campaignmonitor_webhook) && $channel_old->campaignmonitor_webhook == TRUE) {
+    return FALSE;
+  }
+
+  // Load the latest version of channel.
+  $channel = micro_crm_channel_load($channel_old->channel_id);
+
+  // Compare if channel in queue is the latest one.
+  if ($channel->revision_id > $channel_old->revision_id) {
+    return FALSE;
+  }
+  $queue = DrupalQueue::get('micro_crm_campaignmonitor');
+
+  // Load channel into wrapper.
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+  // Load contact.
+  $contact = micro_crm_channel_load_contact(array($channel->channel_id));
+
+  // Connect to Campaign Monitor API.
+  $cm = CampaignMonitor::getConnector();
+
+  // Get e-mail address from channel object.
+  $email = $wrapper->field_micro_crm_email->value();
+
+  // Iterate all available lists.
+  foreach (_micro_crm_campaignmonitor_get_lists() as $list_id) {
+
+    // Check if e-mail is subscribed.
+    if ($cm->isSubscribed($list_id, $email)) {
+      if ($channel->status == MICRO_CRM_NEWSLETTER_CHANNEL_STATUS) {
+        // Prepare custom fields.
+        $custom_fields = _micro_crm_campaignmonitor_prepare_custom_fields($list_id, $contact);
+        $name = _micro_crm_campaignmonitor_retrieve_name_from_custom_fields($custom_fields);
+        // Update.
+        if (!$cm->subscribe($list_id, $email, $name, array_values($custom_fields))) {
+          $queue->createItem($channel);
+          watchdog('micro_crm_campaignmonitor', 'Unable to send request for channel (@channel) to Campaign Monitor right now. Re-added to queue.', array('@channel' => $channel->channel_id), WATCHDOG_ALERT);
+        }
+        else {
+
+          watchdog('micro_crm_campaignmonitor', 'Channel (@channel) has been successfully synchronized to Campaign Monitor.', array('@channel' => $channel->channel_id), WATCHDOG_NOTICE);
+        }
+      }
+      else {
+        // Unsubscribe.
+        if (!$cm->unsubscribe($list_id, $email)) {
+          $queue->createItem($channel);
+          watchdog('micro_crm_campaignmonitor', 'Unable to send request for channel (@channel) to Campaign Monitor right now. Re-added to queue.', array('@channel' => $channel->channel_id), WATCHDOG_ALERT);
+        }
+        else {
+
+          watchdog('micro_crm_campaignmonitor', 'Channel (@channel) has been successfully synchronized to Campaign Monitor.', array('@channel' => $channel->channel_id), WATCHDOG_NOTICE);
+        }
+      }
+    }
+    else {
+      if ($channel->status == MICRO_CRM_NEWSLETTER_CHANNEL_STATUS) {
+        // Prepare custom fields.
+        $custom_fields = _micro_crm_campaignmonitor_prepare_custom_fields($list_id, $contact);
+        $name = _micro_crm_campaignmonitor_retrieve_name_from_custom_fields($custom_fields);
+        // Subscribe.
+        if (!$cm->subscribe($list_id, $email, $name, array_values($custom_fields))) {
+          $queue->createItem($channel);
+          watchdog('micro_crm_campaignmonitor', 'Unable to send request for channel (@channel) to Campaign Monitor right now. Re-added to queue.', array('@channel' => $channel->channel_id), WATCHDOG_ALERT);
+        }
+        else {
+
+          watchdog('micro_crm_campaignmonitor', 'Channel (@channel) has been successfully synchronized to Campaign Monitor.', array('@channel' => $channel->channel_id), WATCHDOG_NOTICE);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * @todo: Encapsulate singe event process.
+ * @todo: consider using Queue.
+ * @todo: Add IP address access validation.
+ * @todo: Check inline todo's.
+ */
+function micro_crm_campaignmonitor_webhook($type) {
+  $data = file_get_contents('php://input');
+  $response = json_decode($data);
+  watchdog('micro_crm_campaignmonitor', print_r($response, TRUE), array(), WATCHDOG_NOTICE);
+  if (!isset($response->ListID)) {
+    return FALSE;
+  }
+  if (!($map = _micro_crm_campaignmonitor_get_list($response->ListID))) {
+    return FALSE;
+  }
+  if (empty($map)) {
+    return FALSE;
+  }
+  // Connect to Campaign Monitor API.
+  $cm = CampaignMonitor::getConnector();
+  if (!$cm) {
+    return FALSE;
+  }
+  if (!($list = $cm->getExtendedList($response->ListID))) {
+    return FALSE;
+  }
+  if (!isset($response->Events)) {
+    return FALSE;
+  }
+  foreach ($response->Events as $item) {
+    $entity = entity_create('micro_crm_channel', array('type' => 'email'));
+
+    if (isset($item->OldEmailAddress) && ($item->OldEmailAddress <> $item->EmailAddress)) {
+      micro_crm_channel_set_value($entity, $item->OldEmailAddress);
+      if ($channel = micro_crm_channel_values_load($entity)) {
+        $channel->log = 'Default e-mail address for campaign monitor campaign has been changed';
+        $channel->status = MICRO_CRM_CHANNEL_STATUS_REGISTERED;
+        $channel->revision = TRUE;
+        entity_save('micro_crm_channel', $channel);
+        // @todo: merge if different contact.
+      }
+      else {
+        $new_entity = entity_create('micro_crm_channel', array('type' => 'email'));
+        micro_crm_channel_set_value($new_entity, $item->OldEmailAddress);
+        $new_entity->log = 'New email address came from Campaign Monitor';
+        $new_entity->status = MICRO_CRM_CHANNEL_STATUS_REGISTERED;
+        $new_entity->revision = TRUE;
+        entity_save('micro_crm_channel', $new_entity);
+      }
+    }
+
+    micro_crm_channel_set_value($entity, $item->EmailAddress);
+    if (!($channel = micro_crm_channel_values_load($entity))) {
+      $channel = $entity;
+    }
+
+    $channel->campaignmonitor_webhook = TRUE;
+    $channel->revision = TRUE;
+    $channel->log = 'Channel updated by Campaign Monitor webhook';
+    if ($item->Type == 'Subscribe') {
+      $channel->status = MICRO_CRM_NEWSLETTER_CHANNEL_STATUS;
+    }
+    elseif (isset($item->State) && $item->State == 'Active') {
+      $channel->status = MICRO_CRM_NEWSLETTER_CHANNEL_STATUS;
+    }
+    else {
+      $channel->status = MICRO_CRM_CHANNEL_STATUS_REGISTERED;
+    }
+
+    try {
+      entity_save('micro_crm_channel', $channel);
+    }
+    catch (Exception $e) {
+      watchdog_exception('micro_crm_campaignmonitor', $e);
+    }
+
+    $contact = micro_crm_channel_load_contact(array($channel->channel_id));
+    $wrapper = entity_metadata_wrapper('micro_crm_contact', $contact);
+
+    if (isset($map['Name']['field']) && $wrapper->__isset($map['Name']['field']) && $item->Name) {
+      $wrapper->$map['Name']['field']->set($item->Name);
+    }
+    foreach (_micro_crm_campaignmonitor_keyed_custom_fields($item->CustomFields) as $custom_field => $value) {
+      $field_key = NULL;
+      foreach ($list['CustomFields'] as $k => $v) {
+        if ($v['FieldName'] == $custom_field) {
+          $field_key = urlencode($k);
+          break;
+        }
+      }
+      if (!isset($field_key)) {
+        continue;
+      }
+      if (!isset($map[$field_key]['field'])) {
+        continue;
+      }
+      if (!$wrapper->__isset($map[$field_key]['field'])) {
+        continue;
+      }
+
+      if (method_exists($wrapper->{$map[$field_key]['field']}, 'count')) {
+        if (!isset($map[$field_key]['map'])) {
+          continue;
+        }
+        // First remove all known values.
+        foreach ($wrapper->{$map[$field_key]['field']}->getIterator() as $k => $v) {
+          if (in_array($v->raw(), array_values($map[$field_key]['map']))) {
+            $wrapper->{$map[$field_key]['field']}[$k]->set(NULL);
+          }
+        }
+        $values = array();
+        foreach ($value as $v) {
+          if (isset($map[$field_key]['map'][urlencode($v)]) && !empty($map[$field_key]['map'][urlencode($v)])) {
+            $values[] = $map[$field_key]['map'][urlencode($v)];
+          }
+        }
+        $wrapper->{$map[$field_key]['field']}->set($values);
+
+      }
+      else {
+        $value = isset($map[$field_key]['map'][urlencode($value)]) ? $map[$field_key]['map'][urlencode($value)] : $value;
+        $wrapper->{$map[$field_key]['field']}->set($value);
+      }
+    }
+
+    // @todo: Add new created channel here.
+    if (isset($new_entity) && $tmp = micro_crm_contact_get_channels($contact)) {
+      if (!in_array($new_entity->channel_id, $tmp)) {
+        $wrapper->field_micro_crm_channel[] = $new_entity;
+      }
+    }
+
+    $contact->log = 'Contact updated via Campaign Monitor Webhook';
+    $contact->revision = TRUE;
+    $wrapper->save();
+  }
+}
+
+/**
+ *
+ */
+function _micro_crm_campaignmonitor_get_lists() {
+  $lists = array();
+
+  foreach(variable_get('micro_crm_campaignmonitor_lists', array()) as $list_id => $list) {
+    if (!empty($list)) {
+      $lists[$list_id] = $list_id;
+    }
+  }
+
+  return $lists;
+}
+
+/**
+ *
+ */
+function _micro_crm_campaignmonitor_get_field_list($list_id) {
+  $list = array();
+  foreach (_micro_crm_campaignmonitor_get_list($list_id) as $field_name => $field) {
+    if (empty($field['field'])) {
+      continue;
+    }
+    $list[$field_name] = $field;
+  }
+  return $list;
+}
+
+/**
+ * @param $list_id
+ * @param $channel
+ * @return array
+ */
+function _micro_crm_campaignmonitor_prepare_custom_fields($list_id, $contact) {
+  $output = array();
+
+  $cm = CampaignMonitor::getConnector();
+  $list = $cm->getExtendedList($list_id);
+  $wrapper = entity_metadata_wrapper('micro_crm_contact', $contact);
+
+  foreach (_micro_crm_campaignmonitor_get_field_list($list_id) as $field_name => $field) {
+    if ($field_name !== 'Name') {
+      $field_name = urldecode($field_name);
+
+      if (!isset($list['CustomFields'][$field_name]['FieldName'])) {
+        continue;
+      }
+      $field_name = $list['CustomFields'][$field_name]['FieldName'];
+    }
+
+    if (!$wrapper->__isset($field['field'])) {
+      continue;
+    }
+    if (is_array($wrapper->$field['field']->raw())) {
+      foreach($wrapper->$field['field']->getIterator() as $value) {
+        $output[] = array(
+          'Key' => $field_name,
+          'Value' => isset($field['map']) ? _micro_crm_campaignmonitor_map_replace($field['map'], $value->raw()) : $value->raw(),
+        );
+      }
+    }
+    else {
+      $output[] = array(
+        'Key' => $field_name,
+        'Value' => isset($field['map']) ? _micro_crm_campaignmonitor_map_replace($field['map'], $wrapper->$field['field']->raw()) : $wrapper->$field['field']->raw(),
+      );
+    }
+  }
+  return $output;
+}
+
+/**
+ * @param $custom_fields
+ * @return null
+ */
+function _micro_crm_campaignmonitor_retrieve_name_from_custom_fields(&$custom_fields) {
+  foreach($custom_fields as $id => $field) {
+    if ($field['Key'] == 'Name') {
+      unset($custom_fields[$id]);
+      return $field['Value'];
+    }
+  }
+  return NULL;
+}
+
+/**
+ * @param $map
+ * @param $value
+ * @return mixed
+ */
+function _micro_crm_campaignmonitor_map_replace($map, $value) {
+  if (!is_array($map)) {
+    return $value;
+  }
+  $map = array_flip($map);
+  if (isset($map[$value])) {
+    return urldecode($map[$value]);
+  }
+  return $value;
+}
+
+/**
+ * @param $list_id
+ * @return null
+ */
+function _micro_crm_campaignmonitor_get_list($list_id) {
+  return variable_get('micro_crm_campaignmonitor_list_' . $list_id, array());
+}
+
+/**
+ * @param $custom_fields
+ * @return array
+ */
+function _micro_crm_campaignmonitor_keyed_custom_fields($custom_fields) {
+  $array = array();
+  foreach ($custom_fields as $record) {
+    if (!isset($array[$record->Key])) {
+      $array[$record->Key] = $record->Value;
+    }
+    elseif (!is_array($array[$record->Key])) {
+      $array[$record->Key] = array(
+        $array[$record->Key],
+        $record->Value,
+      );
+    }
+    else {
+      $array[$record->Key][] = $record->Value;
+    }
+  }
+  return $array;
+}

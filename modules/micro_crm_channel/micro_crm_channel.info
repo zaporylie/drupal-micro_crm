@@ -4,6 +4,8 @@ core = 7.x
 
 files[] = includes/MicroCRMChannelController.class.php
 files[] = includes/MicroCRMChannelInlineFormController.class.php
+files[] = includes/views/handlers/micro_crm_channel_handler_field_channel_label.inc
+files[] = includes/views/handlers/micro_crm_channel_handler_field_channel_operations.inc
 
 dependencies[] = micro_crm_contact
 dependencies[] = inline_entity_form

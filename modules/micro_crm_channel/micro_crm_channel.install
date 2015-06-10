@@ -163,7 +163,7 @@ function micro_crm_channel_install() {
     'type' => 'entityreference',
     'module' => 'entityreference',
     'active' => 1,
-    'locked' => 1,
+    'locked' => 0,
     'cardinality' => FIELD_CARDINALITY_UNLIMITED,
     'deleted' => 0,
   );
@@ -218,10 +218,7 @@ function micro_crm_channel_uninstall() {
   $results = db_query('SELECT {channel_id} FROM micro_crm_channel')->fetchCol();
   micro_crm_channel_delete_multiple($results);
 
-  $instance = array(
-    'entity_type' => 'micro_crm_contact',
-    'bundle' => 'micro_crm_contact',
-    'field_name' => 'field_micro_crm_channel',
-  );
-  field_delete_instance($instance);
+  if ($instance = field_info_instance('micro_crm_contact', 'field_micro_crm_channel', 'micro_crm_contact')) {
+    field_delete_instance($instance);
+  }
 }

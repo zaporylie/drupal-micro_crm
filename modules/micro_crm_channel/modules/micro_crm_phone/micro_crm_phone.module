@@ -9,21 +9,15 @@
  * Implements hook_entity_info_alter().
  */
 function micro_crm_phone_entity_info_alter(&$entity_info) {
-  $entity_info['micro_crm_channel']['bundles']['phone'] = array(
+  $bundle = array(
     'label' => t('Phone'),
     'module' => 'micro_crm_phone',
   );
-}
-
-/**
- * Implements hook_micro_crm_channel_channel().
- */
-function micro_crm_phone_micro_crm_channel_channel($channel) {
-  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
-  if (!$wrapper->__isset('field_micro_crm_phone')) {
-    return NULL;
+  $entity_info['micro_crm_channel']['bundles']['phone'] = $bundle;
+  if (module_exists('micro_crm_message')) {
+    $entity_info['micro_crm_message']['bundles']['phone'] = $bundle;
+    micro_crm_phone_message_add_bundle();
   }
-  return $wrapper->field_micro_crm_phone->value();
 }
 
 /**
@@ -77,6 +71,18 @@ function micro_crm_phone_micro_crm_channel_is_empty($channel) {
 }
 
 /**
+ * Implements hook_micro_crm_channel_set_value().
+ */
+function micro_crm_phone_micro_crm_channel_set_value(&$channel, $value) {
+  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+  if (!$wrapper->__isset('field_micro_crm_phone')) {
+    return FALSE;
+  }
+  $wrapper->field_micro_crm_phone->set($value);
+  return TRUE;
+}
+
+/**
  * Implements hook_micro_crm_channel_values_load().
  */
 function micro_crm_phone_micro_crm_channel_values_load($channel) {
@@ -104,5 +110,138 @@ function micro_crm_phone_micro_crm_channel_values_load($channel) {
   else {
     $entity = entity_load('micro_crm_channel', array_keys($result['micro_crm_channel']));
     return reset($entity);
+  }
+}
+
+/**
+ * Ensure that phone bundle has all necessary fields.
+ */
+function micro_crm_phone_message_add_bundle() {
+
+  // Add channel field.
+  $field = array(
+    'settings' => array(
+      'target_type' => 'micro_crm_channel',
+      'handler' => 'base',
+      'handler_settings' => array(
+        'target_bundles' => array(
+          'phone' => 'phone',
+        ),
+        'sort' => array(
+          'type' => 'none',
+        ),
+        'behaviors' => array(
+          'entityqueue' => array(
+            'status' => 0,
+          ),
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+      ),
+    ),
+    'field_name' => 'crm_message_phone',
+    'type' => 'entityreference',
+    'module' => 'entityreference',
+    'active' => 1,
+    'locked' => 0,
+    'cardinality' => 1,
+    'deleted' => 0,
+  );
+  if (!field_info_field($field['field_name'])) {
+    field_create_field($field);
+  }
+  $instance = array(
+    'label' => t('Phone'),
+    'widget' => array(
+      'weight' => '1',
+      'type' => 'inline_entity_form',
+      'module' => 'inline_entity_form',
+      'active' => 1,
+      'settings' => array(
+        'fields' => array(),
+        'type_settings' => array(
+          'allow_existing' => 1,
+          'match_operator' => 'CONTAINS',
+          'delete_references' => 0,
+          'override_labels' => 0,
+          'label_singular' => 'Channel',
+          'label_plural' => 'Channels',
+        ),
+      ),
+    ),
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'entityreference_label',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'module' => 'entityreference',
+        'weight' => 0,
+      ),
+    ),
+    'required' => 1,
+    'description' => '',
+    'field_name' => 'crm_message_phone',
+    'entity_type' => 'micro_crm_message',
+    'bundle' => 'phone',
+    'deleted' => 0,
+  );
+  if (!field_info_instance('micro_crm_message', $field['field_name'], 'phone')) {
+    field_create_instance($instance);
+  }
+
+  // Add body field.
+  $field = array(
+    'settings' => array(),
+    'field_name' => 'crm_message_phone_body',
+    'type' => 'text_long',
+    'module' => 'text',
+    'active' => 1,
+    'locked' => 0,
+    'cardinality' => 1,
+    'deleted' => 0,
+  );
+  if (!field_info_field($field['field_name'])) {
+    field_create_field($field);
+  }
+  $instance = array(
+    'label' => t('Body'),
+    'widget' => array(
+      'weight' => '3',
+      'type' => 'text_textarea',
+      'module' => 'text',
+      'active' => 1,
+      'settings' => array(
+        'rows' => '5',
+      ),
+    ),
+    'settings' => array(
+      'text_processing' => '0',
+      'user_register_form' => FALSE,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'text_default',
+        'settings' => array(),
+        'module' => 'text',
+        'weight' => 2,
+      ),
+    ),
+    'required' => 1,
+    'description' => '',
+    'default_value' => NULL,
+    'field_name' => 'crm_message_phone_body',
+    'entity_type' => 'micro_crm_message',
+    'bundle' => 'phone',
+    'deleted' => 0,
+  );
+  if (!field_info_instance('micro_crm_message', $field['field_name'], 'phone')) {
+    field_create_instance($instance);
   }
 }
