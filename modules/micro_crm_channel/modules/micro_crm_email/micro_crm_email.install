@@ -62,21 +62,42 @@ function micro_crm_email_install() {
  */
 function micro_crm_email_uninstall() {
 
-  if ($instance = field_info_instance('micro_crm_channel', 'field_micro_crm_email', 'email')) {
-    field_delete_instance($instance);
-  }
+  $instance = array(
+    'entity_type' => 'micro_crm_channel',
+    'field_name' => 'field_micro_crm_email',
+    'bundle' => 'email',
+  );
+  field_delete_instance($instance);
 
-  if ($instance = field_info_instance('micro_crm_message', 'crm_message_email', 'email')) {
-    field_delete_instance($instance);
-  }
+  $instance = array(
+    'entity_type' => 'micro_crm_message',
+    'field_name' => 'crm_message_email',
+    'bundle' => 'email',
+  );
+  field_delete_instance($instance);
 
-  if ($instance = field_info_instance('micro_crm_message', 'crm_message_email_subject', 'email')) {
-    field_delete_instance($instance);
-  }
+  $instance = array(
+    'entity_type' => 'micro_crm_message',
+    'field_name' => 'crm_message_email_subject',
+    'bundle' => 'email',
+  );
+  field_delete_instance($instance);
 
-  if ($instance = field_info_instance('micro_crm_message', 'crm_message_email_body', 'email')) {
-    field_delete_instance($instance);
-  }
+  $instance = array(
+    'entity_type' => 'micro_crm_message',
+    'field_name' => 'crm_message_email_body',
+    'bundle' => 'email',
+  );
+  field_delete_instance($instance);
 
   variable_del('micro_crm_channel_ui_email_newsletter');
+
+  if (db_table_exists('micro_crm_message')) {
+    field_attach_delete_bundle('micro_crm_message', 'email');
+    db_delete('micro_crm_message')->condition('type', 'email')->execute();
+  }
+  if (db_table_exists('micro_crm_channel')) {
+    field_attach_delete_bundle('micro_crm_channel', 'email');
+    db_delete('micro_crm_channel')->condition('type', 'email')->execute();
+  }
 }

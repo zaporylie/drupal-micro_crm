@@ -1,6 +1,7 @@
-name = Micro CRM Contact UI
+name = Contact UI
 description = Provides UI for module
 core = 7.x
+package = CRM
 
 dependencies[] = micro_crm_contact
 dependencies[] = micro_crm_ui

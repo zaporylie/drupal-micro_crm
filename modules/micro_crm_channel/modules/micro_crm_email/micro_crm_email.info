@@ -1,5 +1,6 @@
-name = Micro CRM Email channel
+name = Email Channel
 core = 7.x
+package = CRM
 
 dependencies[] = micro_crm_channel
 dependencies[] = email

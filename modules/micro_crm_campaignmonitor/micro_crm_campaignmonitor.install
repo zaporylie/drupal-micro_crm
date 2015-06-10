@@ -10,7 +10,10 @@
  */
 function micro_crm_campaignmonitor_uninstall() {
   variable_del('micro_crm_campaignmonitor_lists');
-  $results = db_select('variables', 'v')->addField('v', 'name', 'name')->condition('v.name', 'micro_crm_campaignmonitor_list_*', 'LIKE')->execute()->fetchCol();
+  $query = db_select('variable', 'v');
+  $query->addField('v', 'name', 'name');
+  $query->condition('v.name', 'micro_crm_campaignmonitor_list_%', 'LIKE');
+  $results = $query->execute()->fetchCol();
   foreach ($results as $result) {
     variable_del($result);
   }

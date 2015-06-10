@@ -1,6 +1,7 @@
-name = Micro CRM Campaign Monitor Sync
+name = Newsletter Campaign Monitor
 description = Synchronize local contacts and channels to Campaign Monitor.
 core = 7.x
+package = CRM
 
 dependencies[] = micro_crm_newsletter
 dependencies[] = campaignmonitor

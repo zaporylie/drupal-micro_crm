@@ -10,6 +10,7 @@
  */
 function micro_crm_message_schema() {
 
+  module_load_include('module', 'micro_crm_message', 'micro_crm_message');
   $schema['micro_crm_message'] = array(
     'description' => 'message entity',
     'fields' => array(
@@ -151,6 +152,4 @@ function micro_crm_message_install() {
  */
 function micro_crm_message_uninstall() {
 
-  $results = db_query('SELECT {message_id} FROM micro_crm_message')->fetchCol();
-  micro_crm_message_delete_multiple($results);
 }

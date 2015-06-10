@@ -10,6 +10,7 @@
  */
 function micro_crm_contact_schema() {
 
+  module_load_include('module', 'micro_crm_contact', 'micro_crm_contact');
   $schema['micro_crm_contact'] = array(
     'description' => 'Contact entity',
     'fields' => array(
@@ -217,10 +218,10 @@ function micro_crm_contact_install() {
  */
 function micro_crm_contact_uninstall() {
 
-  $results = db_query('SELECT {contact_id} FROM micro_crm_contact')->fetchCol();
-  micro_crm_contact_delete_multiple($results);
-
-  if ($instance = field_info_instance('micro_crm_contact', 'field_micro_crm_deprecated', 'micro_crm_contact')) {
-    field_delete_instance($instance);
-  }
+  $instance = array(
+    'entity_type' => 'micro_crm_contact',
+    'field_name' => 'field_micro_crm_deprecated',
+    'bundle' => 'micro_crm_contact',
+  );
+  field_delete_instance($instance);
 }
