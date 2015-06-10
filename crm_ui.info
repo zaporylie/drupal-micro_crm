@@ -3,4 +3,6 @@ description = Creates main position in menu tree
 core = 7.x
 package = CRM
 
-dependencies = crm
+dependencies[] = crm
+
+files[] = tests/crm_ui.test

@@ -4,3 +4,5 @@ core = 7.x
 package = CRM
 
 dependencies[] = entity
+
+files[] = tests/crm.test

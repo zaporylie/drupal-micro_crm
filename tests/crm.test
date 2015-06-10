@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * Tests basic CRM functions.
+ */
+class CRMTestCase extends DrupalWebTestCase {
+  protected $profile = 'testing';
+
+  public static function getInfo() {
+    return array(
+      'name' => 'CRM',
+      'description' => 'Tests basic CRM functions.',
+      'group' => 'CRM',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('crm');
+  }
+
+
+}
