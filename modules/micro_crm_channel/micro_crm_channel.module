@@ -293,6 +293,7 @@ function micro_crm_channel_token_access_callback($channel) {
   if (isset($channel->token) && isset($channel->token_created) && (REQUEST_TIME - $channel->token_created < MICRO_CRM_CHANNEL_TOKEN_VALIDATION_INTERVAL)) {
     return TRUE;
   }
+  drupal_set_message(t('One-time link expired.'), 'warning', FALSE);
   return FALSE;
 }
 

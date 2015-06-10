@@ -115,9 +115,11 @@ function micro_crm_email_micro_crm_channel_set_value(&$channel, $value) {
 
 /**
  * Ensure that email bundle has all necessary fields.
+ *
+ * @todo: block field deletion.
  */
 function micro_crm_email_message_add_bundle() {
-  // @todo add channel field.
+
   $field = array(
     'settings' => array(
       'target_type' => 'micro_crm_channel',
@@ -143,7 +145,7 @@ function micro_crm_email_message_add_bundle() {
     'type' => 'entityreference',
     'module' => 'entityreference',
     'active' => 1,
-    'locked' => 1,
+    'locked' => 0,
     'cardinality' => 1,
     'deleted' => 0,
   );
@@ -194,7 +196,6 @@ function micro_crm_email_message_add_bundle() {
     field_create_instance($instance);
   }
 
-  // @todo add email subject.
   $field = array(
     'settings' => array(
       'max_length' => '255',
@@ -203,7 +204,7 @@ function micro_crm_email_message_add_bundle() {
     'type' => 'text',
     'module' => 'text',
     'active' => 1,
-    'locked' => 1,
+    'locked' => 0,
     'cardinality' => 1,
     'deleted' => 0,
   );
@@ -246,14 +247,13 @@ function micro_crm_email_message_add_bundle() {
     field_create_instance($instance);
   }
 
-  // @todo add email body.
   $field = array(
     'settings' => array(),
     'field_name' => 'crm_message_email_body',
     'type' => 'text_long',
     'module' => 'text',
     'active' => 1,
-    'locked' => 1,
+    'locked' => 0,
     'cardinality' => 1,
     'deleted' => 0,
   );

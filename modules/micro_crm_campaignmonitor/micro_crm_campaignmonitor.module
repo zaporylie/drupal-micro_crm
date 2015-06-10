@@ -67,11 +67,11 @@ function micro_crm_campaignmonitor_libraries_info() {
  * Implements hook_micro_crm_channel_update().
  */
 function micro_crm_campaignmonitor_micro_crm_channel_update($channel) {
-  // @todo process data and send to campaign monitor.
-  if ($channel->type == 'email' && ((isset($channel->unsubscribe) && $channel->unsubscribe == TRUE) || $channel->status == MICRO_CRM_NEWSLETTER_CHANNEL_STATUS)) {
+  if ($channel->type == 'email' && ((isset($channel->unsubscribe) && $channel->unsubscribe == TRUE) || (isset($channel->subscribe) && $channel->subscribe == TRUE) || (isset($channel->newsletter_confirmation) && $channel->newsletter_confirmation == TRUE))) {
     $queue = DrupalQueue::get('micro_crm_campaignmonitor');
     $queue->createQueue();
     $queue->createItem($channel);
+    watchdog('micro_crm_campaignmonitor', 'Channel (@channel) has been added to Campaign Monitor sync queue.', array('@channel' => $channel->channel_id), WATCHDOG_NOTICE);
   }
 }
 
@@ -127,12 +127,22 @@ function micro_crm_campaignmonitor_sync($channel_old) {
         // Update.
         if (!$cm->subscribe($list_id, $email, $name, array_values($custom_fields))) {
           $queue->createItem($channel);
+          watchdog('micro_crm_campaignmonitor', 'Unable to send request for channel (@channel) to Campaign Monitor right now. Re-added to queue.', array('@channel' => $channel->channel_id), WATCHDOG_ALERT);
+        }
+        else {
+
+          watchdog('micro_crm_campaignmonitor', 'Channel (@channel) has been successfully synchronized to Campaign Monitor.', array('@channel' => $channel->channel_id), WATCHDOG_NOTICE);
         }
       }
       else {
         // Unsubscribe.
         if (!$cm->unsubscribe($list_id, $email)) {
           $queue->createItem($channel);
+          watchdog('micro_crm_campaignmonitor', 'Unable to send request for channel (@channel) to Campaign Monitor right now. Re-added to queue.', array('@channel' => $channel->channel_id), WATCHDOG_ALERT);
+        }
+        else {
+
+          watchdog('micro_crm_campaignmonitor', 'Channel (@channel) has been successfully synchronized to Campaign Monitor.', array('@channel' => $channel->channel_id), WATCHDOG_NOTICE);
         }
       }
     }
@@ -144,6 +154,11 @@ function micro_crm_campaignmonitor_sync($channel_old) {
         // Subscribe.
         if (!$cm->subscribe($list_id, $email, $name, array_values($custom_fields))) {
           $queue->createItem($channel);
+          watchdog('micro_crm_campaignmonitor', 'Unable to send request for channel (@channel) to Campaign Monitor right now. Re-added to queue.', array('@channel' => $channel->channel_id), WATCHDOG_ALERT);
+        }
+        else {
+
+          watchdog('micro_crm_campaignmonitor', 'Channel (@channel) has been successfully synchronized to Campaign Monitor.', array('@channel' => $channel->channel_id), WATCHDOG_NOTICE);
         }
       }
     }

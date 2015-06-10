@@ -144,7 +144,7 @@ function micro_crm_phone_message_add_bundle() {
     'type' => 'entityreference',
     'module' => 'entityreference',
     'active' => 1,
-    'locked' => 1,
+    'locked' => 0,
     'cardinality' => 1,
     'deleted' => 0,
   );
@@ -202,7 +202,7 @@ function micro_crm_phone_message_add_bundle() {
     'type' => 'text_long',
     'module' => 'text',
     'active' => 1,
-    'locked' => 1,
+    'locked' => 0,
     'cardinality' => 1,
     'deleted' => 0,
   );

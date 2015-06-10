@@ -17,7 +17,7 @@ function micro_crm_email_install() {
     'type' => 'email',
     'module' => 'email',
     'active' => 1,
-    'locked' => 1,
+    'locked' => 0,
     'cardinality' => 1,
     'deleted' => 0,
   );
@@ -61,10 +61,22 @@ function micro_crm_email_install() {
  * Implements hook_uninstall().
  */
 function micro_crm_email_uninstall() {
-  $instance = array(
-    'entity_type' => 'micro_crm_channel',
-    'bundle' => 'email',
-    'field_name' => 'field_micro_crm_email',
-  );
-  field_delete_instance($instance);
+
+  if ($instance = field_info_instance('micro_crm_channel', 'field_micro_crm_email', 'email')) {
+    field_delete_instance($instance);
+  }
+
+  if ($instance = field_info_instance('micro_crm_message', 'crm_message_email', 'email')) {
+    field_delete_instance($instance);
+  }
+
+  if ($instance = field_info_instance('micro_crm_message', 'crm_message_email_subject', 'email')) {
+    field_delete_instance($instance);
+  }
+
+  if ($instance = field_info_instance('micro_crm_message', 'crm_message_email_body', 'email')) {
+    field_delete_instance($instance);
+  }
+
+  variable_del('micro_crm_channel_ui_email_newsletter');
 }

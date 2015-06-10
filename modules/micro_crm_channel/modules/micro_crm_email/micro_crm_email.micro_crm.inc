@@ -37,7 +37,7 @@ function micro_crm_email_micro_crm_channel_label($channel) {
 /**
  * Implements hook_micro_crm_newsletter_prepare_message().
  */
-function micro_crm_email_micro_crm_newsletter_prepare_message($channel) {
+function micro_crm_email_micro_crm_newsletter_prepare_message($channel, $type = 'unsubscribe') {
   $message = entity_create('micro_crm_message', array('type' => 'email'));
   $wrapper = entity_metadata_wrapper('micro_crm_message', $message);
   if (!$wrapper->__isset('crm_message_email')) {
@@ -50,10 +50,25 @@ function micro_crm_email_micro_crm_newsletter_prepare_message($channel) {
     return FALSE;
   }
   $wrapper->crm_message_email->set($channel);
-  $wrapper->crm_message_email_subject->set(t('Cancel your newsletter subscription'));
-  $wrapper->crm_message_email_body->set(array(
-    'format' => 'plain_text',
-    'value' => t("Thank you for being with us. Click the button below to confirm.\n @button", array('@button' => url('micro_crm/newsletter/unsubscribe/' . $channel->token, array('absolute' => TRUE)))),
-  ));
+  switch ($type) {
+    case 'subscribe':
+      $wrapper->crm_message_email_subject->set(t('Confirm your subscription'));
+      $wrapper->crm_message_email_body->set(array(
+        'format' => 'plain_text',
+        'value' => t("Click the button below to confirm.\n @button", array('@button' => url('micro_crm/newsletter/subscribe/' . $channel->token, array('absolute' => TRUE)))),
+      ));
+      break;
+
+    case 'unsubscribe':
+      $wrapper->crm_message_email_subject->set(t('Cancel your newsletter subscription'));
+      $wrapper->crm_message_email_body->set(array(
+        'format' => 'plain_text',
+        'value' => t("Thank you for being with us. Click the button below to confirm.\n @button", array('@button' => url('micro_crm/newsletter/unsubscribe/' . $channel->token, array('absolute' => TRUE)))),
+      ));
+      break;
+
+    default:
+      return FALSE;
+  }
   return $message;
 }

@@ -150,6 +150,66 @@ function micro_crm_contact_schema() {
  */
 function micro_crm_contact_install() {
 
+  $t = get_t();
+  $field = array(
+    'settings' => array(
+      'target_type' => 'micro_crm_contact',
+      'handler' => 'base',
+      'handler_settings' => array(
+        'target_bundles' => array(),
+        'sort' => array(
+          'type' => 'none',
+        ),
+        'behaviors' => array(
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+      ),
+    ),
+    'field_name' => 'field_micro_crm_deprecated',
+    'type' => 'entityreference',
+    'module' => 'entityreference',
+    'active' => 1,
+    'locked' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+  );
+  field_create_field($field);
+
+  $instance = array(
+    'label' => $t('Deprecated'),
+    'widget' => array(
+      'weight' => '2',
+      'type' => 'options_select',
+      'module' => 'options',
+      'active' => 1,
+      'settings' => array(),
+    ),
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'entityreference_entity_view',
+        'weight' => '2',
+        'settings' => array(
+          'view_mode' => 'administrator',
+          'links' => 1,
+        ),
+        'module' => 'entityreference',
+      ),
+    ),
+    'required' => 0,
+    'description' => '',
+    'default_value' => NULL,
+    'field_name' => 'field_micro_crm_deprecated',
+    'entity_type' => 'micro_crm_contact',
+    'bundle' => 'micro_crm_contact',
+    'deleted' => 0,
+  );
+  field_create_instance($instance);
 }
 
 /**
@@ -159,4 +219,8 @@ function micro_crm_contact_uninstall() {
 
   $results = db_query('SELECT {contact_id} FROM micro_crm_contact')->fetchCol();
   micro_crm_contact_delete_multiple($results);
+
+  if ($instance = field_info_instance('micro_crm_contact', 'field_micro_crm_deprecated', 'micro_crm_contact')) {
+    field_delete_instance($instance);
+  }
 }
