@@ -26,17 +26,17 @@ function crm_phone_entity_info_alter(&$entity_info) {
 function crm_phone_crm_channel_is_unique($channel, $new = TRUE) {
   $wrapper = entity_metadata_wrapper('crm_channel', $channel);
 
-  if (!$wrapper->__isset('field_crm_phone')) {
+  if (!$wrapper->__isset('crm_phone')) {
     return FALSE;
   }
-  if (!($value = $wrapper->field_crm_phone->value())) {
+  if (!($value = $wrapper->crm_phone->value())) {
     return FALSE;
   }
   $query = new EntityFieldQuery();
 
   $query->entityCondition('entity_type', 'crm_channel')
     ->entityCondition('bundle', 'phone')
-    ->fieldCondition('field_crm_phone', 'value', $value, '=');
+    ->fieldCondition('crm_phone', 'value', $value, '=');
 
   $result = $query->execute();
   if (!isset($result['crm_channel'])) {
@@ -58,10 +58,10 @@ function crm_phone_crm_channel_is_unique($channel, $new = TRUE) {
  */
 function crm_phone_crm_channel_is_empty($channel) {
   $wrapper = entity_metadata_wrapper('crm_channel', $channel);
-  if (!$wrapper->__isset('field_crm_phone')) {
+  if (!$wrapper->__isset('crm_phone')) {
     return TRUE;
   }
-  if (!($value = $wrapper->field_crm_phone->value())) {
+  if (!($value = $wrapper->crm_phone->value())) {
     return TRUE;
   }
   if (!$value) {
@@ -75,10 +75,10 @@ function crm_phone_crm_channel_is_empty($channel) {
  */
 function crm_phone_crm_channel_set_value(&$channel, $value) {
   $wrapper = entity_metadata_wrapper('crm_channel', $channel);
-  if (!$wrapper->__isset('field_crm_phone')) {
+  if (!$wrapper->__isset('crm_phone')) {
     return FALSE;
   }
-  $wrapper->field_crm_phone->set($value);
+  $wrapper->crm_phone->set($value);
   return TRUE;
 }
 
@@ -88,17 +88,17 @@ function crm_phone_crm_channel_set_value(&$channel, $value) {
 function crm_phone_crm_channel_values_load($channel) {
   $wrapper = entity_metadata_wrapper('crm_channel', $channel);
 
-  if (!$wrapper->__isset('field_crm_phone')) {
+  if (!$wrapper->__isset('crm_phone')) {
     return NULL;
   }
-  if (!($value = $wrapper->field_crm_phone->value())) {
+  if (!($value = $wrapper->crm_phone->value())) {
     return NULL;
   }
   $query = new EntityFieldQuery();
 
   $query->entityCondition('entity_type', 'crm_channel')
     ->entityCondition('bundle', 'phone')
-    ->fieldCondition('field_crm_phone', 'value', $value, '=');
+    ->fieldCondition('crm_phone', 'value', $value, '=');
 
   $result = $query->execute();
   if (!isset($result['crm_channel'])) {

@@ -13,7 +13,7 @@ function crm_phone_install() {
   $t = get_t();
   $field = array(
     'settings' => array(),
-    'field_name' => 'field_crm_phone',
+    'field_name' => 'crm_phone',
     'type' => 'telephone',
     'module' => 'telephone',
     'active' => 1,
@@ -49,7 +49,7 @@ function crm_phone_install() {
     'required' => 1,
     'description' => '',
     'default_value' => NULL,
-    'field_name' => 'field_crm_phone',
+    'field_name' => 'crm_phone',
     'entity_type' => 'crm_channel',
     'bundle' => 'phone',
     'deleted' => 0,
@@ -63,7 +63,7 @@ function crm_phone_install() {
 function crm_phone_uninstall() {
   $instance = array(
     'entity_type' => 'crm_channel',
-    'field_name' => 'field_crm_phone',
+    'field_name' => 'crm_phone',
     'bundle' => 'phone',
   );
   field_delete_instance($instance);

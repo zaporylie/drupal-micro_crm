@@ -13,7 +13,7 @@ function crm_phone_crm_message_send($message) {
   if (!$wrapper->__isset('crm_message_phone_body') || !($message = $wrapper->crm_message_phone_body->value())) {
     return FALSE;
   }
-  if (!$wrapper->__isset('crm_message_phone_body') || !($number = $wrapper->crm_message_phone->field_crm_phone->value())) {
+  if (!$wrapper->__isset('crm_message_phone_body') || !($number = $wrapper->crm_message_phone->crm_phone->value())) {
     return FALSE;
   }
   if (!function_exists('sms_send')) {
@@ -27,10 +27,10 @@ function crm_phone_crm_message_send($message) {
  */
 function crm_phone_crm_channel_label($channel) {
   $wrapper = entity_metadata_wrapper('crm_channel', $channel);
-  if (!$wrapper->__isset('field_crm_phone')) {
+  if (!$wrapper->__isset('crm_phone')) {
     return NULL;
   }
-  return $wrapper->field_crm_phone->value();
+  return $wrapper->crm_phone->value();
 }
 
 /**
