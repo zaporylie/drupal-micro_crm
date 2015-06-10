@@ -10,6 +10,8 @@
  */
 function crm_phone_install() {
 
+  _field_info_collate_types(TRUE);
+
   $t = get_t();
   $field = array(
     'settings' => array(),

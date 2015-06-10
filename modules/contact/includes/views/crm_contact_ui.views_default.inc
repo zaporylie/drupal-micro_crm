@@ -11,11 +11,11 @@ function crm_contact_ui_views_default_views() {
   $views = array();
 
   $view = new view();
-  $view->name = 'contact';
+  $view->name = 'crm_contact';
   $view->description = '';
   $view->tag = 'default';
   $view->base_table = 'crm_contact';
-  $view->human_name = 'Contact';
+  $view->human_name = 'CRM Contact';
   $view->core = 7;
   $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */

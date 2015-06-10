@@ -142,7 +142,9 @@ function crm_channel_schema() {
  */
 function crm_channel_install() {
 
+  _field_info_collate_types(TRUE);
   module_load_include('module', 'crm_channel', 'crm_channel');
+
   $t = get_t();
   $field = array(
     'settings' => array(
