@@ -168,7 +168,7 @@ function crm_contact_install() {
         ),
       ),
     ),
-    'field_name' => 'field_crm_deprecated',
+    'field_name' => 'crm_deprecated',
     'type' => 'entityreference',
     'module' => 'entityreference',
     'active' => 1,
@@ -205,7 +205,7 @@ function crm_contact_install() {
     'required' => 0,
     'description' => '',
     'default_value' => NULL,
-    'field_name' => 'field_crm_deprecated',
+    'field_name' => 'crm_deprecated',
     'entity_type' => 'crm_contact',
     'bundle' => 'crm_contact',
     'deleted' => 0,
@@ -220,7 +220,7 @@ function crm_contact_uninstall() {
 
   $instance = array(
     'entity_type' => 'crm_contact',
-    'field_name' => 'field_crm_deprecated',
+    'field_name' => 'crm_deprecated',
     'bundle' => 'crm_contact',
   );
   field_delete_instance($instance);

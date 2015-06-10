@@ -142,7 +142,7 @@ function crm_contact_ui_uri($contact) {
  * Implements hook_field_widget_form_alter().
  */
 function crm_contact_ui_field_widget_form_alter(&$element, &$form_state, $context) {
-  if (isset($element['#field_name']) && $element['#field_name'] == 'field_crm_deprecated') {
+  if (isset($element['#field_name']) && $element['#field_name'] == 'crm_deprecated') {
     $element['#access'] = FALSE;
   }
 }

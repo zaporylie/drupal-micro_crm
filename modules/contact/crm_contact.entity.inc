@@ -145,7 +145,7 @@ function crm_contact_merge($contacts) {
     $contact_wrapper->crm_channel->set(NULL);
 
     // Add deprecated contact to parent one.
-    $wrapper->field_crm_deprecated[] = $contact_wrapper->getIdentifier();
+    $wrapper->crm_deprecated[] = $contact_wrapper->getIdentifier();
 
     // Save changed contact.
     $contact_wrapper->log->set('Contact has been deprecated after merging to ' . $wrapper->getIdentifier());
