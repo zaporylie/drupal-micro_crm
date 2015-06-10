@@ -127,7 +127,7 @@ function crm_contact_merge($contacts) {
 
   // Get all current channels ids to flat array.
   $tmp = array();
-  foreach ($wrapper->field_crm_channel->getIterator() as $channel) {
+  foreach ($wrapper->crm_channel->getIterator() as $channel) {
     $tmp[] = $channel->getIdentifier();
   }
 
@@ -136,13 +136,13 @@ function crm_contact_merge($contacts) {
     $contact_wrapper = entity_metadata_wrapper('crm_contact', $contact);
 
     // ...and channels and add it to contact we are merging to.
-    foreach ($contact_wrapper->field_crm_channel->getIterator() as $channel_wrapper) {
+    foreach ($contact_wrapper->crm_channel->getIterator() as $channel_wrapper) {
       if (!in_array($channel_wrapper->getIdentifier(), $tmp)) {
-        $wrapper->field_crm_channel[] = $channel_wrapper->getIdentifier();
+        $wrapper->crm_channel[] = $channel_wrapper->getIdentifier();
       }
     }
     // Reset channel field in deprecated contact.
-    $contact_wrapper->field_crm_channel->set(NULL);
+    $contact_wrapper->crm_channel->set(NULL);
 
     // Add deprecated contact to parent one.
     $wrapper->field_crm_deprecated[] = $contact_wrapper->getIdentifier();

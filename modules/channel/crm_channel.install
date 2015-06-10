@@ -160,7 +160,7 @@ function crm_channel_install() {
         ),
       ),
     ),
-    'field_name' => 'field_crm_channel',
+    'field_name' => 'crm_channel',
     'type' => 'entityreference',
     'module' => 'entityreference',
     'active' => 1,
@@ -203,7 +203,7 @@ function crm_channel_install() {
       ),
     ),
     'required' => 0,
-    'field_name' => 'field_crm_channel',
+    'field_name' => 'crm_channel',
     'entity_type' => 'crm_contact',
     'bundle' => 'crm_contact',
     'deleted' => 0,
@@ -219,7 +219,7 @@ function crm_channel_uninstall() {
   field_attach_delete_bundle('crm_contact', 'crm_contact');
   $instance = array(
     'entity_type' => 'crm_contact',
-    'field_name' => 'field_crm_channel',
+    'field_name' => 'crm_channel',
     'bundle' => 'crm_contact',
   );
   field_delete_instance($instance);

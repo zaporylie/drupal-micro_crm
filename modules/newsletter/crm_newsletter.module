@@ -255,12 +255,12 @@ function crm_newsletter_form_submit($form, &$form_state) {
     $wrapper = entity_metadata_wrapper('crm_contact', $entity);
 
     $tmp = array();
-    foreach ($wrapper->field_crm_channel->getIterator() as $channel) {
+    foreach ($wrapper->crm_channel->getIterator() as $channel) {
       $tmp[] = $channel->getIdentifier();
     }
     foreach ($channels as $channel) {
       if (!in_array($channel, $tmp)) {
-        $wrapper->field_crm_channel[] = $channel;
+        $wrapper->crm_channel[] = $channel;
       }
     }
 

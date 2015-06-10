@@ -30,7 +30,7 @@ function crm_newsletter_custom_fields() {
   $custom_fields = array();
 
   foreach (field_info_instances('crm_contact', 'crm_contact') as $key => $instance) {
-    if ($key === 'field_crm_channel') {
+    if ($key === 'crm_channel') {
       continue;
     }
     $custom_fields[$key] = $instance['label'];

@@ -294,7 +294,7 @@ function crm_campaignmonitor_webhook($type) {
     // @todo: Add new created channel here.
     if (isset($new_entity) && $tmp = crm_contact_get_channels($contact)) {
       if (!in_array($new_entity->channel_id, $tmp)) {
-        $wrapper->field_crm_channel[] = $new_entity;
+        $wrapper->crm_channel[] = $new_entity;
       }
     }
 

@@ -123,7 +123,7 @@ function crm_channel_label($channel) {
 function crm_channel_load_contact($ids) {
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'crm_contact')
-    ->fieldCondition('field_crm_channel', 'target_id', $ids, 'IN');
+    ->fieldCondition('crm_channel', 'target_id', $ids, 'IN');
   $result = $query->execute();
 
   if (!empty($result['crm_contact']) && count($result['crm_contact']) > 1) {
