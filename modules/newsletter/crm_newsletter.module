@@ -396,26 +396,26 @@ function crm_newsletter_subscribe_confirmation($channel) {
 function crm_newsletter_crm_channel_presave($channel) {
   if (isset($channel->unsubscribe) && $channel->unsubscribe == TRUE) {
     $method = variable_get('crm_channel_ui_' . $channel->type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
-    if ($method == CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT) {
+    if ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT && function_exists('_crm_message_channel_supported') && _crm_message_channel_supported($channel->type)) {
+      _crm_channel_generate_token($channel);
+      $channel->log = 'Channel token has been generated';
+    }
+    else {
       // Disable newsletter status for channel..
       $channel->status = CRM_CHANNEL_STATUS_REGISTERED;
       $channel->log = 'Channel does not want to receive newsletter messages';
     }
-    elseif ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT) {
-      _crm_channel_generate_token($channel);
-      $channel->log = 'Channel token has been generated';
-    }
   }
   elseif (isset($channel->subscribe) && $channel->subscribe == TRUE) {
     $method = variable_get('crm_channel_ui_' . $channel->type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
-    if ($method == CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT) {
+    if ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT && function_exists('_crm_message_channel_supported') && _crm_message_channel_supported($channel->type)) {
+      _crm_channel_generate_token($channel);
+      $channel->log = 'Channel token has been generated';
+    }
+    else {
       // Disable newsletter status for channel..
       $channel->status = CRM_CHANNEL_STATUS_REGISTERED;
       $channel->log = 'Channel wants to receive newsletter messages';
-    }
-    elseif ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT) {
-      _crm_channel_generate_token($channel);
-      $channel->log = 'Channel token has been generated';
     }
   }
 }
@@ -426,10 +426,7 @@ function crm_newsletter_crm_channel_presave($channel) {
 function crm_newsletter_crm_channel_update($channel) {
   if (isset($channel->unsubscribe) && $channel->unsubscribe == TRUE) {
     $method = variable_get('crm_channel_ui_' . $channel->type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
-    if ($method == CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT) {
-      drupal_set_message(t('You will not receive newsletter messages any more.'));
-    }
-    elseif ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT) {
+    if ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT && function_exists('_crm_message_channel_supported') && _crm_message_channel_supported($channel->type)) {
       if (($message = crm_newsletter_prepare_message($channel, 'unsubscribe')) && crm_message_send($message)) {
         drupal_set_message(t('!channel: Message has been sent. Click on the confirmation link to complete.', array('!channel' => crm_channel_label($channel))), 'warning');
       }
@@ -437,19 +434,22 @@ function crm_newsletter_crm_channel_update($channel) {
         drupal_set_message(t('!channel: Unable to send message. Try again.', array('!channel' => crm_channel_label($channel))), 'error');
       }
     }
+    else {
+      drupal_set_message(t('You will not receive newsletter messages any more.'));
+    }
   }
   elseif (isset($channel->subscribe) && $channel->subscribe == TRUE) {
     $method = variable_get('crm_channel_ui_' . $channel->type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
-    if ($method == CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT) {
-      drupal_set_message(t('!channel has been added to newsletter.', array('!channel' => crm_channel_label($channel))));
-    }
-    elseif ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT) {
+    if ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT && function_exists('_crm_message_channel_supported') && _crm_message_channel_supported($channel->type)) {
       if (($message = crm_newsletter_prepare_message($channel, 'subscribe')) && crm_message_send($message)) {
         drupal_set_message(t('!channel: Message has been sent. Click on the confirmation link to complete.', array('!channel' => crm_channel_label($channel))), 'warning');
       }
       else {
         drupal_set_message(t('!channel: Unable to send message. Try again.', array('!channel' => crm_channel_label($channel))), 'error');
       }
+    }
+    else {
+      drupal_set_message(t('!channel has been added to newsletter.', array('!channel' => crm_channel_label($channel))));
     }
   }
 }
@@ -462,7 +462,7 @@ function crm_newsletter_prepare_message($channel, $message = 'unsubscribe') {
     return FALSE;
   }
   $type = $channel->type;
-  $entity = entity_get_info('crm_channel');
+  $entity = entity_get_info('crm_message');
   if (!isset($type) || !isset($entity['bundles'][$type]['module'])) {
     return FALSE;
   }
@@ -494,16 +494,19 @@ function _crm_newsletter_get_channels() {
  * Implements hook_form_FORM_ID_alter().
  */
 function crm_newsletter_form_crm_channel_ui_settings_alter(&$form, &$form_state) {
-  if (isset($form_state['build_info']['args'][0]) && $type = $form_state['build_info']['args'][0]);
-  $form['crm_channel_ui_' . $type . '_newsletter'] = array(
-    '#type' => 'radios',
-    '#title' => t('Unsubscribe'),
-    '#default_value' => variable_get('crm_channel_ui_' . $type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT),
-    '#options' => array(
-      CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT => t('Single opt in'),
-      CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT => t('Double opt in'),
-    ),
-  );
+  if (isset($form_state['build_info']['args'][0]) && $type = $form_state['build_info']['args'][0]) {
+    if (function_exists('_crm_message_channel_supported') && _crm_message_channel_supported($type)) {
+      $form['crm_channel_ui_' . $type . '_newsletter'] = array(
+        '#type' => 'radios',
+        '#title' => t('Subscription'),
+        '#default_value' => variable_get('crm_channel_ui_' . $type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT),
+        '#options' => array(
+          CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT => t('Single opt'),
+          CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT => t('Double opt'),
+        ),
+      );
+    }
+  }
 }
 
 /**

@@ -19,7 +19,7 @@ function crm_phone_install() {
     'type' => 'telephone',
     'module' => 'telephone',
     'active' => 1,
-    'locked' => 1,
+    'locked' => 0,
     'cardinality' => 1,
     'deleted' => 0,
   );
@@ -69,25 +69,9 @@ function crm_phone_uninstall() {
     'bundle' => 'phone',
   );
   field_delete_instance($instance);
-  $instance = array(
-    'entity_type' => 'crm_message',
-    'field_name' => 'crm_message_phone',
-    'bundle' => 'phone',
-  );
-  field_delete_instance($instance);
-  $instance = array(
-    'entity_type' => 'crm_message',
-    'field_name' => 'crm_message_phone_body',
-    'bundle' => 'phone',
-  );
-  field_delete_instance($instance);
+
 
   variable_del('crm_channel_ui_phone_newsletter');
-
-  if (db_table_exists('crm_message')) {
-    field_attach_delete_bundle('crm_message', 'phone');
-    db_delete('crm_message')->condition('type', 'phone')->execute();
-  }
   if (db_table_exists('crm_channel')) {
     field_attach_delete_bundle('crm_channel', 'phone');
     db_delete('crm_channel')->condition('type', 'phone')->execute();

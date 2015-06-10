@@ -71,33 +71,8 @@ function crm_email_uninstall() {
   );
   field_delete_instance($instance);
 
-  $instance = array(
-    'entity_type' => 'crm_message',
-    'field_name' => 'crm_message_email',
-    'bundle' => 'email',
-  );
-  field_delete_instance($instance);
-
-  $instance = array(
-    'entity_type' => 'crm_message',
-    'field_name' => 'crm_message_email_subject',
-    'bundle' => 'email',
-  );
-  field_delete_instance($instance);
-
-  $instance = array(
-    'entity_type' => 'crm_message',
-    'field_name' => 'crm_message_email_body',
-    'bundle' => 'email',
-  );
-  field_delete_instance($instance);
-
   variable_del('crm_channel_ui_email_newsletter');
 
-  if (db_table_exists('crm_message')) {
-    field_attach_delete_bundle('crm_message', 'email');
-    db_delete('crm_message')->condition('type', 'email')->execute();
-  }
   if (db_table_exists('crm_channel')) {
     field_attach_delete_bundle('crm_channel', 'email');
     db_delete('crm_channel')->condition('type', 'email')->execute();

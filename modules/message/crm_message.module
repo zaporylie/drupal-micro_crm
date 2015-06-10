@@ -151,3 +151,19 @@ function crm_message_send($message) {
   }
   return FALSE;
 }
+
+/**
+ * Returns boolean value if channel is supported by message module or not.
+ *
+ * @param $type
+ * @return bool
+ */
+function _crm_message_channel_supported($type) {
+  $entity = entity_get_info('crm_message');
+  if (isset($entity['bundles'][$type])) {
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}

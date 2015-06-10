@@ -1,11 +1,15 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Implements hook_crm_message_send().
  *
  * @see crm_message_send().
  */
-function crm_email_crm_message_send($message) {
+function crm_email_message_crm_message_send($message) {
   $wrapper = entity_metadata_wrapper('crm_message', $message);
   // @todo ensure all fields exists and was filled.
   if (!$wrapper->__isset('crm_message_email') || !$wrapper->crm_message_email->value()) {
@@ -19,25 +23,14 @@ function crm_email_crm_message_send($message) {
   }
   $params['subject'] = $subject;
   $params['body'] = $body;
-  $result = drupal_mail('crm_email', 'message', $wrapper->crm_message_email->crm_email->value(), $wrapper->language->value(), $params);
+  $result = drupal_mail('crm_email_message', 'message', $wrapper->crm_message_email->crm_email->value(), $wrapper->language->value(), $params);
   return $result['result'];
-}
-
-/**
- * Implements hook_crm_channel_label().
- */
-function crm_email_crm_channel_label($channel) {
-  $wrapper = entity_metadata_wrapper('crm_channel', $channel);
-  if (!$wrapper->__isset('crm_email')) {
-    return NULL;
-  }
-  return $wrapper->crm_email->value();
 }
 
 /**
  * Implements hook_crm_newsletter_prepare_message().
  */
-function crm_email_crm_newsletter_prepare_message($channel, $type = 'unsubscribe') {
+function crm_email_message_crm_newsletter_prepare_message($channel, $type = 'unsubscribe') {
   $message = entity_create('crm_message', array('type' => 'email'));
   $wrapper = entity_metadata_wrapper('crm_message', $message);
   if (!$wrapper->__isset('crm_message_email')) {

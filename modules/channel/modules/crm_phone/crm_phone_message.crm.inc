@@ -1,11 +1,15 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Implements hook_crm_message_send().
  *
  * @see crm_message_send().
  */
-function crm_phone_crm_message_send($message) {
+function crm_phone_message_crm_message_send($message) {
   $wrapper = entity_metadata_wrapper('crm_message', $message);
   if (!$wrapper->__isset('crm_message_phone') || !$wrapper->crm_message_phone->value()) {
     return FALSE;
@@ -16,27 +20,13 @@ function crm_phone_crm_message_send($message) {
   if (!$wrapper->__isset('crm_message_phone_body') || !($number = $wrapper->crm_message_phone->crm_phone->value())) {
     return FALSE;
   }
-  if (!function_exists('sms_send')) {
-    return FALSE;
-  }
   return sms_send($number, $message, array('message_id' => $wrapper->getIdentifier()));
-}
-
-/**
- * Implements hook_crm_channel_label().
- */
-function crm_phone_crm_channel_label($channel) {
-  $wrapper = entity_metadata_wrapper('crm_channel', $channel);
-  if (!$wrapper->__isset('crm_phone')) {
-    return NULL;
-  }
-  return $wrapper->crm_phone->value();
 }
 
 /**
  * Implements hook_crm_newsletter_prepare_message().
  */
-function crm_phone_crm_newsletter_prepare_message($channel, $type = 'unsubscribe') {
+function crm_phone_message_crm_newsletter_prepare_message($channel, $type = 'unsubscribe') {
   $message = entity_create('crm_message', array('type' => 'phone'));
   $wrapper = entity_metadata_wrapper('crm_message', $message);
   if (!$wrapper->__isset('crm_message_phone')) {
