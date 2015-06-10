@@ -10,7 +10,7 @@ class CRMTestCase extends DrupalWebTestCase {
     return array(
       'name' => 'CRM',
       'description' => 'Tests basic CRM functions.',
-      'group' => 'CRM',
+      'group' => 'crm',
     );
   }
 

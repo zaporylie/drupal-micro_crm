@@ -12,7 +12,7 @@ class CRMUITestCase extends DrupalWebTestCase {
     return array(
       'name' => 'CRM UI',
       'description' => 'CRM interface accessibility.',
-      'group' => 'CRM',
+      'group' => 'crm',
     );
   }
 
