@@ -8,114 +8,114 @@
 /**
  * Implements hook_menu().
  */
-function micro_crm_message_ui_menu() {
+function crm_message_ui_menu() {
   $items = array();
 
-  $items['admin/people/micro_crm/config/message'] = array(
+  $items['admin/people/crm/config/message'] = array(
     'title' => 'Message',
-    'page callback' => 'micro_crm_index',
+    'page callback' => 'crm_index',
     'page arguments' => array(),
-    'access arguments' => array('micro crm manage'),
+    'access arguments' => array('crm manage'),
     'type' => MENU_NORMAL_ITEM,
   );
 
-  foreach (micro_crm_channel_types() as $type => $bundle) {
+  foreach (crm_channel_types() as $type => $bundle) {
     $type_arg = strtr($type, '_', '-');
-    $items['admin/people/micro_crm/config/message/' . $type_arg] = array(
+    $items['admin/people/crm/config/message/' . $type_arg] = array(
       'title' => $bundle,
       'page callback' => 'drupal_get_form',
-      'page arguments' => array('micro_crm_message_ui_settings', $type),
-      'access arguments' => array('micro crm manage'),
+      'page arguments' => array('crm_message_ui_settings', $type),
+      'access arguments' => array('crm manage'),
       'type' => MENU_NORMAL_ITEM,
     );
   }
 
-  $items['admin/people/micro_crm/message'] = array(
+  $items['admin/people/crm/message'] = array(
     'title' => 'Message',
-    'page callback' => 'micro_crm_message_ui_list',
+    'page callback' => 'crm_message_ui_list',
     'page arguments' => array(),
-    'access arguments' => array('micro crm message overview'),
+    'access arguments' => array('crm message overview'),
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'includes/micro_crm_message_ui.list.inc',
+    'file' => 'includes/crm_message_ui.list.inc',
   );
 
-  $items['admin/people/micro_crm/message/%micro_crm_message'] = array(
-    'title callback' => 'micro_crm_message_label',
+  $items['admin/people/crm/message/%crm_message'] = array(
+    'title callback' => 'crm_message_label',
     'title arguments' => array(4),
-    'page callback' => 'micro_crm_message_view',
+    'page callback' => 'crm_message_view',
     'page arguments' => array(4),
-    'access callback' => 'micro_crm_message_access',
+    'access callback' => 'crm_message_access',
     'access arguments' => array('view', 4),
     'type' => MENU_CALLBACK,
-    'file' => 'includes/micro_crm_message_ui.list.inc',
+    'file' => 'includes/crm_message_ui.list.inc',
   );
 
-  $items['admin/people/micro_crm/message/%micro_crm_message/view'] = array(
+  $items['admin/people/crm/message/%crm_message/view'] = array(
     'title' => 'View',
-    'page callback' => 'micro_crm_message_view',
+    'page callback' => 'crm_message_view',
     'page arguments' => array(4),
-    'access callback' => 'micro_crm_message_access',
+    'access callback' => 'crm_message_access',
     'access arguments' => array('view', 4),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'file' => 'includes/micro_crm_message_ui.list.inc',
+    'file' => 'includes/crm_message_ui.list.inc',
     'weight' => -2,
   );
 
-  $items['admin/people/micro_crm/message/%micro_crm_message/edit'] = array(
+  $items['admin/people/crm/message/%crm_message/edit'] = array(
     'title' => 'Edit',
-    'page callback' => 'micro_crm_message_ui_form_wrapper',
+    'page callback' => 'crm_message_ui_form_wrapper',
     'page arguments' => array(4),
-    'access callback' => 'micro_crm_message_access',
+    'access callback' => 'crm_message_access',
     'access arguments' => array('update', 4),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'file' => 'includes/micro_crm_message_ui.form.inc',
+    'file' => 'includes/crm_message_ui.form.inc',
     'weight' => -1,
   );
 
-  $items['admin/people/micro_crm/message/%micro_crm_message/delete'] = array(
+  $items['admin/people/crm/message/%crm_message/delete'] = array(
     'title' => 'Delete',
-    'page callback' => 'micro_crm_message_ui_form_wrapper',
+    'page callback' => 'crm_message_ui_form_wrapper',
     'page arguments' => array(4, TRUE),
-    'access callback' => 'micro_crm_message_access',
+    'access callback' => 'crm_message_access',
     'access arguments' => array('delete', 4),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'file' => 'includes/micro_crm_message_ui.form.inc',
+    'file' => 'includes/crm_message_ui.form.inc',
     'weight' => 99,
   );
 
-  $items['admin/people/micro_crm/message/%micro_crm_message/send'] = array(
+  $items['admin/people/crm/message/%crm_message/send'] = array(
     'title' => 'Send',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('micro_crm_message_ui_send', 4),
-    'access callback' => 'micro_crm_message_access',
+    'page arguments' => array('crm_message_ui_send', 4),
+    'access callback' => 'crm_message_access',
     'access arguments' => array('send', 4),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'file' => 'includes/micro_crm_message_ui.form.inc',
+    'file' => 'includes/crm_message_ui.form.inc',
     'weight' => 99,
   );
 
-  $items['admin/people/micro_crm/message/add'] = array(
+  $items['admin/people/crm/message/add'] = array(
     'title' => 'Add message',
-    'page callback' => 'micro_crm_message_ui_add',
+    'page callback' => 'crm_message_ui_add',
     'page arguments' => array(),
-    'access callback' => 'micro_crm_message_access',
+    'access callback' => 'crm_message_access',
     'access arguments' => array('create'),
     'type' => MENU_LOCAL_ACTION,
-    'file' => 'includes/micro_crm_message_ui.list.inc',
+    'file' => 'includes/crm_message_ui.list.inc',
   );
 
-  $items['admin/people/micro_crm/message/add/%'] = array(
+  $items['admin/people/crm/message/add/%'] = array(
     'title' => 'Add message',
-    'page callback' => 'micro_crm_message_ui_form_wrapper',
+    'page callback' => 'crm_message_ui_form_wrapper',
     'page arguments' => array(NULL, FALSE, 5),
-    'access callback' => 'micro_crm_message_access',
+    'access callback' => 'crm_message_access',
     'access arguments' => array('create'),
     'type' => MENU_CALLBACK,
-    'file' => 'includes/micro_crm_message_ui.form.inc',
+    'file' => 'includes/crm_message_ui.form.inc',
   );
 
   return $items;
@@ -124,19 +124,19 @@ function micro_crm_message_ui_menu() {
 /**
  * Settings form.
  */
-function micro_crm_message_ui_settings($form, &$form_state, $bundle) {
+function crm_message_ui_settings($form, &$form_state, $bundle) {
   return system_settings_form($form);
 }
 
 /**
  * Implements hook_entity_info_alter().
  */
-function micro_crm_message_ui_entity_info_alter(&$entity_info) {
+function crm_message_ui_entity_info_alter(&$entity_info) {
   // Expose the admin UI for product fields.
-  foreach ($entity_info['micro_crm_message']['bundles'] as $type => &$bundle) {
+  foreach ($entity_info['crm_message']['bundles'] as $type => &$bundle) {
     $bundle['admin'] = array(
-      'path' => 'admin/people/micro_crm/config/message/' . strtr($type, '_', '-'),
-      'access arguments' => array('micro crm manage'),
+      'path' => 'admin/people/crm/config/message/' . strtr($type, '_', '-'),
+      'access arguments' => array('crm manage'),
     );
   }
 }

@@ -8,80 +8,80 @@
 /**
  * Implements hook_menu().
  */
-function micro_crm_contact_ui_menu() {
+function crm_contact_ui_menu() {
   $items = array();
 
-  $items['admin/people/micro_crm/contact'] = array(
+  $items['admin/people/crm/contact'] = array(
     'title' => 'Contact',
-    'page callback' => 'micro_crm_contact_ui_list',
+    'page callback' => 'crm_contact_ui_list',
     'page arguments' => array(),
-    'access arguments' => array('micro crm contact overview'),
+    'access arguments' => array('crm contact overview'),
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'includes/micro_crm_contact_ui.list.inc',
+    'file' => 'includes/crm_contact_ui.list.inc',
   );
 
-  $items['admin/people/micro_crm/contact/%micro_crm_contact'] = array(
-    'title callback' => 'micro_crm_contact_label',
+  $items['admin/people/crm/contact/%crm_contact'] = array(
+    'title callback' => 'crm_contact_label',
     'title arguments' => array(4),
-    'page callback' => 'micro_crm_contact_view',
+    'page callback' => 'crm_contact_view',
     'page arguments' => array(4),
-    'access callback' => 'micro_crm_contact_access',
+    'access callback' => 'crm_contact_access',
     'access arguments' => array('view', 4),
     'type' => MENU_CALLBACK,
-    'file' => 'includes/micro_crm_contact_ui.list.inc',
+    'file' => 'includes/crm_contact_ui.list.inc',
   );
 
-  $items['admin/people/micro_crm/contact/%micro_crm_contact/view'] = array(
+  $items['admin/people/crm/contact/%crm_contact/view'] = array(
     'title' => 'View',
-    'page callback' => 'micro_crm_contact_view',
+    'page callback' => 'crm_contact_view',
     'page arguments' => array(4),
-    'access callback' => 'micro_crm_contact_access',
+    'access callback' => 'crm_contact_access',
     'access arguments' => array('view', 4),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'file' => 'includes/micro_crm_contact_ui.list.inc',
+    'file' => 'includes/crm_contact_ui.list.inc',
     'weight' => -2,
   );
 
-  $items['admin/people/micro_crm/contact/%micro_crm_contact/edit'] = array(
+  $items['admin/people/crm/contact/%crm_contact/edit'] = array(
     'title' => 'Edit',
-    'page callback' => 'micro_crm_contact_ui_form_wrapper',
+    'page callback' => 'crm_contact_ui_form_wrapper',
     'page arguments' => array(4),
-    'access callback' => 'micro_crm_contact_access',
+    'access callback' => 'crm_contact_access',
     'access arguments' => array('update', 4),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'file' => 'includes/micro_crm_contact_ui.form.inc',
+    'file' => 'includes/crm_contact_ui.form.inc',
     'weight' => -1,
   );
 
-  $items['admin/people/micro_crm/contact/%micro_crm_contact/delete'] = array(
+  $items['admin/people/crm/contact/%crm_contact/delete'] = array(
     'title' => 'Delete',
-    'page callback' => 'micro_crm_contact_ui_form_wrapper',
+    'page callback' => 'crm_contact_ui_form_wrapper',
     'page arguments' => array(4, TRUE),
-    'access callback' => 'micro_crm_contact_access',
+    'access callback' => 'crm_contact_access',
     'access arguments' => array('delete', 4),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'file' => 'includes/micro_crm_contact_ui.form.inc',
+    'file' => 'includes/crm_contact_ui.form.inc',
     'weight' => 99,
   );
 
-  $items['admin/people/micro_crm/contact/add'] = array(
+  $items['admin/people/crm/contact/add'] = array(
     'title' => 'Add contact',
-    'page callback' => 'micro_crm_contact_ui_form_wrapper',
+    'page callback' => 'crm_contact_ui_form_wrapper',
     'page arguments' => array(),
-    'access callback' => 'micro_crm_contact_access',
+    'access callback' => 'crm_contact_access',
     'access arguments' => array('create'),
     'type' => MENU_LOCAL_ACTION,
-    'file' => 'includes/micro_crm_contact_ui.form.inc',
+    'file' => 'includes/crm_contact_ui.form.inc',
   );
 
-  $items['admin/people/micro_crm/config/contact'] = array(
+  $items['admin/people/crm/config/contact'] = array(
     'title' => 'Contact',
-    'page callback' => 'micro_crm_index',
+    'page callback' => 'crm_index',
     'page arguments' => array(),
-    'access arguments' => array('micro crm manage'),
+    'access arguments' => array('crm manage'),
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -91,26 +91,26 @@ function micro_crm_contact_ui_menu() {
 /**
  * Implements hook_views_api().
  */
-function micro_crm_contact_ui_views_api() {
+function crm_contact_ui_views_api() {
   return array(
     'api' => 3,
-    'path' => drupal_get_path('module', 'micro_crm_contact_ui') . '/includes/views',
+    'path' => drupal_get_path('module', 'crm_contact_ui') . '/includes/views',
   );
 }
 
 /**
  * Implements hook_entity_info_alter().
  */
-function micro_crm_contact_ui_entity_info_alter(&$entity_info) {
+function crm_contact_ui_entity_info_alter(&$entity_info) {
 
   // Uri callback.
-  $entity_info['micro_crm_contact']['uri callback'] = 'micro_crm_contact_ui_uri';
+  $entity_info['crm_contact']['uri callback'] = 'crm_contact_ui_uri';
 
   // Expose the order UI for order fields.
-  $entity_info['micro_crm_contact']['bundles']['micro_crm_contact']['admin'] = array(
-    'path' => 'admin/people/micro_crm/config/contact',
-    'real path' => 'admin/people/micro_crm/config/contact',
-    'access arguments' => array('micro crm contact administer'),
+  $entity_info['crm_contact']['bundles']['crm_contact']['admin'] = array(
+    'path' => 'admin/people/crm/config/contact',
+    'real path' => 'admin/people/crm/config/contact',
+    'access arguments' => array('crm contact administer'),
   );
 }
 
@@ -119,7 +119,7 @@ function micro_crm_contact_ui_entity_info_alter(&$entity_info) {
  *
  * @param $contact
  */
-function micro_crm_contact_ui_uri($contact) {
+function crm_contact_ui_uri($contact) {
 //  // First look for a return value in the default entity uri callback.
 //  $uri = commerce_order_uri($order);
 //
@@ -129,9 +129,9 @@ function micro_crm_contact_ui_uri($contact) {
 //  }
 
   // Only return a value if the user has permission to view the order.
-  if (micro_crm_contact_access('view', $contact)) {
+  if (crm_contact_access('view', $contact)) {
     return array(
-      'path' => 'admin/people/micro_crm/contact/' . entity_id('micro_crm_contact', $contact),
+      'path' => 'admin/people/crm/contact/' . entity_id('crm_contact', $contact),
     );
   }
 
@@ -141,8 +141,8 @@ function micro_crm_contact_ui_uri($contact) {
 /**
  * Implements hook_field_widget_form_alter().
  */
-function micro_crm_contact_ui_field_widget_form_alter(&$element, &$form_state, $context) {
-  if (isset($element['#field_name']) && $element['#field_name'] == 'field_micro_crm_deprecated') {
+function crm_contact_ui_field_widget_form_alter(&$element, &$form_state, $context) {
+  if (isset($element['#field_name']) && $element['#field_name'] == 'field_crm_deprecated') {
     $element['#access'] = FALSE;
   }
 }

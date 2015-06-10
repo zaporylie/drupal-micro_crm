@@ -8,10 +8,10 @@
 /**
  * Implements hook_schema().
  */
-function micro_crm_contact_schema() {
+function crm_contact_schema() {
 
-  module_load_include('module', 'micro_crm_contact', 'micro_crm_contact');
-  $schema['micro_crm_contact'] = array(
+  module_load_include('module', 'crm_contact', 'crm_contact');
+  $schema['crm_contact'] = array(
     'description' => 'Contact entity',
     'fields' => array(
       'contact_id' => array(
@@ -21,7 +21,7 @@ function micro_crm_contact_schema() {
         'not null' => TRUE,
       ),
       'revision_id' => array(
-        'description' => 'The current {micro_crm_contact_revision}.revision_id version identifier.',
+        'description' => 'The current {crm_contact_revision}.revision_id version identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
@@ -43,7 +43,7 @@ function micro_crm_contact_schema() {
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
-        'default' => MICRO_CRM_CONTACT_STATUS_REGISTERED,
+        'default' => CRM_CONTACT_STATUS_REGISTERED,
       ),
       'token' => array(
         'description' => 'One-time token.',
@@ -71,19 +71,19 @@ function micro_crm_contact_schema() {
       'token' => array('token'),
     ),
     'foreign keys' => array(
-      'micro_crm_contact_revision' => array(
-        'table' => 'micro_crm_contact_revision',
+      'crm_contact_revision' => array(
+        'table' => 'crm_contact_revision',
         'columns' => array('revision_id' => 'revision_id'),
       ),
     ),
     'indexes' => array(
-      'micro_crm_contact_id' => array('contact_id'),
-      'micro_crm_status' => array('status'),
+      'crm_contact_id' => array('contact_id'),
+      'crm_status' => array('status'),
       'language' => array('language'),
     ),
   );
   
-  $schema['micro_crm_contact_revision'] = array(
+  $schema['crm_contact_revision'] = array(
     'description' => 'Contact entity revision',
     'fields' => array(
       'revision_id' => array(
@@ -93,7 +93,7 @@ function micro_crm_contact_schema() {
         'not null' => TRUE,
       ),
       'contact_id' => array(
-        'description' => 'Parent {micro_crm_contact}.contact_id contact identifier.',
+        'description' => 'Parent {crm_contact}.contact_id contact identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
@@ -103,7 +103,7 @@ function micro_crm_contact_schema() {
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
-        'default' => MICRO_CRM_CONTACT_STATUS_REGISTERED,
+        'default' => CRM_CONTACT_STATUS_REGISTERED,
       ),
       'language' => array(
         'description' => 'The {languages}.language of this record.',
@@ -133,8 +133,8 @@ function micro_crm_contact_schema() {
     ),
     'primary key' => array('revision_id'),
     'foreign keys' => array(
-      'micro_crm_contact' => array(
-        'table' => 'micro_crm_contact',
+      'crm_contact' => array(
+        'table' => 'crm_contact',
         'columns' => array('contact_id' => 'contact_id'),
       ),
     ),
@@ -149,12 +149,12 @@ function micro_crm_contact_schema() {
 /**
  * Implements hook_install().
  */
-function micro_crm_contact_install() {
+function crm_contact_install() {
 
   $t = get_t();
   $field = array(
     'settings' => array(
-      'target_type' => 'micro_crm_contact',
+      'target_type' => 'crm_contact',
       'handler' => 'base',
       'handler_settings' => array(
         'target_bundles' => array(),
@@ -168,7 +168,7 @@ function micro_crm_contact_install() {
         ),
       ),
     ),
-    'field_name' => 'field_micro_crm_deprecated',
+    'field_name' => 'field_crm_deprecated',
     'type' => 'entityreference',
     'module' => 'entityreference',
     'active' => 1,
@@ -205,9 +205,9 @@ function micro_crm_contact_install() {
     'required' => 0,
     'description' => '',
     'default_value' => NULL,
-    'field_name' => 'field_micro_crm_deprecated',
-    'entity_type' => 'micro_crm_contact',
-    'bundle' => 'micro_crm_contact',
+    'field_name' => 'field_crm_deprecated',
+    'entity_type' => 'crm_contact',
+    'bundle' => 'crm_contact',
     'deleted' => 0,
   );
   field_create_instance($instance);
@@ -216,12 +216,12 @@ function micro_crm_contact_install() {
 /**
  * Implements hook_uninstall().
  */
-function micro_crm_contact_uninstall() {
+function crm_contact_uninstall() {
 
   $instance = array(
-    'entity_type' => 'micro_crm_contact',
-    'field_name' => 'field_micro_crm_deprecated',
-    'bundle' => 'micro_crm_contact',
+    'entity_type' => 'crm_contact',
+    'field_name' => 'field_crm_deprecated',
+    'bundle' => 'crm_contact',
   );
   field_delete_instance($instance);
 }

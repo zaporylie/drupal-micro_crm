@@ -6,9 +6,9 @@
  */
 
 /**
- * Class MicroCRMMessageController
+ * Class CRMMessageController
  */
-class MicroCRMMessageController extends EntityAPIController {
+class CRMMessageController extends EntityAPIController {
 
   /**
    * Overrides EntityAPIController::buildQuery().
@@ -49,24 +49,24 @@ class MicroCRMMessageController extends EntityAPIController {
     if ($op !== 'create' && !$entity) {
       return FALSE;
     }
-    if (!in_array($op, array('create', 'view')) && $entity->status == MICRO_CRM_MESSAGE_STATUS_SENT) {
+    if (!in_array($op, array('create', 'view')) && $entity->status == CRM_MESSAGE_STATUS_SENT) {
       return FALSE;
     }
     // The administer permission is a blanket override.
-    if (user_access('micro crm bypass access')) {
+    if (user_access('crm bypass access')) {
       return TRUE;
     }
     switch ($op) {
       case 'create':
-        return user_access('micro crm message create');
+        return user_access('crm message create');
       case 'send':
-        return user_access('micro crm message send');
+        return user_access('crm message send');
       case 'view':
-        return user_access('micro crm message view');
+        return user_access('crm message view');
       case 'update':
-        return user_access('micro crm message update');
+        return user_access('crm message update');
       case 'delete':
-        return user_access('micro crm message delete');
+        return user_access('crm message delete');
     }
     return FALSE;
   }
@@ -83,7 +83,7 @@ class MicroCRMMessageController extends EntityAPIController {
    */
   public function create(array $values = array()) {
     $values += array(
-      'status' => MICRO_CRM_MESSAGE_STATUS_REGISTERED,
+      'status' => CRM_MESSAGE_STATUS_REGISTERED,
       'language' => LANGUAGE_NONE,
     );
     return parent::create($values);

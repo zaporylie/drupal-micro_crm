@@ -5,55 +5,55 @@
  * Blocks and logic behind newsletter integration.
  */
 
-define('MICRO_CRM_NEWSLETTER_CHANNEL_STATUS', 'newsletter');
-define('MICRO_CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT', 'single_opt');
-define('MICRO_CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT', 'double_opt');
+define('CRM_NEWSLETTER_CHANNEL_STATUS', 'newsletter');
+define('CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT', 'single_opt');
+define('CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT', 'double_opt');
 
 /**
  * Implements hook_menu().
  */
-function micro_crm_newsletter_menu() {
+function crm_newsletter_menu() {
   $items = array();
-  $items['admin/people/micro_crm/config/newsletter'] = array(
+  $items['admin/people/crm/config/newsletter'] = array(
     'title' => 'Newsletter',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('micro_crm_newsletter_settings'),
-    'access arguments' => array('micro crm manage'),
+    'page arguments' => array('crm_newsletter_settings'),
+    'access arguments' => array('crm manage'),
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'micro_crm_newsletter.admin.inc',
+    'file' => 'crm_newsletter.admin.inc',
   );
-  $items['micro_crm/newsletter'] = array(
+  $items['crm/newsletter'] = array(
     'title' => 'Subscribe',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('micro_crm_newsletter_form'),
-    'access arguments' => array('micro crm newsletter subscription'),
+    'page arguments' => array('crm_newsletter_form'),
+    'access arguments' => array('crm newsletter subscription'),
     'type' => MENU_NORMAL_ITEM,
   );
-  $items['micro_crm/newsletter/subscribe'] = array(
+  $items['crm/newsletter/subscribe'] = array(
     'title' => 'Subscribe',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('micro_crm_newsletter_form'),
-    'access arguments' => array('micro crm newsletter subscription'),
+    'page arguments' => array('crm_newsletter_form'),
+    'access arguments' => array('crm newsletter subscription'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
-  $items['micro_crm/newsletter/unsubscribe'] = array(
+  $items['crm/newsletter/unsubscribe'] = array(
     'title' => 'Unsubscribe',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('micro_crm_newsletter_unsubscribe_form'),
-    'access arguments' => array('micro crm newsletter subscription'),
+    'page arguments' => array('crm_newsletter_unsubscribe_form'),
+    'access arguments' => array('crm newsletter subscription'),
     'type' => MENU_LOCAL_TASK,
   );
-  $items['micro_crm/newsletter/unsubscribe/%micro_crm_channel_token'] = array(
-    'page callback' => 'micro_crm_newsletter_unsubscribe_confirmation',
+  $items['crm/newsletter/unsubscribe/%crm_channel_token'] = array(
+    'page callback' => 'crm_newsletter_unsubscribe_confirmation',
     'page arguments' => array(3),
-    'access callback' => 'micro_crm_channel_token_access_callback',
+    'access callback' => 'crm_channel_token_access_callback',
     'access arguments' => array(3),
     'type' => MENU_CALLBACK,
   );
-  $items['micro_crm/newsletter/subscribe/%micro_crm_channel_token'] = array(
-    'page callback' => 'micro_crm_newsletter_subscribe_confirmation',
+  $items['crm/newsletter/subscribe/%crm_channel_token'] = array(
+    'page callback' => 'crm_newsletter_subscribe_confirmation',
     'page arguments' => array(3),
-    'access callback' => 'micro_crm_channel_token_access_callback',
+    'access callback' => 'crm_channel_token_access_callback',
     'access arguments' => array(3),
     'type' => MENU_CALLBACK,
   );
@@ -63,7 +63,7 @@ function micro_crm_newsletter_menu() {
 /**
  * Implements hook_block_info().
  */
-function micro_crm_newsletter_block_info() {
+function crm_newsletter_block_info() {
   return array(
     'newsletter' => array(
       'info' => t('Newsletter'),
@@ -75,10 +75,10 @@ function micro_crm_newsletter_block_info() {
 /**
  * Implements hook_hook_info().
  */
-function micro_crm_newsletter_hook_info() {
+function crm_newsletter_hook_info() {
   return array(
-    'micro_crm_newsletter_prepare_message' => array(
-      'group' => 'micro_crm',
+    'crm_newsletter_prepare_message' => array(
+      'group' => 'crm',
     ),
   );
 }
@@ -86,21 +86,21 @@ function micro_crm_newsletter_hook_info() {
 /**
  * Implements hook_permission().
  */
-function micro_crm_newsletter_permission() {
+function crm_newsletter_permission() {
   return array(
-    'micro crm newsletter subscription' => array(
+    'crm newsletter subscription' => array(
       'title' => t('Subscribe / unsubscribe newsletter'),
     ),
   );
 }
 
 /**
- * Implements hook_micro_crm_channel_status_info().
+ * Implements hook_crm_channel_status_info().
  */
-function micro_crm_newsletter_micro_crm_channel_status_info() {
-  $statuses[MICRO_CRM_NEWSLETTER_CHANNEL_STATUS] = array(
+function crm_newsletter_crm_channel_status_info() {
+  $statuses[CRM_NEWSLETTER_CHANNEL_STATUS] = array(
     'title' => t('Newsletter'),
-    'state' => MICRO_CRM_CHANNEL_STATE_ACTIVE,
+    'state' => CRM_CHANNEL_STATE_ACTIVE,
   );
   return $statuses;
 }
@@ -108,13 +108,13 @@ function micro_crm_newsletter_micro_crm_channel_status_info() {
 /**
  * Implements hook_block_view().
  */
-function micro_crm_newsletter_block_view($delta = '') {
+function crm_newsletter_block_view($delta = '') {
   $block = array();
   switch ($delta) {
     case 'newsletter':
       $block['subject'] = t('Newsletter');
-      $block['content'] = drupal_get_form('micro_crm_newsletter_form');
-      $block['content']['#attached']['css'][] = drupal_get_path('module', 'micro_crm_newsletter') . '/micro_crm_newsletter.css';
+      $block['content'] = drupal_get_form('crm_newsletter_form');
+      $block['content']['#attached']['css'][] = drupal_get_path('module', 'crm_newsletter') . '/crm_newsletter.css';
       break;
   }
   return $block;
@@ -123,29 +123,29 @@ function micro_crm_newsletter_block_view($delta = '') {
 /**
  * Newsletter form.
  */
-function micro_crm_newsletter_form($form, &$form_state) {
+function crm_newsletter_form($form, &$form_state) {
   $form['#tree'] = TRUE;
 
   if (!isset($form['#parents'])) {
     $form['#parents'] = array();
   }
   $form['bundles']['#tree'] = TRUE;
-  foreach (_micro_crm_newsletter_get_channels() as $channel) {
+  foreach (_crm_newsletter_get_channels() as $channel) {
     $form['bundles'][$channel] = array(
       '#tree' => TRUE,
     );
-    $entity = entity_create('micro_crm_channel', array('type' => $channel));
-    field_attach_form('micro_crm_channel', $entity, $form['bundles'][$channel], $form_state);
-    array_walk_recursive($form['bundles'][$channel], '_micro_crm_reset_required');
+    $entity = entity_create('crm_channel', array('type' => $channel));
+    field_attach_form('crm_channel', $entity, $form['bundles'][$channel], $form_state);
+    array_walk_recursive($form['bundles'][$channel], '_crm_reset_required');
   }
 
   $form['fields'] = array();
-  foreach (_micro_crm_newsletter_get_custom_fields() as $field) {
-    $instance = field_info_instance('micro_crm_contact', $field, 'micro_crm_contact');
+  foreach (_crm_newsletter_get_custom_fields() as $field) {
+    $instance = field_info_instance('crm_contact', $field, 'crm_contact');
     // Make all custom fields not required.
     $instance['required'] = FALSE;
     $field = field_info_field($field);
-    $form['fields'] += field_default_form('micro_crm_contact', NULL, $field, $instance, LANGUAGE_NONE, NULL, $form, $form_state);
+    $form['fields'] += field_default_form('crm_contact', NULL, $field, $instance, LANGUAGE_NONE, NULL, $form, $form_state);
   }
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] = array(
@@ -159,7 +159,7 @@ function micro_crm_newsletter_form($form, &$form_state) {
 /**
  * Resets required property so none field is required.
  */
-function _micro_crm_reset_required(&$value, $key) {
+function _crm_reset_required(&$value, $key) {
   if (($key === '#required') && ($value == TRUE)) {
     $value = FALSE;
   }
@@ -169,45 +169,45 @@ function _micro_crm_reset_required(&$value, $key) {
  * @param $form
  * @param $form_state
  */
-function micro_crm_newsletter_form_validate(&$form, &$form_state) {
+function crm_newsletter_form_validate(&$form, &$form_state) {
   $empty = 0;
-  $channels = _micro_crm_newsletter_get_channels();
+  $channels = _crm_newsletter_get_channels();
   foreach ($channels as $channel) {
-    $entity = entity_create('micro_crm_channel', array('type' => $channel));
-    field_attach_form_validate('micro_crm_channel', $entity, $form, $form_state);
-//    field_attach_submit('micro_crm_channel', $entity, $form, $form_state);
-    if (micro_crm_channel_is_empty($channel, $entity)) {
+    $entity = entity_create('crm_channel', array('type' => $channel));
+    field_attach_form_validate('crm_channel', $entity, $form, $form_state);
+//    field_attach_submit('crm_channel', $entity, $form, $form_state);
+    if (crm_channel_is_empty($channel, $entity)) {
       $empty += 1;
     }
   }
     form_set_error(NULL, t('At least one channel field has to be filled'));
-  if ($empty == count(_micro_crm_newsletter_get_channels())) {
+  if ($empty == count(_crm_newsletter_get_channels())) {
   }
 }
 
 /**
  * Newsletter form submit callback.
  */
-function micro_crm_newsletter_form_submit($form, &$form_state) {
+function crm_newsletter_form_submit($form, &$form_state) {
   $channels = array();
-  foreach (_micro_crm_newsletter_get_channels() as $channel) {
+  foreach (_crm_newsletter_get_channels() as $channel) {
 
     // Creates dummy entity.
-    $entity = entity_create('micro_crm_channel', array('type' => $channel));
+    $entity = entity_create('crm_channel', array('type' => $channel));
 
     // Attach all fields to entity.
-    field_attach_submit('micro_crm_channel', $entity, $form, $form_state);
+    field_attach_submit('crm_channel', $entity, $form, $form_state);
 
-    if (micro_crm_channel_is_empty($channel, $entity)) {
+    if (crm_channel_is_empty($channel, $entity)) {
       // Skip if channel is empty.
       continue;
     }
 
-    if (!micro_crm_channel_is_unique($channel, $entity)) {
+    if (!crm_channel_is_unique($channel, $entity)) {
       // Load channel if it already exists.
-      $entity = micro_crm_channel_values_load($entity);
+      $entity = crm_channel_values_load($entity);
       if (!is_object($entity)) {
-        watchdog('micro_crm_newsletter', 'Unable to load channel', array(), WATCHDOG_WARNING);
+        watchdog('crm_newsletter', 'Unable to load channel', array(), WATCHDOG_WARNING);
         return;
       }
     }
@@ -215,11 +215,11 @@ function micro_crm_newsletter_form_submit($form, &$form_state) {
     // Save channel as a newsletter ready.
     $entity->subscribe = TRUE;
     try {
-      entity_save('micro_crm_channel', $entity);
+      entity_save('crm_channel', $entity);
     }
     catch (Exception $e) {
-      watchdog_exception('micro_crm_newsletter', $e);
-      drupal_set_message(t('!channel: Unable to submit form. Please try again or contact administrator.', array('!channel' => micro_crm_channel_channel($entity))), 'error');
+      watchdog_exception('crm_newsletter', $e);
+      drupal_set_message(t('!channel: Unable to submit form. Please try again or contact administrator.', array('!channel' => crm_channel_channel($entity))), 'error');
       $form_state['redirect'] = TRUE;
       return;
     }
@@ -230,11 +230,11 @@ function micro_crm_newsletter_form_submit($form, &$form_state) {
 
   if (count($channels)) {
     // Process entity only if there is something to process.
-    $entity = micro_crm_channel_load_contact(array_keys($channels));
+    $entity = crm_channel_load_contact(array_keys($channels));
 
     if (is_array($entity) && count($entity) > 1) {
       // If more than one contact found - merge it together.
-      $entity = micro_crm_contact_merge($entity);
+      $entity = crm_contact_merge($entity);
     }
     elseif (is_array($entity)) {
       // If array contains only one
@@ -242,7 +242,7 @@ function micro_crm_newsletter_form_submit($form, &$form_state) {
     }
 
     // If contact status was in disabled state, bump it to registered.
-    $entity->status = MICRO_CRM_CONTACT_STATUS_REGISTERED;
+    $entity->status = CRM_CONTACT_STATUS_REGISTERED;
 
     foreach ($form_state['values']['fields'] as $key => $field) {
       $info = field_info_field($key);
@@ -252,24 +252,24 @@ function micro_crm_newsletter_form_submit($form, &$form_state) {
         unset($entity->{$key});
       }
     }
-    $wrapper = entity_metadata_wrapper('micro_crm_contact', $entity);
+    $wrapper = entity_metadata_wrapper('crm_contact', $entity);
 
     $tmp = array();
-    foreach ($wrapper->field_micro_crm_channel->getIterator() as $channel) {
+    foreach ($wrapper->field_crm_channel->getIterator() as $channel) {
       $tmp[] = $channel->getIdentifier();
     }
     foreach ($channels as $channel) {
       if (!in_array($channel, $tmp)) {
-        $wrapper->field_micro_crm_channel[] = $channel;
+        $wrapper->field_crm_channel[] = $channel;
       }
     }
 
     $entity->log = t('Contact modified by newsletter form.');
     try {
-      entity_save('micro_crm_contact', $entity);
+      entity_save('crm_contact', $entity);
     }
     catch (Exception $e) {
-      watchdog_exception('micro_crm_newsletter', $e);
+      watchdog_exception('crm_newsletter', $e);
       drupal_set_message(t('Unable to submit form. Please try again or contact administrator'), 'error');
       $form_state['redirect'] = TRUE;
       return;
@@ -281,7 +281,7 @@ function micro_crm_newsletter_form_submit($form, &$form_state) {
  * @param $form
  * @param $form_state
  */
-function micro_crm_newsletter_unsubscribe_form($form, &$form_state) {
+function crm_newsletter_unsubscribe_form($form, &$form_state) {
 
   $form['#tree'] = TRUE;
 
@@ -289,13 +289,13 @@ function micro_crm_newsletter_unsubscribe_form($form, &$form_state) {
     $form['#parents'] = array();
   }
   $form['bundles']['#tree'] = TRUE;
-  foreach (_micro_crm_newsletter_get_channels() as $channel) {
+  foreach (_crm_newsletter_get_channels() as $channel) {
     $form['bundles'][$channel] = array(
       '#tree' => TRUE,
     );
-    $entity = entity_create('micro_crm_channel', array('type' => $channel));
-    field_attach_form('micro_crm_channel', $entity, $form['bundles'][$channel], $form_state);
-    array_walk_recursive($form['bundles'][$channel], '_micro_crm_reset_required');
+    $entity = entity_create('crm_channel', array('type' => $channel));
+    field_attach_form('crm_channel', $entity, $form['bundles'][$channel], $form_state);
+    array_walk_recursive($form['bundles'][$channel], '_crm_reset_required');
   }
 
   $form['actions'] = array('#type' => 'actions');
@@ -311,43 +311,43 @@ function micro_crm_newsletter_unsubscribe_form($form, &$form_state) {
  * @param $form
  * @param $form_state
  */
-function micro_crm_newsletter_unsubscribe_form_validate($form, &$form_state) {
-  foreach (_micro_crm_newsletter_get_channels() as $channel) {
-    $entity = entity_create('micro_crm_channel', array('type' => $channel));
-    field_attach_form_validate('micro_crm_channel', $entity, $form, $form_state);
+function crm_newsletter_unsubscribe_form_validate($form, &$form_state) {
+  foreach (_crm_newsletter_get_channels() as $channel) {
+    $entity = entity_create('crm_channel', array('type' => $channel));
+    field_attach_form_validate('crm_channel', $entity, $form, $form_state);
   }
 }
 
 /**
  * Unsubscribe form submit callback.
  */
-function micro_crm_newsletter_unsubscribe_form_submit($form, &$form_state) {
-  foreach (_micro_crm_newsletter_get_channels() as $type) {
+function crm_newsletter_unsubscribe_form_submit($form, &$form_state) {
+  foreach (_crm_newsletter_get_channels() as $type) {
 
     // Creates dummy entity.
-    $channel = entity_create('micro_crm_channel', array('type' => $type));
+    $channel = entity_create('crm_channel', array('type' => $type));
 
     // Attach all fields to entity.
-    field_attach_submit('micro_crm_channel', $channel, $form, $form_state);
+    field_attach_submit('crm_channel', $channel, $form, $form_state);
 
-    if (micro_crm_channel_is_empty($type, $channel)) {
+    if (crm_channel_is_empty($type, $channel)) {
       // Skip if channel is empty.
       continue;
     }
 
-    if (!($entity = micro_crm_channel_values_load($channel))) {
+    if (!($entity = crm_channel_values_load($channel))) {
       // Load channel if it already exists.
-      drupal_set_message(t('!channel does not exist in our records.', array('!channel' => micro_crm_channel_channel($channel))), 'warning');
+      drupal_set_message(t('!channel does not exist in our records.', array('!channel' => crm_channel_channel($channel))), 'warning');
       continue;
     }
     $channel = $entity;
     $channel->unsubscribe = TRUE;
     try {
-      entity_save('micro_crm_channel', $channel);
+      entity_save('crm_channel', $channel);
     }
     catch (Exception $e) {
-      watchdog_exception('micro_crm_newsletter', $e);
-      drupal_set_message(t('!channel: Unable to submit form. Please try again or contact administrator', array('!channel' => micro_crm_channel_channel($channel))), 'error');
+      watchdog_exception('crm_newsletter', $e);
+      drupal_set_message(t('!channel: Unable to submit form. Please try again or contact administrator', array('!channel' => crm_channel_channel($channel))), 'error');
       $form_state['redirect'] = TRUE;
       return;
     }
@@ -357,98 +357,98 @@ function micro_crm_newsletter_unsubscribe_form_submit($form, &$form_state) {
 /**
  * @param $channel
  */
-function micro_crm_newsletter_unsubscribe_confirmation($channel) {
+function crm_newsletter_unsubscribe_confirmation($channel) {
   try {
-    $channel->status = MICRO_CRM_CHANNEL_STATUS_REGISTERED;
+    $channel->status = CRM_CHANNEL_STATUS_REGISTERED;
     $channel->log = 'Channel does not want to receive newsletter messages';
     $channel->newsletter_confirmation = TRUE;
-    entity_save('micro_crm_channel', $channel);
-    drupal_set_message(t('!channel: Subscription has been canceled.', array('!channel' => micro_crm_channel_label($channel))));
+    entity_save('crm_channel', $channel);
+    drupal_set_message(t('!channel: Subscription has been canceled.', array('!channel' => crm_channel_label($channel))));
     drupal_goto('<front>');
   }
   catch (Exception $e) {
-    watchdog_exception('micro_crm_newsletter', $e);
-    drupal_set_message(t('!channel: Unable to change subscription status', array('!channel' => micro_crm_channel_label($channel))), 'error');
+    watchdog_exception('crm_newsletter', $e);
+    drupal_set_message(t('!channel: Unable to change subscription status', array('!channel' => crm_channel_label($channel))), 'error');
   }
 }
 
 /**
  * @param $channel
  */
-function micro_crm_newsletter_subscribe_confirmation($channel) {
+function crm_newsletter_subscribe_confirmation($channel) {
   try {
-    $channel->status = MICRO_CRM_NEWSLETTER_CHANNEL_STATUS;
+    $channel->status = CRM_NEWSLETTER_CHANNEL_STATUS;
     $channel->log = 'Channel wants to receive newsletter messages';
     $channel->newsletter_confirmation = TRUE;
-    entity_save('micro_crm_channel', $channel);
-    drupal_set_message(t('!channel: Subscription completed.', array('!channel' => micro_crm_channel_label($channel))));
+    entity_save('crm_channel', $channel);
+    drupal_set_message(t('!channel: Subscription completed.', array('!channel' => crm_channel_label($channel))));
     drupal_goto('<front>');
   }
   catch (Exception $e) {
-    watchdog_exception('micro_crm_newsletter', $e);
-    drupal_set_message(t('!channel: Unable to change subscription status', array('!channel' => micro_crm_channel_label($channel))), 'error');
+    watchdog_exception('crm_newsletter', $e);
+    drupal_set_message(t('!channel: Unable to change subscription status', array('!channel' => crm_channel_label($channel))), 'error');
   }
 }
 
 /**
- * Implements hook_micro_crm_channel_presave().
+ * Implements hook_crm_channel_presave().
  */
-function micro_crm_newsletter_micro_crm_channel_presave($channel) {
+function crm_newsletter_crm_channel_presave($channel) {
   if (isset($channel->unsubscribe) && $channel->unsubscribe == TRUE) {
-    $method = variable_get('micro_crm_channel_ui_' . $channel->type . '_newsletter', MICRO_CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
-    if ($method == MICRO_CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT) {
+    $method = variable_get('crm_channel_ui_' . $channel->type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
+    if ($method == CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT) {
       // Disable newsletter status for channel..
-      $channel->status = MICRO_CRM_CHANNEL_STATUS_REGISTERED;
+      $channel->status = CRM_CHANNEL_STATUS_REGISTERED;
       $channel->log = 'Channel does not want to receive newsletter messages';
     }
-    elseif ($method == MICRO_CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT) {
-      _micro_crm_channel_generate_token($channel);
+    elseif ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT) {
+      _crm_channel_generate_token($channel);
       $channel->log = 'Channel token has been generated';
     }
   }
   elseif (isset($channel->subscribe) && $channel->subscribe == TRUE) {
-    $method = variable_get('micro_crm_channel_ui_' . $channel->type . '_newsletter', MICRO_CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
-    if ($method == MICRO_CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT) {
+    $method = variable_get('crm_channel_ui_' . $channel->type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
+    if ($method == CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT) {
       // Disable newsletter status for channel..
-      $channel->status = MICRO_CRM_CHANNEL_STATUS_REGISTERED;
+      $channel->status = CRM_CHANNEL_STATUS_REGISTERED;
       $channel->log = 'Channel wants to receive newsletter messages';
     }
-    elseif ($method == MICRO_CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT) {
-      _micro_crm_channel_generate_token($channel);
+    elseif ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT) {
+      _crm_channel_generate_token($channel);
       $channel->log = 'Channel token has been generated';
     }
   }
 }
 
 /**
- * Implements hook_micro_crm_channel_update().
+ * Implements hook_crm_channel_update().
  */
-function micro_crm_newsletter_micro_crm_channel_update($channel) {
+function crm_newsletter_crm_channel_update($channel) {
   if (isset($channel->unsubscribe) && $channel->unsubscribe == TRUE) {
-    $method = variable_get('micro_crm_channel_ui_' . $channel->type . '_newsletter', MICRO_CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
-    if ($method == MICRO_CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT) {
+    $method = variable_get('crm_channel_ui_' . $channel->type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
+    if ($method == CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT) {
       drupal_set_message(t('You will not receive newsletter messages any more.'));
     }
-    elseif ($method == MICRO_CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT) {
-      if (($message = micro_crm_newsletter_prepare_message($channel, 'unsubscribe')) && micro_crm_message_send($message)) {
-        drupal_set_message(t('!channel: Message has been sent. Click on the confirmation link to complete.', array('!channel' => micro_crm_channel_label($channel))), 'warning');
+    elseif ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT) {
+      if (($message = crm_newsletter_prepare_message($channel, 'unsubscribe')) && crm_message_send($message)) {
+        drupal_set_message(t('!channel: Message has been sent. Click on the confirmation link to complete.', array('!channel' => crm_channel_label($channel))), 'warning');
       }
       else {
-        drupal_set_message(t('!channel: Unable to send message. Try again.', array('!channel' => micro_crm_channel_label($channel))), 'error');
+        drupal_set_message(t('!channel: Unable to send message. Try again.', array('!channel' => crm_channel_label($channel))), 'error');
       }
     }
   }
   elseif (isset($channel->subscribe) && $channel->subscribe == TRUE) {
-    $method = variable_get('micro_crm_channel_ui_' . $channel->type . '_newsletter', MICRO_CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
-    if ($method == MICRO_CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT) {
-      drupal_set_message(t('!channel has been added to newsletter.', array('!channel' => micro_crm_channel_label($channel))));
+    $method = variable_get('crm_channel_ui_' . $channel->type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
+    if ($method == CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT) {
+      drupal_set_message(t('!channel has been added to newsletter.', array('!channel' => crm_channel_label($channel))));
     }
-    elseif ($method == MICRO_CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT) {
-      if (($message = micro_crm_newsletter_prepare_message($channel, 'subscribe')) && micro_crm_message_send($message)) {
-        drupal_set_message(t('!channel: Message has been sent. Click on the confirmation link to complete.', array('!channel' => micro_crm_channel_label($channel))), 'warning');
+    elseif ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT) {
+      if (($message = crm_newsletter_prepare_message($channel, 'subscribe')) && crm_message_send($message)) {
+        drupal_set_message(t('!channel: Message has been sent. Click on the confirmation link to complete.', array('!channel' => crm_channel_label($channel))), 'warning');
       }
       else {
-        drupal_set_message(t('!channel: Unable to send message. Try again.', array('!channel' => micro_crm_channel_label($channel))), 'error');
+        drupal_set_message(t('!channel: Unable to send message. Try again.', array('!channel' => crm_channel_label($channel))), 'error');
       }
     }
   }
@@ -457,19 +457,19 @@ function micro_crm_newsletter_micro_crm_channel_update($channel) {
 /**
  *
  */
-function micro_crm_newsletter_prepare_message($channel, $message = 'unsubscribe') {
+function crm_newsletter_prepare_message($channel, $message = 'unsubscribe') {
   if (!isset($channel->type)) {
     return FALSE;
   }
   $type = $channel->type;
-  $entity = entity_get_info('micro_crm_channel');
+  $entity = entity_get_info('crm_channel');
   if (!isset($type) || !isset($entity['bundles'][$type]['module'])) {
     return FALSE;
   }
   $module = $entity['bundles'][$type]['module'];
-  if ($message = module_invoke($module, 'micro_crm_newsletter_prepare_message', $channel, $message)) {
+  if ($message = module_invoke($module, 'crm_newsletter_prepare_message', $channel, $message)) {
     $message->log = 'Channel unsubscribe request';
-    entity_save('micro_crm_message', $message);
+    entity_save('crm_message', $message);
     return $message;
   }
   return FALSE;
@@ -479,9 +479,9 @@ function micro_crm_newsletter_prepare_message($channel, $message = 'unsubscribe'
  * @return array
  *   Array of channels in key => key format.
  */
-function _micro_crm_newsletter_get_channels() {
+function _crm_newsletter_get_channels() {
   $channels = array();
-  foreach (variable_get('micro_crm_newsletter_channels', array()) as $channel) {
+  foreach (variable_get('crm_newsletter_channels', array()) as $channel) {
     if ($channel === 0) {
       continue;
     }
@@ -493,15 +493,15 @@ function _micro_crm_newsletter_get_channels() {
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function micro_crm_newsletter_form_micro_crm_channel_ui_settings_alter(&$form, &$form_state) {
+function crm_newsletter_form_crm_channel_ui_settings_alter(&$form, &$form_state) {
   if (isset($form_state['build_info']['args'][0]) && $type = $form_state['build_info']['args'][0]);
-  $form['micro_crm_channel_ui_' . $type . '_newsletter'] = array(
+  $form['crm_channel_ui_' . $type . '_newsletter'] = array(
     '#type' => 'radios',
     '#title' => t('Unsubscribe'),
-    '#default_value' => variable_get('micro_crm_channel_ui_' . $type . '_newsletter', MICRO_CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT),
+    '#default_value' => variable_get('crm_channel_ui_' . $type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT),
     '#options' => array(
-      MICRO_CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT => t('Single opt in'),
-      MICRO_CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT => t('Double opt in'),
+      CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT => t('Single opt in'),
+      CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT => t('Double opt in'),
     ),
   );
 }
@@ -510,9 +510,9 @@ function micro_crm_newsletter_form_micro_crm_channel_ui_settings_alter(&$form, &
  * @return array
  *   Array of channels in key => key format.
  */
-function _micro_crm_newsletter_get_custom_fields() {
+function _crm_newsletter_get_custom_fields() {
   $custom_fields = array();
-  foreach (variable_get('micro_crm_newsletter_custom_fields', array()) as $custom_field) {
+  foreach (variable_get('crm_newsletter_custom_fields', array()) as $custom_field) {
     if ($custom_field === 0) {
       continue;
     }

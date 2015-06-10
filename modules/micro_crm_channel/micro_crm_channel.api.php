@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Hooks provided by the Micro CRM Contact Channel module.
+ * Hooks provided by the CRM Channel module.
  */
 
 
-function hook_micro_crm_channel_state_info() {
+function hook_crm_channel_state_info() {
 
 }
 
-function hook_micro_crm_channel_status_info() {
+function hook_crm_channel_status_info() {
 
 }
 
-function hook_micro_crm_channel_is_unique() {
+function hook_crm_channel_is_unique() {
 
 }
 
@@ -26,10 +26,10 @@ function hook_micro_crm_channel_is_unique() {
  *
  * @see rules_invoke_all()
  */
-function hook_micro_crm_channel_presave($channel) {
+function hook_crm_channel_presave($channel) {
   // No example.
 }
 
-function hook_micro_crm_channel_update($channel) {
+function hook_crm_channel_update($channel) {
   // No example.
 }

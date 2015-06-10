@@ -5,82 +5,82 @@
  *
  */
 
-define('MICRO_CRM_MESSAGE_STATUS_REGISTERED', 'registered');
-define('MICRO_CRM_MESSAGE_STATUS_SENT', 'sent');
+define('CRM_MESSAGE_STATUS_REGISTERED', 'registered');
+define('CRM_MESSAGE_STATUS_SENT', 'sent');
 
-module_load_include('inc', 'micro_crm_message', 'micro_crm_message.entity');
+module_load_include('inc', 'crm_message', 'crm_message.entity');
 
 /**
  * Implements hook_views_api().
  */
-function micro_crm_message_views_api() {
+function crm_message_views_api() {
   return array(
     'api' => 3,
-    'path' => drupal_get_path('module', 'micro_crm_message') . '/includes/views',
+    'path' => drupal_get_path('module', 'crm_message') . '/includes/views',
   );
 }
 
 /**
  * Implements hook_hook_info().
  */
-function micro_crm_message_hook_info() {
+function crm_message_hook_info() {
   $hooks = array(
-    'micro_crm_message_status_info' => array(
-      'group' => 'micro_crm',
+    'crm_message_status_info' => array(
+      'group' => 'crm',
     ),
-    'micro_crm_message_status_info_alter' => array(
-      'group' => 'micro_crm',
+    'crm_message_status_info_alter' => array(
+      'group' => 'crm',
     ),
-    'micro_crm_message_uri' => array(
-      'group' => 'micro_crm',
+    'crm_message_uri' => array(
+      'group' => 'crm',
     ),
-    'micro_crm_message_view' => array(
-      'group' => 'micro_crm',
+    'crm_message_view' => array(
+      'group' => 'crm',
     ),
-    'micro_crm_message_presave' => array(
-      'group' => 'micro_crm',
+    'crm_message_presave' => array(
+      'group' => 'crm',
     ),
-    'micro_crm_message_update' => array(
-      'group' => 'micro_crm',
+    'crm_message_update' => array(
+      'group' => 'crm',
     ),
-    'micro_crm_message_insert' => array(
-      'group' => 'micro_crm',
+    'crm_message_insert' => array(
+      'group' => 'crm',
     ),
-    'micro_crm_message_delete' => array(
-      'group' => 'micro_crm',
+    'crm_message_delete' => array(
+      'group' => 'crm',
     ),
-    'micro_crm_message_send' => array(
-      'group' => 'micro_crm',
+    'crm_message_send' => array(
+      'group' => 'crm',
     ),
   );
   return $hooks;
 }
 
 /**
- * Implements hook_micro_crm_message_update().
+ * Implements hook_crm_message_update().
  */
-function micro_crm_message_micro_crm_message_update($message) {
-  if (isset($message->original->status) && $message->original->status == MICRO_CRM_MESSAGE_STATUS_REGISTERED && $message->status == MICRO_CRM_MESSAGE_STATUS_SENT) {
-    watchdog('micro_crm_message', 'Message (message_id: @message) has been sent', array('@message' => $message->message_id), WATCHDOG_NOTICE, l('view', 'admin/people/micro_crm/message/' . $message->message_id));
+function crm_message_crm_message_update($message) {
+  if (isset($message->original->status) && $message->original->status == CRM_MESSAGE_STATUS_REGISTERED && $message->status == CRM_MESSAGE_STATUS_SENT) {
+    watchdog('crm_message', 'Message (message_id: @message) has been sent', array('@message' => $message->message_id), WATCHDOG_NOTICE, l('view', 'admin/people/crm/message/' . $message->message_id));
   }
   else {
-    watchdog('micro_crm_message', 'Message (message_id: @message) has been saved', array('@message' => $message->message_id), WATCHDOG_NOTICE, l('view', 'admin/people/micro_crm/message/' . $message->message_id));
+    watchdog('crm_message', 'Message (message_id: @message) has been saved', array('@message' => $message->message_id), WATCHDOG_NOTICE, l('view', 'admin/people/crm/message/' . $message->message_id));
   }
 }
 
 /**
- * Implements hook_micro_crm_message_status_info().
+ * Implements hook_crm_message_status_info().
  */
-function micro_crm_message_micro_crm_message_status_info() {
+function crm_message_crm_message_status_info() {
   $status = array();
 
-  $status[MICRO_CRM_MESSAGE_STATUS_REGISTERED] = array(
+  $status[CRM_MESSAGE_STATUS_REGISTERED] = array(
     'title' => t('Registered'),
     'description' => t('Registered, unprocessed message'),
     'weight' => -99,
   );
 
-  $status[MICRO_CRM_MESSAGE_STATUS_SENT] = array(
+  $status[CRM_MESSAGE_STATUS_SENT] = array(
     'title' => t('Sent'),
     'description' => t('Message has been sent'),
     'weight' => -99,
@@ -95,16 +95,16 @@ function micro_crm_message_micro_crm_message_status_info() {
  * @return array
  *   List of statuses
  */
-function micro_crm_message_statuses() {
+function crm_message_statuses() {
   // First check the static cache for an order states array.
   $statuses = &drupal_static(__FUNCTION__);
 
   // If it did not exist, fetch the statuses now.
   if (empty($statuses)) {
-    $statuses = module_invoke_all('micro_crm_message_status_info');
+    $statuses = module_invoke_all('crm_message_status_info');
 
     // Give other modules a chance to alter the order states.
-    drupal_alter('micro_crm_message_status_info', $statuses);
+    drupal_alter('crm_message_status_info', $statuses);
 
     uasort($statuses, 'drupal_sort_weight');
   }
@@ -115,11 +115,11 @@ function micro_crm_message_statuses() {
 /**
  * Returns list of available statuses.
  */
-function micro_crm_message_status_options_list() {
+function crm_message_status_options_list() {
 
   $options = array();
 
-  foreach (micro_crm_message_statuses() as $key => $status) {
+  foreach (crm_message_statuses() as $key => $status) {
     $options[$key] = $status['title'];
   }
 
@@ -129,23 +129,23 @@ function micro_crm_message_status_options_list() {
 /**
  * @param $message
  */
-function micro_crm_message_send($message) {
+function crm_message_send($message) {
   if (!isset($message->type)) {
     return FALSE;
   }
   $type = $message->type;
-  $entity = entity_get_info('micro_crm_message');
+  $entity = entity_get_info('crm_message');
   if (!isset($type) || !isset($entity['bundles'][$type]['module'])) {
     return FALSE;
   }
   $module = $entity['bundles'][$type]['module'];
-  if ($value = module_invoke($module, 'micro_crm_message_send', $message)) {
+  if ($value = module_invoke($module, 'crm_message_send', $message)) {
     // @todo change status and save.
     if ($value == TRUE) {
-      $message->status = MICRO_CRM_MESSAGE_STATUS_SENT;
+      $message->status = CRM_MESSAGE_STATUS_SENT;
       $message->revision = TRUE;
       $message->log = 'Message ' . $message->message_id . ' has been sent';
-      entity_save('micro_crm_message', $message);
+      entity_save('crm_message', $message);
     }
     return $value;
   }

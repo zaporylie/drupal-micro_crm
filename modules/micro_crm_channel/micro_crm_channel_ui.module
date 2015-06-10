@@ -8,32 +8,32 @@
 /**
  * Implements hook_menu().
  */
-function micro_crm_channel_ui_menu() {
+function crm_channel_ui_menu() {
   $items = array();
 
-  $items['admin/people/micro_crm/config/channel'] = array(
+  $items['admin/people/crm/config/channel'] = array(
     'title' => 'Channel',
-    'page callback' => 'micro_crm_index',
+    'page callback' => 'crm_index',
     'page arguments' => array(),
-    'access arguments' => array('micro crm manage'),
+    'access arguments' => array('crm manage'),
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['admin/people/micro_crm/channel'] = array(
+  $items['admin/people/crm/channel'] = array(
     'title' => 'Channel',
-    'page callback' => 'micro_crm_index',
+    'page callback' => 'crm_index',
     'page arguments' => array(),
-    'access arguments' => array('micro crm manage'),
+    'access arguments' => array('crm manage'),
     'type' => MENU_NORMAL_ITEM,
   );
 
-  foreach (micro_crm_channel_types() as $type => $bundle) {
+  foreach (crm_channel_types() as $type => $bundle) {
     $type_arg = strtr($type, '_', '-');
-    $items['admin/people/micro_crm/config/channel/' . $type_arg] = array(
+    $items['admin/people/crm/config/channel/' . $type_arg] = array(
       'title' => $bundle,
       'page callback' => 'drupal_get_form',
-      'page arguments' => array('micro_crm_channel_ui_settings', $type),
-      'access arguments' => array('micro crm manage'),
+      'page arguments' => array('crm_channel_ui_settings', $type),
+      'access arguments' => array('crm manage'),
       'type' => MENU_NORMAL_ITEM,
     );
   }
@@ -44,19 +44,19 @@ function micro_crm_channel_ui_menu() {
 /**
  * Settings form.
  */
-function micro_crm_channel_ui_settings($form, &$form_state, $bundle) {
+function crm_channel_ui_settings($form, &$form_state, $bundle) {
   return system_settings_form($form);
 }
 
 /**
  * Implements hook_entity_info_alter().
  */
-function micro_crm_channel_ui_entity_info_alter(&$entity_info) {
+function crm_channel_ui_entity_info_alter(&$entity_info) {
   // Expose the admin UI for product fields.
-  foreach ($entity_info['micro_crm_channel']['bundles'] as $type => &$bundle) {
+  foreach ($entity_info['crm_channel']['bundles'] as $type => &$bundle) {
     $bundle['admin'] = array(
-      'path' => 'admin/people/micro_crm/config/channel/' . strtr($type, '_', '-'),
-      'access arguments' => array('micro crm manage'),
+      'path' => 'admin/people/crm/config/channel/' . strtr($type, '_', '-'),
+      'access arguments' => array('crm manage'),
     );
   }
 }

@@ -7,14 +7,14 @@
 /**
  * Implements hook_views_default_views().
  */
-function micro_crm_message_ui_views_default_views() {
+function crm_message_ui_views_default_views() {
   $views = array();
 
   $view = new view();
   $view->name = 'message';
   $view->description = '';
   $view->tag = 'default';
-  $view->base_table = 'micro_crm_message';
+  $view->base_table = 'crm_message';
   $view->human_name = 'Message';
   $view->core = 7;
   $view->api_version = '3.0';
@@ -68,29 +68,29 @@ function micro_crm_message_ui_views_default_views() {
   );
   /* Field: Message: Message ID */
   $handler->display->display_options['fields']['message_id']['id'] = 'message_id';
-  $handler->display->display_options['fields']['message_id']['table'] = 'micro_crm_message';
+  $handler->display->display_options['fields']['message_id']['table'] = 'crm_message';
   $handler->display->display_options['fields']['message_id']['field'] = 'message_id';
   /* Field: Message: Created date */
   $handler->display->display_options['fields']['created']['id'] = 'created';
-  $handler->display->display_options['fields']['created']['table'] = 'micro_crm_message';
+  $handler->display->display_options['fields']['created']['table'] = 'crm_message';
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['date_format'] = 'long';
   $handler->display->display_options['fields']['created']['second_date_format'] = 'long';
   /* Field: Message: Updated date */
   $handler->display->display_options['fields']['changed']['id'] = 'changed';
-  $handler->display->display_options['fields']['changed']['table'] = 'micro_crm_message';
+  $handler->display->display_options['fields']['changed']['table'] = 'crm_message';
   $handler->display->display_options['fields']['changed']['field'] = 'changed';
   $handler->display->display_options['fields']['changed']['date_format'] = 'long';
   $handler->display->display_options['fields']['changed']['second_date_format'] = 'long';
   /* Field: Message: Operations links */
   $handler->display->display_options['fields']['operations']['id'] = 'operations';
-  $handler->display->display_options['fields']['operations']['table'] = 'micro_crm_message';
+  $handler->display->display_options['fields']['operations']['table'] = 'crm_message';
   $handler->display->display_options['fields']['operations']['field'] = 'operations';
   $handler->display->display_options['fields']['operations']['add_destination'] = 0;
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['path'] = 'admin/people/micro_crm/message';
+  $handler->display->display_options['path'] = 'admin/people/crm/message';
 
   $views[$view->name] = $view;
 

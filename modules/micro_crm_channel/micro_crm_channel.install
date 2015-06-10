@@ -8,9 +8,9 @@
 /**
  * Implements hook_schema().
  */
-function micro_crm_channel_schema() {
+function crm_channel_schema() {
 
-  $schema['micro_crm_channel'] = array(
+  $schema['crm_channel'] = array(
     'description' => 'Contact entity channel',
     'fields' => array(
       'channel_id' => array(
@@ -27,7 +27,7 @@ function micro_crm_channel_schema() {
         'default' => '',
       ),
       'revision_id' => array(
-        'description' => 'The current {micro_crm_channel_revision}.revision_id version identifier.',
+        'description' => 'The current {crm_channel_revision}.revision_id version identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
@@ -49,7 +49,7 @@ function micro_crm_channel_schema() {
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
-        'default' => MICRO_CRM_CHANNEL_STATUS_REGISTERED,
+        'default' => CRM_CHANNEL_STATUS_REGISTERED,
       ),
       'token' => array(
         'description' => 'One-time token.',
@@ -70,18 +70,18 @@ function micro_crm_channel_schema() {
       'token' => array('token'),
     ),
     'foreign keys' => array(
-      'micro_crm_channel_revision' => array(
-        'table' => 'micro_crm_channel_revision',
+      'crm_channel_revision' => array(
+        'table' => 'crm_channel_revision',
         'columns' => array('revision_id' => 'revision_id'),
       ),
     ),
     'indexes' => array(
-      'micro_crm_channel_id' => array('channel_id'),
-      'micro_crm_channel_status' => array('status'),
+      'crm_channel_id' => array('channel_id'),
+      'crm_channel_status' => array('status'),
     ),
   );
   
-  $schema['micro_crm_channel_revision'] = array(
+  $schema['crm_channel_revision'] = array(
     'description' => 'Contact channel entity revision',
     'fields' => array(
       'revision_id' => array(
@@ -91,7 +91,7 @@ function micro_crm_channel_schema() {
         'not null' => TRUE,
       ),
       'channel_id' => array(
-        'description' => 'Parent {micro_crm_channel}.channel_id contact channel identifier.',
+        'description' => 'Parent {crm_channel}.channel_id contact channel identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
@@ -101,7 +101,7 @@ function micro_crm_channel_schema() {
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
-        'default' => MICRO_CRM_CHANNEL_STATUS_REGISTERED,
+        'default' => CRM_CHANNEL_STATUS_REGISTERED,
       ),
       'revision_uid' => array(
         'description' => 'Revision author {users}.uid',
@@ -124,8 +124,8 @@ function micro_crm_channel_schema() {
     ),
     'primary key' => array('revision_id'),
     'foreign keys' => array(
-      'micro_crm_channel' => array(
-        'table' => 'micro_crm_channel',
+      'crm_channel' => array(
+        'table' => 'crm_channel',
         'columns' => array('channel_id' => 'channel_id'),
       ),
     ),
@@ -140,13 +140,13 @@ function micro_crm_channel_schema() {
 /**
  * Implements hook_install().
  */
-function micro_crm_channel_install() {
+function crm_channel_install() {
 
-  module_load_include('module', 'micro_crm_channel', 'micro_crm_channel');
+  module_load_include('module', 'crm_channel', 'crm_channel');
   $t = get_t();
   $field = array(
     'settings' => array(
-      'target_type' => 'micro_crm_channel',
+      'target_type' => 'crm_channel',
       'handler' => 'base',
       'handler_settings' => array(
         'target_bundles' => array(),
@@ -160,7 +160,7 @@ function micro_crm_channel_install() {
         ),
       ),
     ),
-    'field_name' => 'field_micro_crm_channel',
+    'field_name' => 'field_crm_channel',
     'type' => 'entityreference',
     'module' => 'entityreference',
     'active' => 1,
@@ -203,9 +203,9 @@ function micro_crm_channel_install() {
       ),
     ),
     'required' => 0,
-    'field_name' => 'field_micro_crm_channel',
-    'entity_type' => 'micro_crm_contact',
-    'bundle' => 'micro_crm_contact',
+    'field_name' => 'field_crm_channel',
+    'entity_type' => 'crm_contact',
+    'bundle' => 'crm_contact',
     'deleted' => 0,
   );
   field_create_instance($instance);
@@ -214,13 +214,13 @@ function micro_crm_channel_install() {
 /**
  * Implements hook_uninstall().
  */
-function micro_crm_channel_uninstall() {
+function crm_channel_uninstall() {
 
-  field_attach_delete_bundle('micro_crm_contact', 'micro_crm_contact');
+  field_attach_delete_bundle('crm_contact', 'crm_contact');
   $instance = array(
-    'entity_type' => 'micro_crm_contact',
-    'field_name' => 'field_micro_crm_channel',
-    'bundle' => 'micro_crm_contact',
+    'entity_type' => 'crm_contact',
+    'field_name' => 'field_crm_channel',
+    'bundle' => 'crm_contact',
   );
   field_delete_instance($instance);
 

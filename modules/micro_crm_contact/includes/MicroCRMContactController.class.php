@@ -5,7 +5,7 @@
  * Defines contact entity controller.
  */
 
-class MicroCRMContactController extends EntityAPIController {
+class CRMContactController extends EntityAPIController {
   /**
    * Overrides EntityAPIController::buildQuery().
    */
@@ -45,18 +45,18 @@ class MicroCRMContactController extends EntityAPIController {
       return FALSE;
     }
     // The administer permission is a blanket override.
-    if (user_access('micro crm bypass access')) {
+    if (user_access('crm bypass access')) {
       return TRUE;
     }
     switch ($op) {
       case 'create':
-        return user_access('micro crm contact create');
+        return user_access('crm contact create');
       case 'view':
-        return user_access('micro crm contact view');
+        return user_access('crm contact view');
       case 'update':
-        return user_access('micro crm contact update');
+        return user_access('crm contact update');
       case 'delete':
-        return user_access('micro crm contact delete');
+        return user_access('crm contact delete');
     }
     return FALSE;
   }
@@ -71,7 +71,7 @@ class MicroCRMContactController extends EntityAPIController {
    */
   public function create(array $values = array()) {
     $values += array(
-      'status' => MICRO_CRM_CONTACT_STATUS_REGISTERED,
+      'status' => CRM_CONTACT_STATUS_REGISTERED,
       'language' => LANGUAGE_NONE,
     );
     return parent::create($values);

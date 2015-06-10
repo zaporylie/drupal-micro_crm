@@ -7,9 +7,9 @@
 /**
  * Implements hook_entity_property_info().
  */
-function micro_crm_contact_entity_property_info() {
+function crm_contact_entity_property_info() {
   $info = array();
-  $properties = &$info['micro_crm_contact']['properties'];
+  $properties = &$info['crm_contact']['properties'];
   $default_properties = array(
     'setter callback' => 'entity_property_verbatim_set',
     'getter callback' => 'entity_property_verbatim_get',

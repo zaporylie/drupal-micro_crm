@@ -7,9 +7,9 @@
 /**
  * Implements hook_entity_property_info().
  */
-function micro_crm_channel_entity_property_info() {
+function crm_channel_entity_property_info() {
   $info = array();
-  $properties = &$info['micro_crm_channel']['properties'];
+  $properties = &$info['crm_channel']['properties'];
   $default_properties = array(
     'setter callback' => 'entity_property_verbatim_set',
     'getter callback' => 'entity_property_verbatim_get',
@@ -23,7 +23,7 @@ function micro_crm_channel_entity_property_info() {
     'label' => t('Channel'),
     'type' => 'text',
     'description' => t('General value.'),
-    'getter callback' => 'micro_crm_channel_channel',
+    'getter callback' => 'crm_channel_channel',
   );
   $properties['log'] = array(
     'label' => t("Revision log message"),

@@ -1,8 +1,8 @@
 name = Newsletter
-description = Newsletter extension to Micro CRM
+description = Newsletter extension to CRM
 core = 7.x
 package = CRM
 
-dependencies[] = micro_crm_channel
-dependencies[] = micro_crm_ui
-dependencies[] = micro_crm_message
+dependencies[] = crm_channel
+dependencies[] = crm_ui
+dependencies[] = crm_message

@@ -2,11 +2,11 @@ name = Contact
 description = Creates CRM Contact Base Entity
 core = 7.x
 package = CRM
-dependencies[] = micro_crm
+dependencies[] = crm
 
-files[] = includes/MicroCRMContactController.class.php
+files[] = includes/CRMContactController.class.php
 
-files[] = includes/views/handlers/micro_crm_contact_handler_field_contact_link.inc
-files[] = includes/views/handlers/micro_crm_contact_handler_field_contact_link_delete.inc
-files[] = includes/views/handlers/micro_crm_contact_handler_field_contact_link_edit.inc
-files[] = includes/views/handlers/micro_crm_contact_handler_field_contact_operations.inc
+files[] = includes/views/handlers/crm_contact_handler_field_contact_link.inc
+files[] = includes/views/handlers/crm_contact_handler_field_contact_link_delete.inc
+files[] = includes/views/handlers/crm_contact_handler_field_contact_link_edit.inc
+files[] = includes/views/handlers/crm_contact_handler_field_contact_operations.inc

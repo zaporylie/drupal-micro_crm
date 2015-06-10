@@ -8,11 +8,11 @@
 /**
  * Implements hook_uninstall().
  */
-function micro_crm_campaignmonitor_uninstall() {
-  variable_del('micro_crm_campaignmonitor_lists');
+function crm_campaignmonitor_uninstall() {
+  variable_del('crm_campaignmonitor_lists');
   $query = db_select('variable', 'v');
   $query->addField('v', 'name', 'name');
-  $query->condition('v.name', 'micro_crm_campaignmonitor_list_%', 'LIKE');
+  $query->condition('v.name', 'crm_campaignmonitor_list_%', 'LIKE');
   $results = $query->execute()->fetchCol();
   foreach ($results as $result) {
     variable_del($result);

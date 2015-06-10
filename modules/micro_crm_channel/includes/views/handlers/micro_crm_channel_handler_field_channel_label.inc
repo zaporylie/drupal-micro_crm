@@ -5,7 +5,7 @@
  *
  * @todo: load all needed fields and build label from it.
  */
-class micro_crm_channel_handler_field_channel_label extends views_handler_field {
+class crm_channel_handler_field_channel_label extends views_handler_field {
   function construct() {
     parent::construct();
     $this->additional_fields['channel_id'] = 'channel_id';
@@ -26,6 +26,6 @@ class micro_crm_channel_handler_field_channel_label extends views_handler_field 
 
   function render($values) {
     $channel_id = $this->get_value($values, 'channel_id');
-    return entity_label('micro_crm_channel', micro_crm_channel_load($channel_id));
+    return entity_label('crm_channel', crm_channel_load($channel_id));
   }
 }

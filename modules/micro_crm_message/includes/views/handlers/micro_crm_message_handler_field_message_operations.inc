@@ -3,7 +3,7 @@
 /**
  * Field handler to present a product's operations links.
  */
-class micro_crm_message_handler_field_message_operations extends views_handler_field {
+class crm_message_handler_field_message_operations extends views_handler_field {
   function construct() {
     parent::construct();
 
@@ -37,7 +37,7 @@ class micro_crm_message_handler_field_message_operations extends views_handler_f
     $message_id = $this->get_value($values, 'message_id');
 
     // Get the operations links.
-    $links = menu_contextual_links('micro-crm-message', 'admin/people/micro_crm/message', array($message_id));
+    $links = menu_contextual_links('crm-message', 'admin/people/crm/message', array($message_id));
 
     if (!empty($links)) {
       // Add the destination to the links if specified.

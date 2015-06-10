@@ -3,6 +3,6 @@ description = Provides UI for module
 core = 7.x
 package = CRM
 
-dependencies[] = micro_crm_contact
-dependencies[] = micro_crm_ui
+dependencies[] = crm_contact
+dependencies[] = crm_ui
 dependencies[] = views

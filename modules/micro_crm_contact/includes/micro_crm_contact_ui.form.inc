@@ -15,27 +15,27 @@
  *
  * @return array
  */
-function micro_crm_contact_ui_form_wrapper($contact = array(), $delete = FALSE) {
+function crm_contact_ui_form_wrapper($contact = array(), $delete = FALSE) {
   if ($delete == TRUE && isset($contact->contact_id)) {
-    return drupal_get_form('micro_crm_contact_ui_delete_form', $contact);
+    return drupal_get_form('crm_contact_ui_delete_form', $contact);
   }
   if (empty($contact))  {
-    $contact = entity_create('micro_crm_contact', array());
+    $contact = entity_create('crm_contact', array());
   }
-  return drupal_get_form('micro_crm_contact_ui_form', $contact);
+  return drupal_get_form('crm_contact_ui_form', $contact);
 }
 
 /**
  * Contact form.
  */
-function micro_crm_contact_ui_form($form, &$form_state, $contact) {
+function crm_contact_ui_form($form, &$form_state, $contact) {
 
   $form['contact'] = array(
     '#type' => 'value',
     '#value' => $contact,
   );
 
-  field_attach_form('micro_crm_contact', $contact, $form, $form_state);
+  field_attach_form('crm_contact', $contact, $form, $form_state);
 
   $form['settings'] = array(
     '#type' => 'vertical_tabs',
@@ -52,7 +52,7 @@ function micro_crm_contact_ui_form($form, &$form_state, $contact) {
     '#title' => t('Status'),
     '#required' => TRUE,
     '#default_value' => $contact->status,
-    '#options' => micro_crm_contact_status_options_list(),
+    '#options' => crm_contact_status_options_list(),
   );
 
   $form['settings']['options']['language'] = array(
@@ -60,7 +60,7 @@ function micro_crm_contact_ui_form($form, &$form_state, $contact) {
     '#title' => t('Language'),
     '#required' => TRUE,
     '#default_value' => $contact->language,
-    '#options' => array(LANGUAGE_NONE => t('Undefined')) + micro_crm_language_list(),
+    '#options' => array(LANGUAGE_NONE => t('Undefined')) + crm_language_list(),
   );
   $form['settings']['revision'] = array(
     '#type' => 'fieldset',
@@ -84,14 +84,14 @@ function micro_crm_contact_ui_form($form, &$form_state, $contact) {
 /**
  * Contact form validation
  */
-function micro_crm_contact_ui_form_validate($form, &$form_state) {
-  field_attach_form_validate('micro_crm_contact', $form_state['values']['contact'], $form, $form_state);
+function crm_contact_ui_form_validate($form, &$form_state) {
+  field_attach_form_validate('crm_contact', $form_state['values']['contact'], $form, $form_state);
 }
 
 /**
  * Contact form submit callback.
  */
-function micro_crm_contact_ui_form_submit($form, &$form_state) {
+function crm_contact_ui_form_submit($form, &$form_state) {
   $contact = $form_state['values']['contact'];
 
   $contact->status = $form_state['values']['status'];
@@ -101,14 +101,14 @@ function micro_crm_contact_ui_form_submit($form, &$form_state) {
     $contact->revision = TRUE;
   }
   try {
-    field_attach_submit('micro_crm_contact', $contact, $form, $form_state);
-    entity_save('micro_crm_contact', $contact);
-    $uri = entity_uri('micro_crm_contact', $contact);
+    field_attach_submit('crm_contact', $contact, $form, $form_state);
+    entity_save('crm_contact', $contact);
+    $uri = entity_uri('crm_contact', $contact);
     $form_state['redirect'] = $uri['path'];
     drupal_set_message(t('Contact has been saved'));
   }
   catch (Exception $e) {
-    watchdog_exception('micro_crm_channel', $e);
+    watchdog_exception('crm_channel', $e);
     $form_state['rebuild'] = TRUE;
     drupal_set_message(t('Unable to save contact'), 'error');
   }
@@ -118,7 +118,7 @@ function micro_crm_contact_ui_form_submit($form, &$form_state) {
 /**
  * Delete confirmation form.
  */
-function micro_crm_contact_ui_delete_form($form, &$form_state, $contact) {
+function crm_contact_ui_delete_form($form, &$form_state, $contact) {
   $form['contact'] = array(
     '#type' => 'value',
     '#value' => $contact,
@@ -126,16 +126,16 @@ function micro_crm_contact_ui_delete_form($form, &$form_state, $contact) {
   return confirm_form(
     $form,
     t('Do you want to delete contact?'),
-    'admin/people/micro_crm/contact'
+    'admin/people/crm/contact'
   );
 }
 
 /**
  * Delete form submit handler.
  */
-function micro_crm_contact_ui_delete_form_submit($form, &$form_state) {
-  $contact_id = entity_id('micro_crm_contact', $form_state['values']['contact']);
-  if (entity_delete('micro_crm_contact', $contact_id) !== FALSE) {
+function crm_contact_ui_delete_form_submit($form, &$form_state) {
+  $contact_id = entity_id('crm_contact', $form_state['values']['contact']);
+  if (entity_delete('crm_contact', $contact_id) !== FALSE) {
     drupal_set_message(t('Contact @contact has been deleted', array('@contact' => $contact_id)));
   }
 }

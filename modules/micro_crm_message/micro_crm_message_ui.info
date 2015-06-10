@@ -3,5 +3,5 @@ description = Allows you to create and send new message via Drupal UI
 core = 7.x
 package = CRM
 
-dependencies[] = micro_crm_message
-dependencies[] = micro_crm_ui
+dependencies[] = crm_message
+dependencies[] = crm_ui

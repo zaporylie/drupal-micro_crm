@@ -8,44 +8,44 @@
 /**
  * Implements hook_entity_info_alter().
  */
-function micro_crm_email_entity_info_alter(&$entity_info) {
+function crm_email_entity_info_alter(&$entity_info) {
   $bundle = array(
     'label' => t('E-mail'),
-    'module' => 'micro_crm_email',
+    'module' => 'crm_email',
   );
-  $entity_info['micro_crm_channel']['bundles']['email'] = $bundle;
-  if (module_exists('micro_crm_message')) {
-    $entity_info['micro_crm_message']['bundles']['email'] = $bundle;
-    micro_crm_email_message_add_bundle();
+  $entity_info['crm_channel']['bundles']['email'] = $bundle;
+  if (module_exists('crm_message')) {
+    $entity_info['crm_message']['bundles']['email'] = $bundle;
+    crm_email_message_add_bundle();
   }
 }
 
 /**
- * Implements hook_micro_crm_channel_is_unique().
+ * Implements hook_crm_channel_is_unique().
  */
-function micro_crm_email_micro_crm_channel_is_unique($channel, $new = TRUE) {
-  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+function crm_email_crm_channel_is_unique($channel, $new = TRUE) {
+  $wrapper = entity_metadata_wrapper('crm_channel', $channel);
 
-  if (!$wrapper->__isset('field_micro_crm_email')) {
+  if (!$wrapper->__isset('field_crm_email')) {
     return FALSE;
   }
-  if (!($value = $wrapper->field_micro_crm_email->value())) {
+  if (!($value = $wrapper->field_crm_email->value())) {
     return FALSE;
   }
   $query = new EntityFieldQuery();
 
-  $query->entityCondition('entity_type', 'micro_crm_channel')
+  $query->entityCondition('entity_type', 'crm_channel')
     ->entityCondition('bundle', 'email')
-    ->fieldCondition('field_micro_crm_email', 'email', $value, '=');
+    ->fieldCondition('field_crm_email', 'email', $value, '=');
 
   $result = $query->execute();
-  if (!isset($result['micro_crm_channel'])) {
+  if (!isset($result['crm_channel'])) {
     return TRUE;
   }
-  elseif (isset($result['micro_crm_channel']) && count($result['micro_crm_channel']) == 0 && $new == TRUE) {
+  elseif (isset($result['crm_channel']) && count($result['crm_channel']) == 0 && $new == TRUE) {
     return TRUE;
   }
-  elseif (isset($result['micro_crm_channel']) && count($result['micro_crm_channel']) == 1 && $new == FALSE) {
+  elseif (isset($result['crm_channel']) && count($result['crm_channel']) == 1 && $new == FALSE) {
     return TRUE;
   }
   else {
@@ -54,14 +54,14 @@ function micro_crm_email_micro_crm_channel_is_unique($channel, $new = TRUE) {
 }
 
 /**
- * Implements hook_micro_crm_channel_is_empty().
+ * Implements hook_crm_channel_is_empty().
  */
-function micro_crm_email_micro_crm_channel_is_empty($channel) {
-  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
-  if (!$wrapper->__isset('field_micro_crm_email')) {
+function crm_email_crm_channel_is_empty($channel) {
+  $wrapper = entity_metadata_wrapper('crm_channel', $channel);
+  if (!$wrapper->__isset('field_crm_email')) {
     return TRUE;
   }
-  if (!($value = $wrapper->field_micro_crm_email->value())) {
+  if (!($value = $wrapper->field_crm_email->value())) {
     return TRUE;
   }
   if (!$value) {
@@ -71,45 +71,45 @@ function micro_crm_email_micro_crm_channel_is_empty($channel) {
 }
 
 /**
- * Implements hook_micro_crm_channel_values_load().
+ * Implements hook_crm_channel_values_load().
  */
-function micro_crm_email_micro_crm_channel_values_load($channel) {
-  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
+function crm_email_crm_channel_values_load($channel) {
+  $wrapper = entity_metadata_wrapper('crm_channel', $channel);
 
-  if (!$wrapper->__isset('field_micro_crm_email')) {
+  if (!$wrapper->__isset('field_crm_email')) {
     return NULL;
   }
-  if (!($value = $wrapper->field_micro_crm_email->value())) {
+  if (!($value = $wrapper->field_crm_email->value())) {
     return NULL;
   }
   $query = new EntityFieldQuery();
 
-  $query->entityCondition('entity_type', 'micro_crm_channel')
+  $query->entityCondition('entity_type', 'crm_channel')
     ->entityCondition('bundle', 'email')
-    ->fieldCondition('field_micro_crm_email', 'email', $value, '=');
+    ->fieldCondition('field_crm_email', 'email', $value, '=');
 
   $result = $query->execute();
-  if (!isset($result['micro_crm_channel'])) {
+  if (!isset($result['crm_channel'])) {
     return NULL;
   }
-  elseif (isset($result['micro_crm_channel']) && count($result['micro_crm_channel']) <> 1) {
+  elseif (isset($result['crm_channel']) && count($result['crm_channel']) <> 1) {
     return NULL;
   }
   else {
-    $entity = entity_load('micro_crm_channel', array_keys($result['micro_crm_channel']));
+    $entity = entity_load('crm_channel', array_keys($result['crm_channel']));
     return reset($entity);
   }
 }
 
 /**
- * Implements hook_micro_crm_channel_set_value().
+ * Implements hook_crm_channel_set_value().
  */
-function micro_crm_email_micro_crm_channel_set_value(&$channel, $value) {
-  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
-  if (!$wrapper->__isset('field_micro_crm_email')) {
+function crm_email_crm_channel_set_value(&$channel, $value) {
+  $wrapper = entity_metadata_wrapper('crm_channel', $channel);
+  if (!$wrapper->__isset('field_crm_email')) {
     return FALSE;
   }
-  $wrapper->field_micro_crm_email->set($value);
+  $wrapper->field_crm_email->set($value);
   return TRUE;
 }
 
@@ -118,11 +118,11 @@ function micro_crm_email_micro_crm_channel_set_value(&$channel, $value) {
  *
  * @todo: block field deletion.
  */
-function micro_crm_email_message_add_bundle() {
+function crm_email_message_add_bundle() {
 
   $field = array(
     'settings' => array(
-      'target_type' => 'micro_crm_channel',
+      'target_type' => 'crm_channel',
       'handler' => 'base',
       'handler_settings' => array(
         'target_bundles' => array(
@@ -188,11 +188,11 @@ function micro_crm_email_message_add_bundle() {
     'required' => 1,
     'description' => '',
     'field_name' => 'crm_message_email',
-    'entity_type' => 'micro_crm_message',
+    'entity_type' => 'crm_message',
     'bundle' => 'email',
     'deleted' => 0,
   );
-  if (!field_info_instance('micro_crm_message', $field['field_name'], 'email')) {
+  if (!field_info_instance('crm_message', $field['field_name'], 'email')) {
     field_create_instance($instance);
   }
 
@@ -239,11 +239,11 @@ function micro_crm_email_message_add_bundle() {
     'description' => '',
     'default_value' => NULL,
     'field_name' => 'crm_message_email_subject',
-    'entity_type' => 'micro_crm_message',
+    'entity_type' => 'crm_message',
     'bundle' => 'email',
     'deleted' => 0,
   );
-  if (!field_info_instance('micro_crm_message', $field['field_name'], 'email')) {
+  if (!field_info_instance('crm_message', $field['field_name'], 'email')) {
     field_create_instance($instance);
   }
 
@@ -288,11 +288,11 @@ function micro_crm_email_message_add_bundle() {
     'description' => '',
     'default_value' => NULL,
     'field_name' => 'crm_message_email_body',
-    'entity_type' => 'micro_crm_message',
+    'entity_type' => 'crm_message',
     'bundle' => 'email',
     'deleted' => 0,
   );
-  if (!field_info_instance('micro_crm_message', $field['field_name'], 'email')) {
+  if (!field_info_instance('crm_message', $field['field_name'], 'email')) {
     field_create_instance($instance);
   }
 }
@@ -300,7 +300,7 @@ function micro_crm_email_message_add_bundle() {
 /**
  * Implements hook_mail().
  */
-function micro_crm_email_mail($key, &$message, $params) {
+function crm_email_mail($key, &$message, $params) {
 
   switch ($key) {
     case 'message':

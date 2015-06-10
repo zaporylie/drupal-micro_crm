@@ -1,19 +1,19 @@
 <?php
 
 /**
- * Implements hook_micro_crm_message_send().
+ * Implements hook_crm_message_send().
  *
- * @see micro_crm_message_send().
+ * @see crm_message_send().
  */
-function micro_crm_phone_micro_crm_message_send($message) {
-  $wrapper = entity_metadata_wrapper('micro_crm_message', $message);
+function crm_phone_crm_message_send($message) {
+  $wrapper = entity_metadata_wrapper('crm_message', $message);
   if (!$wrapper->__isset('crm_message_phone') || !$wrapper->crm_message_phone->value()) {
     return FALSE;
   }
   if (!$wrapper->__isset('crm_message_phone_body') || !($message = $wrapper->crm_message_phone_body->value())) {
     return FALSE;
   }
-  if (!$wrapper->__isset('crm_message_phone_body') || !($number = $wrapper->crm_message_phone->field_micro_crm_phone->value())) {
+  if (!$wrapper->__isset('crm_message_phone_body') || !($number = $wrapper->crm_message_phone->field_crm_phone->value())) {
     return FALSE;
   }
   if (!function_exists('sms_send')) {
@@ -23,22 +23,22 @@ function micro_crm_phone_micro_crm_message_send($message) {
 }
 
 /**
- * Implements hook_micro_crm_channel_label().
+ * Implements hook_crm_channel_label().
  */
-function micro_crm_phone_micro_crm_channel_label($channel) {
-  $wrapper = entity_metadata_wrapper('micro_crm_channel', $channel);
-  if (!$wrapper->__isset('field_micro_crm_phone')) {
+function crm_phone_crm_channel_label($channel) {
+  $wrapper = entity_metadata_wrapper('crm_channel', $channel);
+  if (!$wrapper->__isset('field_crm_phone')) {
     return NULL;
   }
-  return $wrapper->field_micro_crm_phone->value();
+  return $wrapper->field_crm_phone->value();
 }
 
 /**
- * Implements hook_micro_crm_newsletter_prepare_message().
+ * Implements hook_crm_newsletter_prepare_message().
  */
-function micro_crm_phone_micro_crm_newsletter_prepare_message($channel, $type = 'unsubscribe') {
-  $message = entity_create('micro_crm_message', array('type' => 'phone'));
-  $wrapper = entity_metadata_wrapper('micro_crm_message', $message);
+function crm_phone_crm_newsletter_prepare_message($channel, $type = 'unsubscribe') {
+  $message = entity_create('crm_message', array('type' => 'phone'));
+  $wrapper = entity_metadata_wrapper('crm_message', $message);
   if (!$wrapper->__isset('crm_message_phone')) {
     return FALSE;
   }
@@ -48,11 +48,11 @@ function micro_crm_phone_micro_crm_newsletter_prepare_message($channel, $type = 
   $wrapper->crm_message_phone->set($channel);
   switch ($type) {
     case 'subscribe':
-      $wrapper->crm_message_phone_body->set(t("Click to confirm @button", array('@button' => url('micro_crm/newsletter/subscribe/' . $channel->token, array('absolute' => TRUE)))));
+      $wrapper->crm_message_phone_body->set(t("Click to confirm @button", array('@button' => url('crm/newsletter/subscribe/' . $channel->token, array('absolute' => TRUE)))));
       break;
 
     case 'unsubscribe':
-      $wrapper->crm_message_phone_body->set(t("Thank you for being with us. Click to confirm @button", array('@button' => url('micro_crm/newsletter/unsubscribe/' . $channel->token, array('absolute' => TRUE)))));
+      $wrapper->crm_message_phone_body->set(t("Thank you for being with us. Click to confirm @button", array('@button' => url('crm/newsletter/unsubscribe/' . $channel->token, array('absolute' => TRUE)))));
       break;
 
     default:

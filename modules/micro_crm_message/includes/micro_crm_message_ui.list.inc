@@ -10,7 +10,7 @@
  *
  * @return array
  */
-function micro_crm_message_ui_list() {
+function crm_message_ui_list() {
   $build = array();
 
   return $build;
@@ -19,14 +19,14 @@ function micro_crm_message_ui_list() {
 /**
  *
  */
-function micro_crm_message_ui_add() {
+function crm_message_ui_add() {
   $build = array();
   $items = array();
 
-  foreach (micro_crm_channel_types() as $type => $name) {
+  foreach (crm_channel_types() as $type => $name) {
     $type_arg = strtr($type, '_', '-');
     $items[] = array(
-      'data' => l($name, 'admin/people/micro_crm/message/add/' . $type_arg),
+      'data' => l($name, 'admin/people/crm/message/add/' . $type_arg),
     );
   }
 

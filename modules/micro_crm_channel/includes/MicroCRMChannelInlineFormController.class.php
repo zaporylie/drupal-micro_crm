@@ -5,7 +5,7 @@
  *
  */
 
-class MicroCRMChannelInlineFormController extends EntityInlineEntityFormController {
+class CRMChannelInlineFormController extends EntityInlineEntityFormController {
 
   /**
    * Overrides EntityInlineEntityFormController::defaultLabels().
@@ -65,7 +65,7 @@ class MicroCRMChannelInlineFormController extends EntityInlineEntityFormControll
       '#weight' => 99,
       '#default_value' => $entity->status,
       '#required' => TRUE,
-      '#options' => micro_crm_channel_status_option_list(),
+      '#options' => crm_channel_status_option_list(),
     );
     return parent::entityForm($entity_form, $form_state);
   }

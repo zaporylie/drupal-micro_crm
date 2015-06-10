@@ -2,5 +2,5 @@ name = Phone Channel
 core = 7.x
 package = CRM
 
-dependencies[] = micro_crm_channel
+dependencies[] = crm_channel
 dependencies[] = telephone_validation

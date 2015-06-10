@@ -3,7 +3,7 @@
 /**
  * Field handler to present a product's operations links.
  */
-class micro_crm_channel_handler_field_channel_operations extends views_handler_field {
+class crm_channel_handler_field_channel_operations extends views_handler_field {
   function construct() {
     parent::construct();
 
@@ -37,7 +37,7 @@ class micro_crm_channel_handler_field_channel_operations extends views_handler_f
     $channel_id = $this->get_value($values, 'channel_id');
 
     // Get the operations links.
-    $links = menu_contextual_links('micro-crm-channel', 'admin/people/micro_crm/channel', array($channel_id));
+    $links = menu_contextual_links('crm-channel', 'admin/people/crm/channel', array($channel_id));
 
     if (!empty($links)) {
       // Add the destination to the links if specified.

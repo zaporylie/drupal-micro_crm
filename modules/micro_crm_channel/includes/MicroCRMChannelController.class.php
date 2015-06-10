@@ -6,9 +6,9 @@
  */
 
 /**
- * Class MicroCRMChannelController
+ * Class CRMChannelController
  */
-class MicroCRMChannelController extends EntityAPIController {
+class CRMChannelController extends EntityAPIController {
 
   /**
    * Overrides EntityAPIController::buildQuery().
@@ -50,18 +50,18 @@ class MicroCRMChannelController extends EntityAPIController {
       return FALSE;
     }
     // The administer permission is a blanket override.
-    if (user_access('micro crm bypass access')) {
+    if (user_access('crm bypass access')) {
       return TRUE;
     }
     switch ($op) {
       case 'create':
-        return user_access('micro crm channel create');
+        return user_access('crm channel create');
       case 'view':
-        return user_access('micro crm channel view');
+        return user_access('crm channel view');
       case 'update':
-        return user_access('micro crm channel update');
+        return user_access('crm channel update');
       case 'delete':
-        return user_access('micro crm channel delete');
+        return user_access('crm channel delete');
     }
     return FALSE;
   }
@@ -78,7 +78,7 @@ class MicroCRMChannelController extends EntityAPIController {
    */
   public function create(array $values = array()) {
     $values += array(
-      'status' => MICRO_CRM_CHANNEL_STATUS_REGISTERED,
+      'status' => CRM_CHANNEL_STATUS_REGISTERED,
     );
     return parent::create($values);
   }
@@ -92,7 +92,7 @@ class MicroCRMChannelController extends EntityAPIController {
     // uniqueness.
     if (isset($entity->is_new) && $entity->is_new == TRUE && !isset($entity->order_id)) {
       // Throw exception if new but not unique channel is going to be save.
-      if (!micro_crm_channel_is_unique($entity->type, $entity)) {
+      if (!crm_channel_is_unique($entity->type, $entity)) {
         throw new Exception('Channel already exists');
       }
       // Add timestamp.

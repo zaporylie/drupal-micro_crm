@@ -8,12 +8,12 @@
 /**
  * Implements hook_install().
  */
-function micro_crm_phone_install() {
+function crm_phone_install() {
 
   $t = get_t();
   $field = array(
     'settings' => array(),
-    'field_name' => 'field_micro_crm_phone',
+    'field_name' => 'field_crm_phone',
     'type' => 'telephone',
     'module' => 'telephone',
     'active' => 1,
@@ -49,8 +49,8 @@ function micro_crm_phone_install() {
     'required' => 1,
     'description' => '',
     'default_value' => NULL,
-    'field_name' => 'field_micro_crm_phone',
-    'entity_type' => 'micro_crm_channel',
+    'field_name' => 'field_crm_phone',
+    'entity_type' => 'crm_channel',
     'bundle' => 'phone',
     'deleted' => 0,
   );
@@ -60,34 +60,34 @@ function micro_crm_phone_install() {
 /**
  * Implements hook_uninstall().
  */
-function micro_crm_phone_uninstall() {
+function crm_phone_uninstall() {
   $instance = array(
-    'entity_type' => 'micro_crm_channel',
-    'field_name' => 'field_micro_crm_phone',
+    'entity_type' => 'crm_channel',
+    'field_name' => 'field_crm_phone',
     'bundle' => 'phone',
   );
   field_delete_instance($instance);
   $instance = array(
-    'entity_type' => 'micro_crm_message',
+    'entity_type' => 'crm_message',
     'field_name' => 'crm_message_phone',
     'bundle' => 'phone',
   );
   field_delete_instance($instance);
   $instance = array(
-    'entity_type' => 'micro_crm_message',
+    'entity_type' => 'crm_message',
     'field_name' => 'crm_message_phone_body',
     'bundle' => 'phone',
   );
   field_delete_instance($instance);
 
-  variable_del('micro_crm_channel_ui_phone_newsletter');
+  variable_del('crm_channel_ui_phone_newsletter');
 
-  if (db_table_exists('micro_crm_message')) {
-    field_attach_delete_bundle('micro_crm_message', 'phone');
-    db_delete('micro_crm_message')->condition('type', 'phone')->execute();
+  if (db_table_exists('crm_message')) {
+    field_attach_delete_bundle('crm_message', 'phone');
+    db_delete('crm_message')->condition('type', 'phone')->execute();
   }
-  if (db_table_exists('micro_crm_channel')) {
-    field_attach_delete_bundle('micro_crm_channel', 'phone');
-    db_delete('micro_crm_channel')->condition('type', 'phone')->execute();
+  if (db_table_exists('crm_channel')) {
+    field_attach_delete_bundle('crm_channel', 'phone');
+    db_delete('crm_channel')->condition('type', 'phone')->execute();
   }
 }

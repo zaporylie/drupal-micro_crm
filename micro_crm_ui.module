@@ -8,22 +8,22 @@
 /**
  * Implements hook_menu().
  */
-function micro_crm_ui_menu() {
+function crm_ui_menu() {
   $items = array();
 
-  $items['admin/people/micro_crm'] = array(
+  $items['admin/people/crm'] = array(
     'title' => 'CRM',
-    'page callback' => 'micro_crm_index',
+    'page callback' => 'crm_index',
     'page arguments' => array(),
-    'access arguments' => array('micro crm manage'),
+    'access arguments' => array('crm manage'),
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['admin/people/micro_crm/config'] = array(
+  $items['admin/people/crm/config'] = array(
     'title' => 'Config',
-    'page callback' => 'micro_crm_index',
+    'page callback' => 'crm_index',
     'page arguments' => array(),
-    'access arguments' => array('micro crm manage'),
+    'access arguments' => array('crm manage'),
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -36,7 +36,7 @@ function micro_crm_ui_menu() {
  * @return array
  *   Returns renderable array.
  */
-function micro_crm_index() {
+function crm_index() {
   $build = array();
 
   return $build;

@@ -8,10 +8,10 @@
 /**
  * Implements hook_schema().
  */
-function micro_crm_message_schema() {
+function crm_message_schema() {
 
-  module_load_include('module', 'micro_crm_message', 'micro_crm_message');
-  $schema['micro_crm_message'] = array(
+  module_load_include('module', 'crm_message', 'crm_message');
+  $schema['crm_message'] = array(
     'description' => 'message entity',
     'fields' => array(
       'message_id' => array(
@@ -28,7 +28,7 @@ function micro_crm_message_schema() {
         'default' => '',
       ),
       'revision_id' => array(
-        'description' => 'The current {micro_crm_message_revision}.revision_id version identifier.',
+        'description' => 'The current {crm_message_revision}.revision_id version identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
@@ -50,7 +50,7 @@ function micro_crm_message_schema() {
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
-        'default' => MICRO_CRM_MESSAGE_STATUS_REGISTERED,
+        'default' => CRM_MESSAGE_STATUS_REGISTERED,
       ),
       'language' => array(
         'description' => 'The {languages}.language of this record.',
@@ -65,19 +65,19 @@ function micro_crm_message_schema() {
       'revision_id' => array('revision_id'),
     ),
     'foreign keys' => array(
-      'micro_crm_message_revision' => array(
-        'table' => 'micro_crm_message_revision',
+      'crm_message_revision' => array(
+        'table' => 'crm_message_revision',
         'columns' => array('revision_id' => 'revision_id'),
       ),
     ),
     'indexes' => array(
-      'micro_crm_message_id' => array('message_id'),
-      'micro_crm_status' => array('status'),
+      'crm_message_id' => array('message_id'),
+      'crm_status' => array('status'),
       'language' => array('language'),
     ),
   );
 
-  $schema['micro_crm_message_revision'] = array(
+  $schema['crm_message_revision'] = array(
     'description' => 'message entity revision',
     'fields' => array(
       'revision_id' => array(
@@ -87,7 +87,7 @@ function micro_crm_message_schema() {
         'not null' => TRUE,
       ),
       'message_id' => array(
-        'description' => 'Parent {micro_crm_message}.message_id message identifier.',
+        'description' => 'Parent {crm_message}.message_id message identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
@@ -97,7 +97,7 @@ function micro_crm_message_schema() {
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
-        'default' => MICRO_CRM_MESSAGE_STATUS_REGISTERED,
+        'default' => CRM_MESSAGE_STATUS_REGISTERED,
       ),
       'language' => array(
         'description' => 'The {languages}.language of this record.',
@@ -127,8 +127,8 @@ function micro_crm_message_schema() {
     ),
     'primary key' => array('revision_id'),
     'foreign keys' => array(
-      'micro_crm_message' => array(
-        'table' => 'micro_crm_message',
+      'crm_message' => array(
+        'table' => 'crm_message',
         'columns' => array('message_id' => 'message_id'),
       ),
     ),
@@ -143,13 +143,13 @@ function micro_crm_message_schema() {
 /**
  * Implements hook_install().
  */
-function micro_crm_message_install() {
+function crm_message_install() {
 
 }
 
 /**
  * Implements hook_uninstall().
  */
-function micro_crm_message_uninstall() {
+function crm_message_uninstall() {
 
 }
