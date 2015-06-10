@@ -42,6 +42,16 @@ function crm_channel_ui_menu() {
 }
 
 /**
+ * Implements hook_views_api().
+ */
+function crm_channel_ui_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'crm_channel_ui') . '/includes/views',
+  );
+}
+
+/**
  * Settings form.
  */
 function crm_channel_ui_settings($form, &$form_state, $bundle) {

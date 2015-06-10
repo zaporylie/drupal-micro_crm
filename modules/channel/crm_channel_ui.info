@@ -5,4 +5,4 @@ package = CRM
 
 dependencies[] = crm_channel
 dependencies[] = crm_ui
-dependencies[] = views
+dependencies[] = views_ui

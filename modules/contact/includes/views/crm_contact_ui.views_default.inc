@@ -24,7 +24,8 @@ function crm_contact_ui_views_default_views() {
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Contact';
   $handler->display->display_options['use_more_always'] = FALSE;
-  $handler->display->display_options['access']['type'] = 'none';
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['access']['perm'] = 'crm contact overview';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
@@ -60,23 +61,23 @@ function crm_contact_ui_views_default_views() {
       'empty_column' => 0,
     ),
   );
-  /* Field: CRM: Contact ID */
+  /* Field: Contact: Contact ID */
   $handler->display->display_options['fields']['contact_id']['id'] = 'contact_id';
   $handler->display->display_options['fields']['contact_id']['table'] = 'crm_contact';
   $handler->display->display_options['fields']['contact_id']['field'] = 'contact_id';
-  /* Field: CRM: Created date */
+  /* Field: Contact: Created date */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'crm_contact';
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['date_format'] = 'medium';
   $handler->display->display_options['fields']['created']['second_date_format'] = 'long';
-  /* Field: CRM: Updated date */
+  /* Field: Contact: Updated date */
   $handler->display->display_options['fields']['changed']['id'] = 'changed';
   $handler->display->display_options['fields']['changed']['table'] = 'crm_contact';
   $handler->display->display_options['fields']['changed']['field'] = 'changed';
   $handler->display->display_options['fields']['changed']['date_format'] = 'medium';
   $handler->display->display_options['fields']['changed']['second_date_format'] = 'long';
-  /* Field: CRM: Operations links */
+  /* Field: Contact: Operations links */
   $handler->display->display_options['fields']['operations']['id'] = 'operations';
   $handler->display->display_options['fields']['operations']['table'] = 'crm_contact';
   $handler->display->display_options['fields']['operations']['field'] = 'operations';
@@ -85,6 +86,13 @@ function crm_contact_ui_views_default_views() {
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
   $handler->display->display_options['path'] = 'admin/people/crm/contact';
+  $handler->display->display_options['menu']['type'] = 'normal';
+  $handler->display->display_options['menu']['title'] = 'Contact';
+  $handler->display->display_options['menu']['weight'] = '0';
+  $handler->display->display_options['menu']['name'] = 'management';
+  $handler->display->display_options['menu']['context'] = 0;
+  $handler->display->display_options['menu']['context_only_inline'] = 0;
+
 
   $views[$view->name] = $view;
 
