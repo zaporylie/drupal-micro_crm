@@ -19,7 +19,7 @@ function crm_email_crm_message_send($message) {
   }
   $params['subject'] = $subject;
   $params['body'] = $body;
-  $result = drupal_mail('crm_email', 'message', $wrapper->crm_message_email->field_crm_email->value(), $wrapper->language->value(), $params);
+  $result = drupal_mail('crm_email', 'message', $wrapper->crm_message_email->crm_email->value(), $wrapper->language->value(), $params);
   return $result['result'];
 }
 
@@ -28,10 +28,10 @@ function crm_email_crm_message_send($message) {
  */
 function crm_email_crm_channel_label($channel) {
   $wrapper = entity_metadata_wrapper('crm_channel', $channel);
-  if (!$wrapper->__isset('field_crm_email')) {
+  if (!$wrapper->__isset('crm_email')) {
     return NULL;
   }
-  return $wrapper->field_crm_email->value();
+  return $wrapper->crm_email->value();
 }
 
 /**

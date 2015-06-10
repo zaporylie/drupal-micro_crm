@@ -113,7 +113,7 @@ function crm_campaignmonitor_sync($channel_old) {
   $cm = CampaignMonitor::getConnector();
 
   // Get e-mail address from channel object.
-  $email = $wrapper->field_crm_email->value();
+  $email = $wrapper->crm_email->value();
 
   // Iterate all available lists.
   foreach (_crm_campaignmonitor_get_lists() as $list_id) {
