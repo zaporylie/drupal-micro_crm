@@ -3,6 +3,7 @@ description = CRM soultion for Drupal.
 core = 7.x
 package = CRM
 
-dependencies[] = entity
+files[] = tests/crm_base.test
+files[] = tests/crm_ui.test
 
-files[] = tests/crm.test
+dependencies[] = entity

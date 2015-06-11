@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * Tests basic CRM functions.
+ */
+class CRMBaseTestCase extends DrupalWebTestCase {
+
+  protected $user;
+  protected $admin;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'CRM',
+      'description' => 'Tests basic CRM functions.',
+      'group' => 'crm',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('crm');
+    // User creation for different operations.
+
+    $admin_permissions = array(
+      'access administration pages',
+      'crm manage',
+      'access content',
+    );
+    $user_permissions = array(
+      'access content',
+    );
+    $this->admin = $this->drupalCreateUser($admin_permissions);
+    $this->user = $this->drupalCreateUser($user_permissions);
+  }
+
+}

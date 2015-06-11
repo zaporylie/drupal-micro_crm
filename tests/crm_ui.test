@@ -3,10 +3,8 @@
 /**
  * Tests basic CRM functions.
  */
-class CRMUITestCase extends DrupalWebTestCase {
+class CRMUITestCase extends CRMBaseTestCase {
 
-  public $user;
-  public $admin;
 
   public static function getInfo() {
     return array(
@@ -18,18 +16,6 @@ class CRMUITestCase extends DrupalWebTestCase {
 
   function setUp() {
     parent::setUp('crm', 'crm_ui');
-    // User creation for different operations.
-
-    $admin_permissions = array(
-      'access administration pages',
-      'crm manage',
-      'access content',
-    );
-    $user_permissions = array(
-      'access content',
-    );
-    $this->admin = $this->drupalCreateUser($admin_permissions);
-    $this->user = $this->drupalCreateUser($user_permissions);
   }
 
   /**
