@@ -60,7 +60,7 @@ before_script:
 
   # Reference and enable rules in build site.
   - ln -s $TESTDIR modules/crm
-  - drush --yes pm-download smsframework entityreference entity inline_entity_form ctools views email telephone telephone_validation
+  - drush --yes pm-download smsframework entityreference entity inline_entity_form ctools views email telephone
   - drush --yes pm-enable simpletest
 
   # Start a web server on port 8080, run in the background; wait for
