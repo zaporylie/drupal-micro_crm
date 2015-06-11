@@ -5,3 +5,4 @@ package = CRM
 
 dependencies[] = crm_message
 dependencies[] = crm_ui
+dependencies[] = views
