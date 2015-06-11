@@ -33,4 +33,22 @@ class CRMBaseTestCase extends DrupalWebTestCase {
     $this->user = $this->drupalCreateUser($this->user_permissions);
   }
 
+  function mergePermissions() {
+    $args = func_get_args();
+    $permission = array();
+    foreach ($args as $arg) {
+      if (is_array($arg)) {
+        foreach ($arg as $perm) {
+          if (!in_array($perm, $permission)) {
+            $permission[] = $perm;
+          }
+        }
+        if (!in_array($arg, $permission)) {
+          $permission[] = $arg;
+        }
+      }
+    }
+    return $permission;
+  }
+
 }

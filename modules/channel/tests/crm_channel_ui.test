@@ -22,7 +22,7 @@ class CRMChannelUITestCase extends CRMBaseTestCase {
       'crm channel delete',
       'crm channel view',
     );
-    $this->admin_permissions = array_merge($this->admin_permissions, $admin_permissions);
+    $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
 
     parent::setUp('crm_channel_ui', 'crm_email');
 
