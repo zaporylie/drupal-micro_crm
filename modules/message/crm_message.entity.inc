@@ -98,7 +98,7 @@ function crm_message_view($message, $view_mode = 'customer') {
  */
 function crm_message_uri($message) {
   return array(
-    'path' => 'admin/people/crm/message/' . $message->message_id . '/view',
+    'path' => 'admin/people/crm/message/' . $message->message_id,
   );
 }
 

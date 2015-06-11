@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * Tests basic CRM functions.
+ */
+class CRMChannelUITestCase extends CRMBaseTestCase {
+
+
+  public static function getInfo() {
+    return array(
+      'name' => 'CRM Channel UI',
+      'description' => 'CRM Channel interface accessibility.',
+      'group' => 'crm',
+    );
+  }
+
+  function setUp() {
+    $admin_permissions = array(
+      'crm channel overview',
+      'crm channel create',
+      'crm channel update',
+      'crm channel delete',
+      'crm channel view',
+    );
+    $this->admin_permissions = array_merge($this->admin_permissions, $admin_permissions);
+
+    parent::setUp('crm_channel_ui', 'crm_email');
+
+    module_enable(array('views_ui'));
+    views_module_include('views_default', TRUE);
+    views_get_all_views(TRUE);
+    menu_rebuild();
+  }
+
+  /**
+   * Tests the interface accessibility.
+   */
+  function testInterfaceAccessibility() {
+    // Login with normal user.
+    $this->drupalLogin($this->user);
+
+    $this->drupalGet('admin/people/crm/config/channel');
+    $this->assertResponse(403, t('Normal user is not able to access the config page'));
+    $this->drupalGet('admin/people/crm/channel');
+    $this->assertResponse(403, t('Normal user is not able to access the admin page'));
+    $this->drupalGet('admin/people/crm/channel/add');
+    $this->assertResponse(403, t('Normal user is not able to access the add page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->admin);
+
+    $this->drupalGet('admin/people/crm/config/channel');
+    $this->assertResponse(200, t('Admin user is not able to access the config page'));
+    $this->assertText(t('Channel'), t('%title title present in the admin list page', array('%title' => t('Channel'))));
+
+    $this->drupalGet('admin/people/crm/channel');
+    $this->assertResponse(200, t('Admin user is not able to access the admin page'));
+    $this->assertText(t('Channel'), t('%title title present in the admin list page', array('%title' => t('Channel'))));
+
+    $this->drupalGet('admin/people/crm/channel/add');
+    $this->assertResponse(200, t('Admin user is not able to access the add page'));
+    $this->assertText(t('Add new channel'), t('%title title present in the add page', array('%title' => t('Add new channel'))));
+  }
+
+}

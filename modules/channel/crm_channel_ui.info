@@ -6,3 +6,5 @@ package = CRM
 dependencies[] = crm_channel
 dependencies[] = crm_ui
 ;dependencies[] = views_ui
+
+files[] = tests/crm_channel_ui.test
