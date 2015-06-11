@@ -1,0 +1,8 @@
+name = Contact UI
+description = Provides UI for module
+core = 7.x
+package = CRM
+
+dependencies[] = crm_contact
+dependencies[] = crm_ui
+dependencies[] = views_ui

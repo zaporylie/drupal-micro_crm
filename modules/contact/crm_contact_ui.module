@@ -1,0 +1,148 @@
+<?php
+
+/**
+ * @file
+ * UI for contact entity.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function crm_contact_ui_menu() {
+  $items = array();
+
+  $items['admin/people/crm/contact'] = array(
+    'title' => 'Contact',
+    'page callback' => 'crm_contact_ui_list',
+    'page arguments' => array(),
+    'access arguments' => array('crm contact overview'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'includes/crm_contact_ui.list.inc',
+  );
+
+  $items['admin/people/crm/contact/%crm_contact'] = array(
+    'title callback' => 'crm_contact_label',
+    'title arguments' => array(4),
+    'page callback' => 'crm_contact_view',
+    'page arguments' => array(4),
+    'access callback' => 'crm_contact_access',
+    'access arguments' => array('view', 4),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/crm_contact_ui.list.inc',
+  );
+
+  $items['admin/people/crm/contact/%crm_contact/view'] = array(
+    'title' => 'View',
+    'page callback' => 'crm_contact_view',
+    'page arguments' => array(4),
+    'access callback' => 'crm_contact_access',
+    'access arguments' => array('view', 4),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_contact_ui.list.inc',
+    'weight' => -2,
+  );
+
+  $items['admin/people/crm/contact/%crm_contact/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'crm_contact_ui_form_wrapper',
+    'page arguments' => array(4),
+    'access callback' => 'crm_contact_access',
+    'access arguments' => array('update', 4),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_contact_ui.form.inc',
+    'weight' => -1,
+  );
+
+  $items['admin/people/crm/contact/%crm_contact/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'crm_contact_ui_form_wrapper',
+    'page arguments' => array(4, TRUE),
+    'access callback' => 'crm_contact_access',
+    'access arguments' => array('delete', 4),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_contact_ui.form.inc',
+    'weight' => 99,
+  );
+
+  $items['admin/people/crm/contact/add'] = array(
+    'title' => 'Add contact',
+    'page callback' => 'crm_contact_ui_form_wrapper',
+    'page arguments' => array(),
+    'access callback' => 'crm_contact_access',
+    'access arguments' => array('create'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'includes/crm_contact_ui.form.inc',
+  );
+
+  $items['admin/people/crm/config/contact'] = array(
+    'title' => 'Contact',
+    'page callback' => 'crm_index',
+    'page arguments' => array(),
+    'access arguments' => array('crm manage'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function crm_contact_ui_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'crm_contact_ui') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function crm_contact_ui_entity_info_alter(&$entity_info) {
+
+  // Uri callback.
+  $entity_info['crm_contact']['uri callback'] = 'crm_contact_ui_uri';
+
+  // Expose the order UI for order fields.
+  $entity_info['crm_contact']['bundles']['crm_contact']['admin'] = array(
+    'path' => 'admin/people/crm/config/contact',
+    'real path' => 'admin/people/crm/config/contact',
+    'access arguments' => array('crm contact administer'),
+  );
+}
+
+/**
+ *
+ *
+ * @param $contact
+ */
+function crm_contact_ui_uri($contact) {
+//  // First look for a return value in the default entity uri callback.
+//  $uri = commerce_order_uri($order);
+//
+//  // If a value was found, return it now.
+//  if (!empty($uri)) {
+//    return $uri;
+//  }
+
+  // Only return a value if the user has permission to view the order.
+  if (crm_contact_access('view', $contact)) {
+    return array(
+      'path' => 'admin/people/crm/contact/' . entity_id('crm_contact', $contact),
+    );
+  }
+
+  return NULL;
+}
+
+/**
+ * Implements hook_field_widget_form_alter().
+ */
+function crm_contact_ui_field_widget_form_alter(&$element, &$form_state, $context) {
+  if (isset($element['#field_name']) && $element['#field_name'] == 'crm_deprecated') {
+    $element['#access'] = FALSE;
+  }
+}

@@ -1,0 +1,8 @@
+name = Channel UI
+description = Adds UI to contact channel.
+core = 7.x
+package = CRM
+
+dependencies[] = crm_channel
+dependencies[] = crm_ui
+dependencies[] = views_ui

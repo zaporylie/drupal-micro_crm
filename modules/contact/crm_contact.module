@@ -1,0 +1,139 @@
+<?php
+
+/**
+ * @file
+ *
+ */
+
+define('CRM_CONTACT_STATUS_REGISTERED', 'registered');
+
+module_load_include('inc', 'crm_contact', 'crm_contact.entity');
+
+/**
+ * Implements hook_permission().
+ */
+function crm_contact_permission() {
+  return array(
+    'crm contact overview' => array(
+      'title' => t('Grant access to contact list'),
+    ),
+    'crm contact administer' => array(
+      'title' => t('Administer CRM Contact'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_hook_info().
+ */
+function crm_contact_hook_info() {
+  $hooks = array(
+    'crm_contact_status_info' => array(
+      'group' => 'crm',
+    ),
+    'crm_contact_status_info_alter' => array(
+      'group' => 'crm',
+    ),
+    'crm_contact_uri' => array(
+      'group' => 'crm',
+    ),
+    'crm_contact_view' => array(
+      'group' => 'crm',
+    ),
+    'crm_contact_presave' => array(
+      'group' => 'crm',
+    ),
+    'crm_contact_update' => array(
+      'group' => 'crm',
+    ),
+    'crm_contact_insert' => array(
+      'group' => 'crm',
+    ),
+    'crm_contact_delete' => array(
+      'group' => 'crm',
+    ),
+  );
+  return $hooks;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function crm_contact_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'crm_contact') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_crm_contact_status_info().
+ */
+function crm_contact_crm_contact_status_info() {
+  $status = array();
+
+  $status[CRM_CONTACT_STATUS_REGISTERED] = array(
+    'title' => t('Registered'),
+    'description' => t('Registered, unprocessed contact'),
+    'weight' => -99,
+  );
+
+  return $status;
+}
+
+/**
+ * Returns all statuses contact declared by modules.
+ *
+ * @return array
+ *   List of statuses
+ */
+function crm_contact_statuses() {
+  // First check the static cache for an order states array.
+  $statuses = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the statuses now.
+  if (empty($statuses)) {
+    $statuses = module_invoke_all('crm_contact_status_info');
+
+    // Give other modules a chance to alter the order states.
+    drupal_alter('crm_contact_status_info', $statuses);
+
+    uasort($statuses, 'drupal_sort_weight');
+  }
+
+  return $statuses;
+}
+
+/**
+ * Returns list of available statuses.
+ */
+function crm_contact_status_options_list() {
+
+  $options = array();
+
+  foreach (crm_contact_statuses() as $key => $status) {
+    $options[$key] = $status['title'];
+  }
+
+  return $options;
+}
+
+/**
+ * @param $contact
+ * @return bool
+ */
+function crm_contact_get_channels($contact) {
+  if (!module_exists('crm_channel')) {
+    return FALSE;
+  }
+  $wrapper = entity_metadata_wrapper('crm_contact', $contact);
+  if (!$wrapper->__isset('crm_channel')) {
+    return FALSE;
+  }
+
+  $tmp = array();
+  foreach ($wrapper->crm_channel->getIterator() as $channel) {
+    $tmp[] = $channel->getIdentifier();
+  }
+  return $tmp;
+}

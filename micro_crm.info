@@ -1,8 +1,0 @@
-name = Micro CRM
-description = CRM soultion for Drupal.
-core = 7.x
-
-dependencies[] = entity
-
-files[] = micro_crm.entity.inc
-files[] = includes/MicroCRMController.class.php

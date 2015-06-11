@@ -1,0 +1,80 @@
+<?php
+
+/**
+ * @file
+ *
+ */
+
+/**
+ * Implements hook_install().
+ */
+function crm_email_install() {
+
+  _field_info_collate_types(TRUE);
+
+  $t = get_t();
+  $field = array(
+    'settings' => array(),
+    'field_name' => 'crm_email',
+    'type' => 'email',
+    'module' => 'email',
+    'active' => 1,
+    'locked' => 0,
+    'cardinality' => 1,
+    'deleted' => 0,
+  );
+  field_create_field($field);
+
+  $instance = array(
+    'label' => $t('E-mail'),
+    'widget' => array(
+      'weight' => -99,
+      'type' => 'email_textfield',
+      'module' => 'email',
+      'active' => 1,
+      'settings' => array(
+        'size' => '60',
+      ),
+    ),
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'email_default',
+        'settings' => array(),
+        'module' => 'email',
+        'weight' => -99,
+      ),
+    ),
+    'required' => 1,
+    'description' => '',
+    'default_value' => NULL,
+    'field_name' => 'crm_email',
+    'entity_type' => 'crm_channel',
+    'bundle' => 'email',
+    'deleted' => 0,
+  );
+  field_create_instance($instance);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function crm_email_uninstall() {
+
+  $instance = array(
+    'entity_type' => 'crm_channel',
+    'field_name' => 'crm_email',
+    'bundle' => 'email',
+  );
+  field_delete_instance($instance);
+
+  variable_del('crm_channel_ui_email_newsletter');
+
+  if (db_table_exists('crm_channel')) {
+    field_attach_delete_bundle('crm_channel', 'email');
+    db_delete('crm_channel')->condition('type', 'email')->execute();
+  }
+}

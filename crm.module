@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * @file
+ * General settings and methods.
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function crm_permission() {
+  return array(
+    'crm manage' => array(
+      'title' => t('Manage CRM'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Returns list of all available languages.
+ */
+function crm_language_list() {
+  include_once DRUPAL_ROOT . '/includes/iso.inc';
+
+  $languages = array();
+
+  foreach (language_list() as $key => $language) {
+    $languages[$key] = $language->name;
+  }
+  return $languages;
+}

@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_install().
+ */
+function crm_channel_ui_install() {
+  db_update('system')
+    ->fields(array('weight' => 1001))
+    ->condition('name', 'crm_channel_ui', '=')
+    ->execute();
+}

@@ -1,0 +1,13 @@
+name = Channel
+description = Allows you to add custom comunication channels
+core = 7.x
+package = CRM
+
+files[] = includes/CRMChannelController.class.php
+files[] = includes/CRMChannelInlineFormController.class.php
+files[] = includes/views/handlers/crm_channel_handler_field_channel_label.inc
+files[] = includes/views/handlers/crm_channel_handler_field_channel_operations.inc
+
+dependencies[] = crm_contact
+dependencies[] = inline_entity_form
+dependencies[] = entityreference

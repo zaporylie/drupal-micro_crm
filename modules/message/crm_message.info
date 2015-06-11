@@ -1,0 +1,9 @@
+name = Message
+description = Allows to create and send message via channel
+core = 7.x
+package = CRM
+
+files[] = includes/CRMMessageController.class.php
+files[] = includes/views/handlers/crm_message_handler_field_message_operations.inc
+
+dependencies[] = crm_channel

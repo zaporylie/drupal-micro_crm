@@ -1,0 +1,7 @@
+name = Newsletter
+description = Newsletter extension to CRM
+core = 7.x
+package = CRM
+
+dependencies[] = crm_channel_ui
+dependencies[] = crm_contact_ui

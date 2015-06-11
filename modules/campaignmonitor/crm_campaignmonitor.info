@@ -1,0 +1,8 @@
+name = Newsletter Campaign Monitor
+description = Synchronize local contacts and channels to Campaign Monitor.
+core = 7.x
+package = CRM
+
+dependencies[] = crm_newsletter
+dependencies[] = campaignmonitor
+dependencies[] = crm_email

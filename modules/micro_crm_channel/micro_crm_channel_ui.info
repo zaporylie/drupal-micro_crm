@@ -1,7 +1,0 @@
-name = Micro CRM Contact Channel UI
-description = Adds UI to contact channel.
-core = 7.x
-
-dependencies[] = micro_crm_channel
-dependencies[] = micro_crm_ui
-dependencies[] = views

@@ -1,0 +1,7 @@
+name = Message UI
+description = Allows you to create and send new message via Drupal UI
+core = 7.x
+package = CRM
+
+dependencies[] = crm_message
+dependencies[] = crm_ui

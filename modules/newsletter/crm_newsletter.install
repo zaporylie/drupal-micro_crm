@@ -1,0 +1,12 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function crm_newsletter_uninstall() {
+  variable_del('crm_newsletter_custom_fields');
+}

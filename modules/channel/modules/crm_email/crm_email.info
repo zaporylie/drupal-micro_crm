@@ -1,0 +1,6 @@
+name = Email Channel
+core = 7.x
+package = CRM
+
+dependencies[] = crm_channel
+dependencies[] = email

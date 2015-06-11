@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ *
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function crm_ui_menu() {
+  $items = array();
+
+  $items['admin/people/crm'] = array(
+    'title' => 'CRM',
+    'page callback' => 'crm_index',
+    'page arguments' => array(),
+    'access arguments' => array('crm manage'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/people/crm/config'] = array(
+    'title' => 'Config',
+    'page callback' => 'crm_index',
+    'page arguments' => array(),
+    'access arguments' => array('crm manage'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Renders index based on current parent element.
+ *
+ * @return array
+ *   Returns renderable array.
+ */
+function crm_index() {
+  $build = array();
+
+  return $build;
+}

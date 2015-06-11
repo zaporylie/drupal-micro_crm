@@ -1,5 +1,0 @@
-name = Micro CRM Email channel
-core = 7.x
-
-dependencies[] = micro_crm_channel
-dependencies[] = email

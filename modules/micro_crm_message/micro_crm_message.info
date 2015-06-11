@@ -1,8 +1,0 @@
-name = Micro CRM Message module
-description = Allows to create and send message via channel
-core = 7.x
-
-files[] = includes/MicroCRMMessageController.class.php
-files[] = includes/views/handlers/micro_crm_message_handler_field_message_operations.inc
-
-dependencies[] = micro_crm_channel

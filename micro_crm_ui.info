@@ -1,5 +1,0 @@
-name = Micro CRM UI
-description = Creates main position in menu tree
-core = 7.x
-
-dependencies = micro_crm

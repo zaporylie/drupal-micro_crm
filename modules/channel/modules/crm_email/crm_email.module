@@ -1,0 +1,110 @@
+<?php
+
+/**
+ * @file
+ *
+ */
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function crm_email_entity_info_alter(&$entity_info) {
+  $bundle = array(
+    'label' => t('E-mail'),
+    'module' => 'crm_email',
+  );
+  $entity_info['crm_channel']['bundles']['email'] = $bundle;
+}
+
+/**
+ * Implements hook_crm_channel_is_unique().
+ */
+function crm_email_crm_channel_is_unique($channel, $new = TRUE) {
+  $wrapper = entity_metadata_wrapper('crm_channel', $channel);
+
+  if (!$wrapper->__isset('crm_email')) {
+    return FALSE;
+  }
+  if (!($value = $wrapper->crm_email->value())) {
+    return FALSE;
+  }
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'crm_channel')
+    ->entityCondition('bundle', 'email')
+    ->fieldCondition('crm_email', 'email', $value, '=');
+
+  $result = $query->execute();
+  if (!isset($result['crm_channel'])) {
+    return TRUE;
+  }
+  elseif (isset($result['crm_channel']) && count($result['crm_channel']) == 0 && $new == TRUE) {
+    return TRUE;
+  }
+  elseif (isset($result['crm_channel']) && count($result['crm_channel']) == 1 && $new == FALSE) {
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Implements hook_crm_channel_is_empty().
+ */
+function crm_email_crm_channel_is_empty($channel) {
+  $wrapper = entity_metadata_wrapper('crm_channel', $channel);
+  if (!$wrapper->__isset('crm_email')) {
+    return TRUE;
+  }
+  if (!($value = $wrapper->crm_email->value())) {
+    return TRUE;
+  }
+  if (!$value) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Implements hook_crm_channel_values_load().
+ */
+function crm_email_crm_channel_values_load($channel) {
+  $wrapper = entity_metadata_wrapper('crm_channel', $channel);
+
+  if (!$wrapper->__isset('crm_email')) {
+    return NULL;
+  }
+  if (!($value = $wrapper->crm_email->value())) {
+    return NULL;
+  }
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'crm_channel')
+    ->entityCondition('bundle', 'email')
+    ->fieldCondition('crm_email', 'email', $value, '=');
+
+  $result = $query->execute();
+  if (!isset($result['crm_channel'])) {
+    return NULL;
+  }
+  elseif (isset($result['crm_channel']) && count($result['crm_channel']) <> 1) {
+    return NULL;
+  }
+  else {
+    $entity = entity_load('crm_channel', array_keys($result['crm_channel']));
+    return reset($entity);
+  }
+}
+
+/**
+ * Implements hook_crm_channel_set_value().
+ */
+function crm_email_crm_channel_set_value(&$channel, $value) {
+  $wrapper = entity_metadata_wrapper('crm_channel', $channel);
+  if (!$wrapper->__isset('crm_email')) {
+    return FALSE;
+  }
+  $wrapper->crm_email->set($value);
+  return TRUE;
+}

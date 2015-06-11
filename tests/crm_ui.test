@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * Tests basic CRM functions.
+ */
+class CRMUITestCase extends CRMBaseTestCase {
+
+
+  public static function getInfo() {
+    return array(
+      'name' => 'CRM UI',
+      'description' => 'CRM interface accessibility.',
+      'group' => 'crm',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('crm', 'crm_ui');
+  }
+
+  /**
+   * Tests the interface accessibility.
+   */
+  function testInterfaceAccessibility() {
+    // Login with normal user.
+    $this->drupalLogin($this->user);
+
+    $this->drupalGet('admin/people/crm');
+    $this->assertResponse(403, t('Normal user is not able to access the admin page'));
+    $this->drupalGet('admin/people/crm/config');
+    $this->assertResponse(403, t('Normal user is not able to access the config page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->admin);
+
+    $this->drupalGet('admin/people/crm');
+    $this->assertResponse(200, t('Admin user is not able to access the admin page'));
+    $this->assertText(t('CRM'), t('%title title present in the admin list page', array('%title' => t('CRM'))));
+
+    $this->drupalGet('admin/people/crm/config');
+    $this->assertResponse(200, t('Admin user is not able to access the config page'));
+    $this->assertText(t('Config'), t('%title title present in the admin list page', array('%title' => t('Config'))));
+  }
+
+}

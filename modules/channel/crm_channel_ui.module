@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * @file
+ * Implements some hooks to create admin interface for contact channels.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function crm_channel_ui_menu() {
+  $items = array();
+
+  $items['admin/people/crm/config/channel'] = array(
+    'title' => 'Channel',
+    'page callback' => 'crm_index',
+    'page arguments' => array(),
+    'access arguments' => array('crm manage'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/people/crm/channel'] = array(
+    'title' => 'Channel',
+    'page callback' => 'crm_index',
+    'page arguments' => array(),
+    'access arguments' => array('crm manage'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  foreach (crm_channel_types() as $type => $bundle) {
+    $type_arg = strtr($type, '_', '-');
+    $items['admin/people/crm/config/channel/' . $type_arg] = array(
+      'title' => $bundle,
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('crm_channel_ui_settings', $type),
+      'access arguments' => array('crm manage'),
+      'type' => MENU_NORMAL_ITEM,
+    );
+  }
+
+  return $items;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function crm_channel_ui_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'crm_channel_ui') . '/includes/views',
+  );
+}
+
+/**
+ * Settings form.
+ */
+function crm_channel_ui_settings($form, &$form_state, $bundle) {
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function crm_channel_ui_entity_info_alter(&$entity_info) {
+  // Expose the admin UI for product fields.
+  foreach ($entity_info['crm_channel']['bundles'] as $type => &$bundle) {
+    $bundle['admin'] = array(
+      'path' => 'admin/people/crm/config/channel/' . strtr($type, '_', '-'),
+      'access arguments' => array('crm manage'),
+    );
+  }
+}

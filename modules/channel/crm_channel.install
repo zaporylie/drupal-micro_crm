@@ -1,0 +1,229 @@
+<?php
+
+/**
+ * @file
+ * Holds Contact Entity Channel schema.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function crm_channel_schema() {
+
+  $schema['crm_channel'] = array(
+    'description' => 'Contact entity channel',
+    'fields' => array(
+      'channel_id' => array(
+        'description' => 'The primary identifier for a table.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'type' => array(
+        'description' => 'The type of this order.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'revision_id' => array(
+        'description' => 'The current {crm_channel_revision}.revision_id version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'created' => array(
+        'description' => 'Creation date',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'Modification date',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'description' => 'Plain text record status',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => CRM_CHANNEL_STATUS_REGISTERED,
+      ),
+      'token' => array(
+        'description' => 'One-time token.',
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => FALSE,
+      ),
+      'token_created' => array(
+        'description' => 'When the token has been generated',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('channel_id'),
+    'unique keys' => array(
+      'revision_id' => array('revision_id'),
+      'token' => array('token'),
+    ),
+    'foreign keys' => array(
+      'crm_channel_revision' => array(
+        'table' => 'crm_channel_revision',
+        'columns' => array('revision_id' => 'revision_id'),
+      ),
+    ),
+    'indexes' => array(
+      'crm_channel_id' => array('channel_id'),
+      'crm_channel_status' => array('status'),
+    ),
+  );
+  
+  $schema['crm_channel_revision'] = array(
+    'description' => 'Contact channel entity revision',
+    'fields' => array(
+      'revision_id' => array(
+        'description' => 'The primary identifier for a table.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'channel_id' => array(
+        'description' => 'Parent {crm_channel}.channel_id contact channel identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'status' => array(
+        'description' => 'Plain text record status',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => CRM_CHANNEL_STATUS_REGISTERED,
+      ),
+      'revision_uid' => array(
+        'description' => 'Revision author {users}.uid',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'revision_timestamp' => array(
+        'description' => 'Revision date of creation',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'log' => array(
+        'description' => 'The log entry explaining the changes in this version.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'big',
+      ),
+    ),
+    'primary key' => array('revision_id'),
+    'foreign keys' => array(
+      'crm_channel' => array(
+        'table' => 'crm_channel',
+        'columns' => array('channel_id' => 'channel_id'),
+      ),
+    ),
+    'indexes' => array(
+      'channel_id' => array('channel_id'),
+    ),
+  );
+  
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function crm_channel_install() {
+
+  _field_info_collate_types(TRUE);
+  module_load_include('module', 'crm_channel', 'crm_channel');
+
+  $t = get_t();
+  $field = array(
+    'settings' => array(
+      'target_type' => 'crm_channel',
+      'handler' => 'base',
+      'handler_settings' => array(
+        'target_bundles' => array(),
+        'sort' => array(
+          'type' => 'none',
+        ),
+        'behaviors' => array(
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+      ),
+    ),
+    'field_name' => 'crm_channel',
+    'type' => 'entityreference',
+    'module' => 'entityreference',
+    'active' => 1,
+    'locked' => 0,
+    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    'deleted' => 0,
+  );
+  field_create_field($field);
+
+  $instance = array(
+    'label' => $t('Channel'),
+    'widget' => array(
+      'weight' => -99,
+      'type' => 'inline_entity_form',
+      'module' => 'inline_entity_form',
+      'active' => 1,
+      'settings' => array(
+        'fields' => array(),
+        'type_settings' => array(
+          'allow_existing' => 0,
+          'match_operator' => 'CONTAINS',
+          'delete_references' => 1,
+          'override_labels' => 0,
+        ),
+      ),
+    ),
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'entityreference_label',
+        'settings' => array(
+          'view_mode' => 'default',
+          'link' => FALSE,
+        ),
+        'module' => 'entityreference',
+        'weight' => 0,
+      ),
+    ),
+    'required' => 0,
+    'field_name' => 'crm_channel',
+    'entity_type' => 'crm_contact',
+    'bundle' => 'crm_contact',
+    'deleted' => 0,
+  );
+  field_create_instance($instance);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function crm_channel_uninstall() {
+
+  field_attach_delete_bundle('crm_contact', 'crm_contact');
+  $instance = array(
+    'entity_type' => 'crm_contact',
+    'field_name' => 'crm_channel',
+    'bundle' => 'crm_contact',
+  );
+  field_delete_instance($instance);
+
+}
