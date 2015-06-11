@@ -218,3 +218,14 @@ function crm_message_types() {
 
   return $message_types;
 }
+
+/**
+ * Returns type label.
+ */
+function crm_message_type_get_name($type) {
+  $types = crm_message_types();
+  if (isset($types[$type])) {
+    return $types[$type];
+  }
+  return NULL;
+}

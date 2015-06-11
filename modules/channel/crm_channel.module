@@ -227,6 +227,17 @@ function crm_channel_types() {
 }
 
 /**
+ * Returns name of type (bundle).
+ */
+function crm_channel_type_get_name($type) {
+  $channels = crm_channel_types();
+  if (isset($channels[$type])) {
+    return $channels[$type];
+  }
+  return NULL;
+}
+
+/**
  * Getter function which returns channel independent value.
  *
  * @param $channel

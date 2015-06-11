@@ -47,6 +47,34 @@ function crm_channel_views_data() {
     ),
   );
 
+
+  $data['crm_channel']['label'] = array(
+    'title' => t('Label'),
+    'help' => t('Provides a rendered channel label.'),
+    'field' => array(
+      'handler' => 'crm_channel_handler_field_channel_label',
+    ),
+  );
+
+  // Expose the channel type.
+  $data['crm_channel']['type'] = array(
+    'title' => t('Type'),
+    'help' => t('The human-readable name of the type of the channel.'),
+    'field' => array(
+      'handler' => 'crm_channel_handler_field_channel_type',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'crm_channel_handler_filter_channel_type',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
   $data['crm_channel']['created'] = array(
     'title' => t('Created date'),
     'help' => t('The date the channel was created.'),
@@ -74,14 +102,6 @@ function crm_channel_views_data() {
     ),
     'filter' => array(
       'handler' => 'views_handler_filter_date',
-    ),
-  );
-
-  $data['crm_channel']['label'] = array(
-    'title' => t('Label'),
-    'help' => t('Provides a rendered channel label.'),
-    'field' => array(
-      'handler' => 'crm_channel_handler_field_channel_label',
     ),
   );
 

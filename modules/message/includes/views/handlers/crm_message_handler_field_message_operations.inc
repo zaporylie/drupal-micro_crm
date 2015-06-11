@@ -4,10 +4,16 @@
  * Field handler to present a product's operations links.
  */
 class crm_message_handler_field_message_operations extends views_handler_field {
+
   function construct() {
     parent::construct();
 
     $this->additional_fields['message_id'] = 'message_id';
+  }
+
+  function query() {
+    $this->ensure_my_table();
+    $this->add_additional_fields();
   }
 
   function option_definition() {
@@ -26,11 +32,6 @@ class crm_message_handler_field_message_operations extends views_handler_field {
       '#title' => t('Add a destination parameter to operations links so users return to this View on form submission.'),
       '#default_value' => $this->options['add_destination'],
     );
-  }
-
-  function query() {
-    $this->ensure_my_table();
-    $this->add_additional_fields();
   }
 
   function render($values) {
