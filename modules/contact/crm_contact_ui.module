@@ -81,7 +81,7 @@ function crm_contact_ui_menu() {
     'title' => 'Contact',
     'page callback' => 'crm_index',
     'page arguments' => array(),
-    'access arguments' => array('crm manage'),
+    'access arguments' => array('crm administer'),
     'type' => MENU_NORMAL_ITEM,
   );
 

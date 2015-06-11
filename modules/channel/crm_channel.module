@@ -71,6 +71,28 @@ function crm_channel_views_api() {
   );
 }
 
+/**
+ * Implements hook_permission().
+ */
+function crm_channel_permission() {
+  return array(
+    'crm channel overview' => array(
+      'title' => t('Access to channel list'),
+    ),
+    'crm channel create' => array(
+      'title' => t('Create new channel'),
+    ),
+    'crm channel view' => array(
+      'title' => t('View channel'),
+    ),
+    'crm channel update' => array(
+      'title' => t('Update channel'),
+    ),
+    'crm channel delete' => array(
+      'title' => t('Delete channel'),
+    ),
+  );
+}
 
 /**
  * Implements hook_crm_channel_state_info().

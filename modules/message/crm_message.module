@@ -57,6 +57,32 @@ function crm_message_hook_info() {
 }
 
 /**
+ * Implements hook_permission().
+ */
+function crm_message_permission() {
+  return array(
+    'crm message overview' => array(
+      'title' => t('Access to message list'),
+    ),
+    'crm message create' => array(
+      'title' => t('Create new message'),
+    ),
+    'crm message view' => array(
+      'title' => t('View message'),
+    ),
+    'crm message update' => array(
+      'title' => t('Update message'),
+    ),
+    'crm message delete' => array(
+      'title' => t('Delete message'),
+    ),
+    'crm message send' => array(
+      'title' => t('Send message'),
+    ),
+  );
+}
+
+/**
  * Implements hook_crm_message_update().
  */
 function crm_message_crm_message_update($message) {
@@ -166,4 +192,29 @@ function _crm_message_channel_supported($type) {
   else {
     return FALSE;
   }
+}
+
+/**
+ * Returns list of types (bundles) in key => title format.
+ *
+ * @return array
+ */
+function crm_message_types() {
+  // First check the static cache for a product types array.
+  $message_types = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the types now.
+  if (!isset($message_types)) {
+    $message_types = array();
+
+    $entity = entity_get_info('crm_message');
+    if (isset($entity['bundles'])) {
+      foreach ($entity['bundles'] as $key => $bundle) {
+        // @todo: add something here or simplify it.
+        $message_types[$key] = $bundle['label'];
+      }
+    }
+  }
+
+  return $message_types;
 }

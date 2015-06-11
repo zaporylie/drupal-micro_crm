@@ -23,6 +23,7 @@ class CRMBaseTestCase extends DrupalWebTestCase {
     $admin_permissions = array(
       'access administration pages',
       'crm manage',
+      'crm administer',
       'access content',
     );
     $this->admin = $this->drupalCreateUser($admin_permissions);
