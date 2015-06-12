@@ -43,6 +43,8 @@ class CRMBaseTestCase extends DrupalWebTestCase {
             $permission[] = $perm;
           }
         }
+      }
+      else {
         if (!in_array($arg, $permission)) {
           $permission[] = $arg;
         }
