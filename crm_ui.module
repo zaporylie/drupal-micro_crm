@@ -25,6 +25,7 @@ function crm_ui_menu() {
     'page arguments' => array(),
     'access arguments' => array('crm administer'),
     'type' => MENU_NORMAL_ITEM,
+    'weight' => 99,
   );
 
   return $items;

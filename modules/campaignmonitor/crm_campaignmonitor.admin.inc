@@ -104,6 +104,29 @@ function crm_campaignmonitor_settings($form, &$form_state) {
     }
   }
 
+
+  $form['settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('General settigns'),
+  );
+  $form['settings']['crm_campaignmonitor_debug'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Debug webhook'),
+    '#description' => t('Log all webhook requests'),
+    '#default_value' => variable_get('crm_campaignmonitor_debug', FALSE),
+  );
+  $form['settings']['crm_campaignmonitor_queue_incoming'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Queue incoming requests'),
+    '#description' => t('Add incoming requests to queue. It makes system more stable but sometimes you can lost data integrity. Recommended value - FALSE'),
+    '#default_value' => variable_get('crm_campaignmonitor_queue_incoming', FALSE),
+  );
+  $form['settings']['crm_campaignmonitor_queue_outgoing'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Queue outgoing requests'),
+    '#description' => t('Add outgoing requests to queue. It makes system more stable but sometimes you can lost data integrity. Recommended value - TRUE'),
+    '#default_value' => variable_get('crm_campaignmonitor_queue_outgoing', TRUE),
+  );
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] = array(
     '#type' => 'submit',
@@ -116,12 +139,18 @@ function crm_campaignmonitor_settings($form, &$form_state) {
  * Settings form submit callback.
  */
 function crm_campaignmonitor_settings_submit($form, &$form_state) {
+  // Lists.
   variable_set('crm_campaignmonitor_lists', $form_state['values']['crm_campaignmonitor_lists']);
+  // List map.
   foreach ($form_state['values']['crm_campaignmonitor_lists'] as $list) {
     if ($list !== 0) {
       variable_set('crm_campaignmonitor_list_' . $list, $form_state['values']['crm_campaignmonitor'][$list]);
     }
   }
+  // Settings.
+  variable_set('crm_campaignmonitor_debug', $form_state['values']['settings']['crm_campaignmonitor_debug']);
+  variable_set('crm_campaignmonitor_queue_incoming', $form_state['values']['settings']['crm_campaignmonitor_queue_incoming']);
+  variable_set('crm_campaignmonitor_queue_outgoing', $form_state['values']['settings']['crm_campaignmonitor_queue_outgoing']);
 }
 
 /**
