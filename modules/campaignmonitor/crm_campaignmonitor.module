@@ -14,7 +14,7 @@ function crm_campaignmonitor_menu() {
     'title' => 'Campaign Monitor',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('crm_campaignmonitor_settings'),
-    'access arguments' => array('crm manage'),
+    'access arguments' => array('crm administer'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'crm_campaignmonitor.admin.inc',
   );
@@ -23,7 +23,7 @@ function crm_campaignmonitor_menu() {
     'title' => 'Campaign Monitor',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('crm_campaignmonitor_settings'),
-    'access arguments' => array('crm manage'),
+    'access arguments' => array('crm administer'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'file' => 'crm_campaignmonitor.admin.inc',
   );
@@ -32,7 +32,7 @@ function crm_campaignmonitor_menu() {
     'title' => 'Webhooks',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('crm_campaignmonitor_webhooks'),
-    'access arguments' => array('crm manage'),
+    'access arguments' => array('crm administer'),
     'type' => MENU_LOCAL_TASK,
     'file' => 'crm_campaignmonitor.admin.inc',
   );

@@ -15,17 +15,17 @@ function crm_message_ui_menu() {
     'title' => 'Message',
     'page callback' => 'crm_index',
     'page arguments' => array(),
-    'access arguments' => array('crm manage'),
+    'access arguments' => array('crm administer'),
     'type' => MENU_NORMAL_ITEM,
   );
 
-  foreach (crm_channel_types() as $type => $bundle) {
+  foreach (crm_message_types() as $type => $bundle) {
     $type_arg = strtr($type, '_', '-');
     $items['admin/people/crm/config/message/' . $type_arg] = array(
       'title' => $bundle,
       'page callback' => 'drupal_get_form',
       'page arguments' => array('crm_message_ui_settings', $type),
-      'access arguments' => array('crm manage'),
+      'access arguments' => array('crm administer'),
       'type' => MENU_NORMAL_ITEM,
     );
   }
@@ -119,6 +119,16 @@ function crm_message_ui_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function crm_message_ui_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'crm_message_ui') . '/includes/views',
+  );
 }
 
 /**

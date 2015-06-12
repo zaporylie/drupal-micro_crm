@@ -4,3 +4,5 @@ package = CRM
 
 dependencies[] = crm_channel
 dependencies[] = email
+
+files[] = tests/crm_email.test

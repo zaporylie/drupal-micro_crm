@@ -33,7 +33,7 @@ install:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
 
   # install drush globally
-  - composer global require drush/drush:7.0
+  - composer global require drush/drush:6.4.0
   - composer global require youngj/httpserver:dev-master
 
 before_script:
@@ -60,7 +60,8 @@ before_script:
 
   # Reference and enable rules in build site.
   - ln -s $TESTDIR modules/crm
-  - drush --yes pm-enable simpletest crm
+  - drush --yes pm-download smsframework entityreference entity inline_entity_form ctools views email telephone
+  - drush --yes pm-enable simpletest
 
   # Start a web server on port 8080, run in the background; wait for
   # initialization.
@@ -69,4 +70,4 @@ before_script:
 
 script:
   # Run the Simpletests for Rules.
-  - php ./scripts/run-tests.sh --php `which php` --concurrency 12 --url http://127.0.0.1:8080 --verbose --color "crm"
+  - drush test-run --uri=http://127.0.0.1:8080 "crm"

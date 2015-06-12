@@ -1,0 +1,147 @@
+<?php
+
+/**
+ * Tests basic CRM functions.
+ */
+class CRMEmailTestCase extends CRMBaseTestCase {
+
+
+  public static function getInfo() {
+    return array(
+      'name' => 'CRM Email',
+      'description' => 'CRM Email interface accessibility.',
+      'group' => 'crm',
+    );
+  }
+
+  function setUp() {
+    $admin_permissions = array(
+      'crm channel overview',
+      'crm channel create',
+      'crm channel update',
+      'crm channel delete',
+      'crm channel view',
+    );
+    $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
+
+    parent::setUp('crm_channel_ui', 'crm_email');
+
+    $this->drupalLogin($this->admin);
+  }
+
+  /**
+   * Tests the interface accessibility.
+   */
+  function testInterfaceAccessibility() {
+
+    // Creates random email channel.
+    $channel = $this->createRandomEmailChannel();
+    $uri = entity_uri('crm_channel', $channel);
+
+    // Login with normal user.
+    $this->drupalLogin($this->user);
+    $this->drupalGet('admin/people/crm/channel/add/email');
+    $this->assertResponse(403, t('Normal user is not able to access the add page'));
+
+    $this->drupalGet($uri['path'] . '/view');
+    $this->assertResponse(403, t('Normal user is not able to view channel'));
+
+    $this->drupalGet($uri['path'] . '/edit');
+    $this->assertResponse(403, t('Normal user is not able to edit channel'));
+
+    $this->drupalGet($uri['path'] . '/delete');
+    $this->assertResponse(403, t('Normal user is not able to delete channel'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->admin);
+
+    $this->drupalGet('admin/people/crm/channel/add');
+    $this->assertResponse(200, t('Admin user is not able to access the add page'));
+    $this->assertText(t('E-mail'), t('%title title present in the add page', array('%title' => t('E-mail'))));
+
+    $this->drupalGet('admin/people/crm/channel/add/email');
+    $this->assertResponse(200, t('Admin user is not able to access the email add page'));
+
+    // @todo move to separate test case.
+    $langcode = LANGUAGE_NONE;
+    $this->assertFieldByName("crm_email[$langcode][0][email]", NULL, t('%title field present in the add page', array('%title' => t('E-mail'))));
+
+    $this->drupalGet('admin/people/crm/channel');
+    $this->assertLinkByHref($uri['path'] . '/view');
+    $this->assertLinkByHref($uri['path'] . '/edit');
+    $this->assertLinkByHref($uri['path'] . '/delete');
+
+    $this->drupalGet($uri['path'] . '/view');
+    $this->assertResponse(200, t('Admin user is not able to access the channel view'));
+
+    $this->drupalGet($uri['path'] . '/edit');
+    $this->assertResponse(200, t('Admin user is not able to access the channel view'));
+
+    $this->drupalGet($uri['path'] . '/delete');
+    $this->assertResponse(200, t('Admin user is not able to access the channel view'));
+  }
+
+  function testAddEmailChannel() {
+    // Create a Email channel.
+    $edit = array();
+    $langcode = LANGUAGE_NONE;
+    $edit["crm_email[$langcode][0][email]"] = $this->randomEmail();
+    $edit["status"] = CRM_CHANNEL_STATUS_UNREGISTERED;
+    $edit["log"] = $this->randomString(32);
+    $this->drupalPost('admin/people/crm/channel/add/email', $edit, t('Save'));
+
+    // Check that the Basic page has been created.
+    $this->assertRaw(t('Channel has been saved'));
+  }
+
+  function testEditEmailChannel() {
+    $channel = $this->createRandomEmailChannel();
+    $wrapper = entity_metadata_wrapper('crm_channel', $channel);
+    $uri = entity_uri('crm_channel', $channel);
+    $this->drupalGet($uri['path'] . '/edit');
+    $this->assertResponse(200);
+
+    $langcode = LANGUAGE_NONE;
+    $this->assertFieldByName("crm_email[$langcode][0][email]", $wrapper->crm_email->value(), t('Email address match'));
+
+    $edit = array();
+    $edit["crm_email[$langcode][0][email]"] = $this->randomEmail();
+    $edit["status"] = CRM_CHANNEL_STATUS_UNREGISTERED;
+    $edit["log"] = $this->randomString(32);
+    $this->drupalPost('admin/people/crm/channel/' . $channel->channel_id . '/edit', $edit, t('Save'));
+
+    // Check that the Basic page has been created.
+    $this->assertRaw(t('Channel has been saved'));
+
+  }
+
+  function testDeleteEmailChannel() {
+
+  }
+
+  function createRandomEmailChannel($values = array()) {
+    $values += array(
+      'mail' => $this->randomEmail(),
+      'log' => $this->randomString(),
+    );
+    $channel = entity_create('crm_channel', array(
+      'type' => 'email',
+    ));
+    try {
+      $wrapper = entity_metadata_wrapper('crm_channel', $channel);
+      $wrapper->crm_email->set($values['mail']);
+      $wrapper->log->set($values['log']);
+      $wrapper->save();
+    }
+    catch (Exception $e) {
+      print_r($e);
+    }
+
+    return $wrapper->value();
+  }
+
+  function randomEmail() {
+    return $this->randomName() . '@' . $this->randomName() . '.' . $this->randomName(2);
+  }
+
+}

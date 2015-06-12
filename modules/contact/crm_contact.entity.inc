@@ -42,7 +42,7 @@ function crm_contact_entity_info() {
 }
 
 /**
- * Contact ccess callback.
+ * Contact access callback.
  *
  * @param $op
  * @param $entity
@@ -156,4 +156,15 @@ function crm_contact_merge($contacts) {
   $wrapper->log->set('Contacts has been merged into this one.');
   $wrapper->save();
   return $entity;
+}
+
+/**
+ * @param $contact
+ * @return array|null
+ */
+function crm_contact_uri($contact) {
+  return array(
+    'path' => 'admin/people/crm/contact/' . $contact->contact_id,
+  );
+
 }

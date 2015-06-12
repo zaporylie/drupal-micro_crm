@@ -18,7 +18,7 @@ function crm_newsletter_menu() {
     'title' => 'Newsletter',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('crm_newsletter_settings'),
-    'access arguments' => array('crm manage'),
+    'access arguments' => array('crm administer'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'crm_newsletter.admin.inc',
   );
@@ -113,8 +113,13 @@ function crm_newsletter_block_view($delta = '') {
   switch ($delta) {
     case 'newsletter':
       $block['subject'] = t('Newsletter');
-      $block['content'] = drupal_get_form('crm_newsletter_form');
-      $block['content']['#attached']['css'][] = drupal_get_path('module', 'crm_newsletter') . '/crm_newsletter.css';
+      if (user_access('crm newsletter subscription')) {
+        $block['content'] = drupal_get_form('crm_newsletter_form');
+        $block['content']['#attached']['css'][] = drupal_get_path('module', 'crm_newsletter') . '/crm_newsletter.css';
+      }
+      else {
+        $block['content'] = array();
+      }
       break;
   }
   return $block;
@@ -455,7 +460,8 @@ function crm_newsletter_crm_channel_update($channel) {
 }
 
 /**
- *
+ * @todo: Create message template module.
+ * @todo: add token integration.
  */
 function crm_newsletter_prepare_message($channel, $message = 'unsubscribe') {
   if (!isset($channel->type)) {

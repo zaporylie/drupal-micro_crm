@@ -12,6 +12,13 @@ function crm_permission() {
   return array(
     'crm manage' => array(
       'title' => t('Manage CRM'),
+    ),
+    'crm administer' => array(
+      'title' => t('Administer CRM'),
+      'restrict access' => TRUE,
+    ),
+    'crm bypass access' => array(
+      'title' => t('Bypass CRUD permissions'),
       'restrict access' => TRUE,
     ),
   );

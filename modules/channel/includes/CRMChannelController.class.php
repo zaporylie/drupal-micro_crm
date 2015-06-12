@@ -49,6 +49,9 @@ class CRMChannelController extends EntityAPIController {
     if ($op !== 'create' && !$entity) {
       return FALSE;
     }
+    if (is_object($entity) && !crm_channel_type_get_name($entity->type)) {
+      return FALSE;
+    }
     // The administer permission is a blanket override.
     if (user_access('crm bypass access')) {
       return TRUE;
@@ -69,7 +72,7 @@ class CRMChannelController extends EntityAPIController {
   /**
    * Overrides EntityAPIController::view().
    */
-  public function view($entities, $view_mode = 'summary', $langcode = NULL, $page = NNULL) {
+  public function view($entities, $view_mode = 'summary', $langcode = NULL, $page = NULL) {
     return parent::view($entities, $view_mode, $langcode, $page);
   }
 

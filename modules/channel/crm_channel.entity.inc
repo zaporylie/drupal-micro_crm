@@ -88,8 +88,11 @@ function crm_channel_delete_multiple($ids) {
 /**
  *
  */
-function crm_channel_view($channel) {
-
+function crm_channel_view($channel, $view_mode = 'administrator') {
+  if (!is_array($channel)) {
+    $channel = array($channel->channel_id => $channel);
+  }
+  return entity_get_controller('crm_channel')->view($channel, $view_mode);
 }
 
 /**

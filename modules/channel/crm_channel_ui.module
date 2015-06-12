@@ -15,7 +15,7 @@ function crm_channel_ui_menu() {
     'title' => 'Channel',
     'page callback' => 'crm_index',
     'page arguments' => array(),
-    'access arguments' => array('crm manage'),
+    'access arguments' => array('crm administer'),
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -23,7 +23,7 @@ function crm_channel_ui_menu() {
     'title' => 'Channel',
     'page callback' => 'crm_index',
     'page arguments' => array(),
-    'access arguments' => array('crm manage'),
+    'access arguments' => array('crm channel overview'),
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -33,12 +33,93 @@ function crm_channel_ui_menu() {
       'title' => $bundle,
       'page callback' => 'drupal_get_form',
       'page arguments' => array('crm_channel_ui_settings', $type),
-      'access arguments' => array('crm manage'),
+      'access arguments' => array('crm administer'),
       'type' => MENU_NORMAL_ITEM,
     );
   }
 
+  $items['admin/people/crm/channel/%crm_channel'] = array(
+    'title callback' => 'crm_channel_label',
+    'title arguments' => array(4),
+    'page callback' => 'crm_channel_view',
+    'page arguments' => array(4),
+    'access callback' => 'crm_channel_access',
+    'access arguments' => array('view', 4),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/people/crm/channel/%crm_channel/view'] = array(
+    'title' => 'View',
+    'page callback' => 'crm_channel_view',
+    'page arguments' => array(4),
+    'access callback' => 'crm_channel_access',
+    'access arguments' => array('view', 4),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'weight' => -2,
+  );
+
+  $items['admin/people/crm/channel/%crm_channel/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'crm_channel_ui_form_wrapper',
+    'page arguments' => array(4),
+    'access callback' => 'crm_channel_access',
+    'access arguments' => array('update', 4),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_channel_ui.form.inc',
+    'weight' => -1,
+  );
+
+  $items['admin/people/crm/channel/%crm_channel/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'crm_channel_ui_form_wrapper',
+    'page arguments' => array(4, TRUE),
+    'access callback' => 'crm_channel_access',
+    'access arguments' => array('delete', 4),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_channel_ui.form.inc',
+    'weight' => 99,
+  );
+
+  $items['admin/people/crm/channel/add'] = array(
+    'title' => 'Add new channel',
+    'page callback' => 'crm_channel_ui_add',
+    'page arguments' => array(),
+    'access callback' => 'crm_channel_access',
+    'access arguments' => array('create'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/crm_channel_ui.form.inc',
+  );
+
+  $items['admin/people/crm/channel/add/%'] = array(
+    'title' => 'Add new channel',
+    'page callback' => 'crm_channel_ui_form_wrapper',
+    'page arguments' => array(NULL, FALSE, 5),
+    'access callback' => 'crm_channel_access',
+    'access arguments' => array('create'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/crm_channel_ui.form.inc',
+  );
+
   return $items;
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function crm_channel_ui_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link to 'admin/people/crm/channel/add' on 'admin/people/crm/channel' page.
+  if ($root_path == 'admin/people/crm/channel') {
+    $item = menu_get_item('admin/people/crm/channel/add');
+    if ($item['access']) {
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
 }
 
 /**

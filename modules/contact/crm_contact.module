@@ -15,10 +15,19 @@ module_load_include('inc', 'crm_contact', 'crm_contact.entity');
 function crm_contact_permission() {
   return array(
     'crm contact overview' => array(
-      'title' => t('Grant access to contact list'),
+      'title' => t('Access to contact list'),
     ),
-    'crm contact administer' => array(
-      'title' => t('Administer CRM Contact'),
+    'crm contact create' => array(
+      'title' => t('Create new contact'),
+    ),
+    'crm contact view' => array(
+      'title' => t('View contact'),
+    ),
+    'crm contact update' => array(
+      'title' => t('Update contact'),
+    ),
+    'crm contact delete' => array(
+      'title' => t('Delete contact'),
     ),
   );
 }

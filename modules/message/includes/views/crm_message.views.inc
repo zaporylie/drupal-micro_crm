@@ -79,19 +79,29 @@ function crm_message_views_data() {
 
   // Expose links to operate on the product.
   $data['crm_message']['operations'] = array(
+    'title' => t('Operations links'),
+    'help' => t('Display all the available operations links for the message.'),
     'field' => array(
-      'title' => t('Operations links'),
-      'help' => t('Display all the available operations links for the message.'),
       'handler' => 'crm_message_handler_field_message_operations',
     ),
   );
 
-  // Expose links to operate on the product.
-  $data['crm_message']['bundle'] = array(
+  // Expose the message type.
+  $data['crm_message']['type'] = array(
+    'title' => t('Type'),
+    'help' => t('The human-readable name of the type of the message.'),
     'field' => array(
-      'title' => t('Bundle'),
-      'help' => t('Display all the available operations links for the message.'),
-      'handler' => 'crm_message_handler_field_message_operations',
+      'handler' => 'crm_message_handler_field_message_type',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'crm_message_handler_filter_message_type',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
     ),
   );
 
