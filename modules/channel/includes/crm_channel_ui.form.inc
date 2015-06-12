@@ -99,7 +99,7 @@ function crm_channel_ui_form_submit($form, &$form_state) {
     entity_save('crm_channel', $channel);
     $uri = entity_uri('crm_channel', $channel);
     $form_state['redirect'] = $uri['path'];
-    drupal_set_message(t('Contact has been saved'));
+    drupal_set_message(t('Channel has been saved'));
   }
   catch (Exception $e) {
     watchdog_exception('crm_channel', $e);

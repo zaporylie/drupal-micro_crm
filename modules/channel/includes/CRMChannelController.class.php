@@ -49,6 +49,9 @@ class CRMChannelController extends EntityAPIController {
     if ($op !== 'create' && !$entity) {
       return FALSE;
     }
+    if (is_object($entity) && !crm_channel_type_get_name($entity->type)) {
+      return FALSE;
+    }
     // The administer permission is a blanket override.
     if (user_access('crm bypass access')) {
       return TRUE;
