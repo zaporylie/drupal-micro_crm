@@ -40,11 +40,23 @@ function crm_campaignmonitor_menu() {
   $items['crm/newsletter/campaignmonitor/%'] = array(
     'page callback' => 'crm_campaignmonitor_webhook',
     'page arguments' => array(3),
-    'access arguments' => array('access content'),
+    'access callback' => 'crm_campaignmonitor_webhook_access',
     'type' => MENU_CALLBACK,
   );
 
   return $items;
+}
+
+/**
+ * Webhook access validation.
+ *
+ * @todo Validate IP address.
+ */
+function crm_campaignmonitor_webhook_access() {
+  if (user_access('access content')) {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /**
@@ -67,11 +79,16 @@ function crm_campaignmonitor_libraries_info() {
  * Implements hook_crm_channel_update().
  */
 function crm_campaignmonitor_crm_channel_update($channel) {
-  if ($channel->type == 'email' && ((isset($channel->unsubscribe) && $channel->unsubscribe == TRUE) || (isset($channel->subscribe) && $channel->subscribe == TRUE) || (isset($channel->newsletter_confirmation) && $channel->newsletter_confirmation == TRUE))) {
-    $queue = DrupalQueue::get('crm_campaignmonitor');
-    $queue->createQueue();
-    $queue->createItem($channel);
-    watchdog('crm_campaignmonitor', 'Channel (@channel) has been added to Campaign Monitor sync queue.', array('@channel' => $channel->channel_id), WATCHDOG_NOTICE);
+  if ($channel->type == 'email' && (isset($channel->newsletter) || isset($channel->newsletter_confirmation))) {
+    if (variable_get('crm_campaignmonitor_queue_outgoing', TRUE)) {
+      $queue = DrupalQueue::get('crm_campaignmonitor_outgoing');
+      $queue->createQueue();
+      $queue->createItem($channel);
+      watchdog('crm_campaignmonitor', 'Channel (@channel) has been added to Campaign Monitor sync queue.', array('@channel' => $channel->channel_id), WATCHDOG_NOTICE);
+    }
+    else {
+      crm_campaignmonitor_sync($channel);
+    }
   }
 }
 
@@ -79,7 +96,11 @@ function crm_campaignmonitor_crm_channel_update($channel) {
  * Implements hook_cron_queue_info().
  */
 function crm_campaignmonitor_cron_queue_info() {
-  $queues['crm_campaignmonitor'] = array(
+  $queues['crm_campaignmonitor_incoming'] = array(
+    'worker callback' => 'crm_campaignmonitor_sync',
+    'time' => '30',
+  );
+  $queues['crm_campaignmonitor_outgoing'] = array(
     'worker callback' => 'crm_campaignmonitor_sync',
     'time' => '30',
   );
@@ -102,7 +123,7 @@ function crm_campaignmonitor_sync($channel_old) {
   if ($channel->revision_id > $channel_old->revision_id) {
     return FALSE;
   }
-  $queue = DrupalQueue::get('crm_campaignmonitor');
+  $queue = DrupalQueue::get('crm_campaignmonitor_outgoing');
 
   // Load channel into wrapper.
   $wrapper = entity_metadata_wrapper('crm_channel', $channel);
@@ -168,13 +189,14 @@ function crm_campaignmonitor_sync($channel_old) {
 /**
  * @todo: Encapsulate singe event process.
  * @todo: consider using Queue.
- * @todo: Add IP address access validation.
  * @todo: Check inline todo's.
  */
 function crm_campaignmonitor_webhook($type) {
   $data = file_get_contents('php://input');
+  if (variable_get('crm_campaignmonitor_debug', FALSE)) {
+    watchdog('crm_campaignmonitor', 'Debug: !debug', array('!debug' => $data), WATCHDOG_NOTICE);
+  }
   $response = json_decode($data);
-  watchdog('crm_campaignmonitor', print_r($response, TRUE), array(), WATCHDOG_NOTICE);
   if (!isset($response->ListID)) {
     return FALSE;
   }
@@ -225,6 +247,7 @@ function crm_campaignmonitor_webhook($type) {
     $channel->campaignmonitor_webhook = TRUE;
     $channel->revision = TRUE;
     $channel->log = 'Channel updated by Campaign Monitor webhook';
+    $channel->preserve_token = TRUE;
     if ($item->Type == 'Subscribe') {
       $channel->status = CRM_NEWSLETTER_CHANNEL_STATUS;
     }
@@ -277,10 +300,15 @@ function crm_campaignmonitor_webhook($type) {
           }
         }
         $values = array();
-        foreach ($value as $v) {
-          if (isset($map[$field_key]['map'][urlencode($v)]) && !empty($map[$field_key]['map'][urlencode($v)])) {
-            $values[] = $map[$field_key]['map'][urlencode($v)];
+        if (is_array($value)) {
+          foreach ($value as $v) {
+            if (isset($map[$field_key]['map'][urlencode($v)]) && !empty($map[$field_key]['map'][urlencode($v)])) {
+              $values[] = $map[$field_key]['map'][urlencode($v)];
+            }
           }
+        }
+        else {
+          $values[] = $map[$field_key]['map'][urlencode($value)];
         }
         $wrapper->{$map[$field_key]['field']}->set($values);
 
@@ -291,11 +319,16 @@ function crm_campaignmonitor_webhook($type) {
       }
     }
 
+    $tmp = crm_contact_get_channels($contact);
     // @todo: Add new created channel here.
-    if (isset($new_entity) && $tmp = crm_contact_get_channels($contact)) {
+    if (isset($new_entity) && $tmp) {
       if (!in_array($new_entity->channel_id, $tmp)) {
         $wrapper->crm_channel[] = $new_entity;
       }
+    }
+    // Add channel to
+    if (!in_array($channel->channel_id, $tmp)) {
+      $wrapper->crm_channel[] = $channel;
     }
 
     $contact->log = 'Contact updated via Campaign Monitor Webhook';

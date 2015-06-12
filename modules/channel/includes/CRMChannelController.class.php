@@ -109,12 +109,22 @@ class CRMChannelController extends EntityAPIController {
       $entity->revision = TRUE;
     }
 
-    // Reset token on channel save.
-    $entity->token = NULL;
-    $entity->token_created = 0;
+    if (!isset($entity->preserve_token)) {
+      // Reset token on channel save.
+      $entity->token = NULL;
+      $entity->token_created = 0;
+    }
 
     // Save channel.
-    return parent::save($entity);
+    $return = parent::save($entity);
+    if (isset($entity->debug) && $entity->debug == TRUE) {
+      $e = new Exception();
+      watchdog('crm_channel', 'Channel (channel: @id) has been saved. Trace: <pre>@debug</pre>', array('@id' => $entity->channel_id, '@debug' => $e->getTraceAsString()), WATCHDOG_NOTICE);
+    }
+    else {
+      watchdog('crm_channel', 'Channel (channel: @id) has been saved.', array('@id' => $entity->channel_id), WATCHDOG_NOTICE);
+    }
+    return $return;
   }
 
   /**
