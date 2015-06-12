@@ -25,11 +25,6 @@ class CRMEmailTestCase extends CRMBaseTestCase {
     $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
 
     parent::setUp('crm_channel_ui', 'crm_email');
-
-    module_enable(array('views_ui'));
-    views_module_include('views_default', TRUE);
-    views_get_all_views(TRUE);
-    menu_rebuild();
   }
 
   /**
