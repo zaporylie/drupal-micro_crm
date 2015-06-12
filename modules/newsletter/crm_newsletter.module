@@ -116,6 +116,16 @@ function crm_newsletter_block_view($delta = '') {
       if (user_access('crm newsletter subscription')) {
         $block['content'] = drupal_get_form('crm_newsletter_form');
         $block['content']['#attached']['css'][] = drupal_get_path('module', 'crm_newsletter') . '/crm_newsletter.css';
+        $block['content'][] = array(
+          '#weight' => 999,
+          '#theme' => 'link',
+          '#path' => 'crm/newsletter/unsubscribe',
+          '#text' => t('Do you want to cancel your subscription?'),
+          '#options' => array(
+            'attributes' => array(),
+            'html' => FALSE,
+          ),
+        );
       }
       else {
         $block['content'] = array();
@@ -217,6 +227,10 @@ function crm_newsletter_form_submit($form, &$form_state) {
       }
     }
 
+    if (isset($entity->status) && $entity->status == CRM_NEWSLETTER_CHANNEL_STATUS) {
+      drupal_set_message(t('!channel: Thank you for subscribing to our newsletter.', array('!channel' => entity_label('crm_channel', $entity))));
+      continue;
+    }
     // Save channel as a newsletter ready.
     $entity->status = CRM_NEWSLETTER_CHANNEL_STATUS;
     try {
@@ -346,6 +360,10 @@ function crm_newsletter_unsubscribe_form_submit($form, &$form_state) {
       continue;
     }
     $channel = $entity;
+    if (isset($channel->status) && $channel->status != CRM_NEWSLETTER_CHANNEL_STATUS) {
+      drupal_set_message(t('!channel: You will not receive newsletter messages anymore.', array('!channel' => entity_label('crm_channel', $channel))));
+      continue;
+    }
     $channel->status = CRM_CHANNEL_STATUS_REGISTERED;
     try {
       entity_save('crm_channel', $channel);
