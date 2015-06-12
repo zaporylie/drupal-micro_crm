@@ -70,4 +70,4 @@ before_script:
 
 script:
   # Run the Simpletests for Rules.
-  - drush --uri=http://127.0.0.1:8080 --debug "crm"
+  - drush test-run --uri=http://127.0.0.1:8080 "crm"
