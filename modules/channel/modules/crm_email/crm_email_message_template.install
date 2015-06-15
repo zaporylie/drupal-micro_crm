@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_install().
+ */
+function crm_email_message_template_install() {
+  _field_info_collate_types(TRUE);
+
+  if ($instance = field_info_instance('crm_message', 'crm_message_email_subject', 'email')) {
+    $instance['entity_type'] = 'crm_message_template';
+    field_create_instance($instance);
+  }
+
+  if ($instance = field_info_instance('crm_message', 'crm_message_email_body', 'email')) {
+    $instance['entity_type'] = 'crm_message_template';
+    field_create_instance($instance);
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function crm_email_message_template_uninstall() {
+
+  $instance = array(
+    'entity_type' => 'crm_message_template',
+    'field_name' => 'crm_message_email_subject',
+    'bundle' => 'email',
+  );
+  field_delete_instance($instance);
+
+  $instance = array(
+    'entity_type' => 'crm_message_template',
+    'field_name' => 'crm_message_email_body',
+    'bundle' => 'email',
+  );
+  field_delete_instance($instance);
+
+  if (db_table_exists('crm_message_template')) {
+    field_attach_delete_bundle('crm_message_template', 'email');
+    db_delete('crm_message_template')->condition('type', 'email')->execute();
+  }
+
+}

@@ -1,0 +1,6 @@
+name = Email Message Template
+core = 7.x
+package = CRM
+
+dependencies[] = crm_email_message
+dependencies[] = crm_message_template

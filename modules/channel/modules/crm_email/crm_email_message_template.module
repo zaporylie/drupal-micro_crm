@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ *
+ */
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function crm_email_message_template_entity_info_alter(&$entity_info) {
+  $bundle = array(
+    'label' => t('E-mail'),
+    'module' => 'crm_email_message_template',
+  );
+  $entity_info['crm_message_template']['bundles']['email'] = $bundle;
+}
+
+/**
+ * Message template callback: create template;
+ *
+ * @param $values
+ * @return bool
+ */
+function crm_email_message_template_create_template($values) {
+  $template = entity_create('crm_message_template', array(
+    'type' => 'email',
+  ));
+  $wrapper = entity_metadata_wrapper('crm_message_template', $template);
+  if (isset($values['subject']) && $wrapper->__isset('crm_message_email_subject')) {
+    $wrapper->crm_message_email_subject->set($values['subject']);
+  }
+  if (isset($values['body']) && $wrapper->__isset('crm_message_email_body')) {
+    $wrapper->crm_message_email_body->set($values['body']);
+  }
+  return $template;
+}
