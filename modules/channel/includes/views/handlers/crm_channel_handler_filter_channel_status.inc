@@ -9,7 +9,6 @@ class crm_channel_handler_filter_channel_status extends views_handler_filter_in_
     if (!isset($this->value_options)) {
       $this->value_title = t('Status type');
       $this->value_options = crm_channel_status_option_list();
-      crm_channel_types();
     }
   }
 }
