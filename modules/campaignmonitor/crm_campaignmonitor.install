@@ -9,12 +9,30 @@
  * Implements hook_uninstall().
  */
 function crm_campaignmonitor_uninstall() {
-  variable_del('crm_campaignmonitor_lists');
   $query = db_select('variable', 'v');
   $query->addField('v', 'name', 'name');
-  $query->condition('v.name', 'crm_campaignmonitor_list_%', 'LIKE');
+  $query->condition('v.name', 'crm_campaignmonitor_%', 'LIKE');
   $results = $query->execute()->fetchCol();
   foreach ($results as $result) {
     variable_del($result);
   }
+}
+
+/**
+ * Implements hook_install().
+ */
+function crm_campaignmonitor_install() {
+  $ips = array(
+    '27.126.144.0/21',
+    '103.28.40.0/22',
+    '180.189.136.0/22',
+    '184.106.86.128/28',
+    '184.106.87.160/29',
+    '184.106.87.168/29',
+    '203.55.21.0/24',
+    '204.75.142.0/24',
+    '205.166.177.0/24',
+    '206.72.127.0/24',
+  );
+  variable_set('crm_campaignmonitor_webhook_whitelist', $ips);
 }

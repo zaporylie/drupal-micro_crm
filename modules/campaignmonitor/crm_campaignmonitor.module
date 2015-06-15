@@ -48,14 +48,30 @@ function crm_campaignmonitor_menu() {
 }
 
 /**
- * Webhook access validation.
- *
- * @todo Validate IP address.
+ * Implements hook_init().
+ */
+function crm_campaignmonitor_init() {
+  if (arg(0) == 'crm' && arg(1) == 'newsletter' && arg(2) == 'campaignmonitor' && ($type = arg(3)) && !empty($type)) {
+    // Don't use cache.
+    $GLOBALS['conf']['cache'] = FALSE;
+  }
+}
+
+/**
+ * Webhook access callback.
  */
 function crm_campaignmonitor_webhook_access() {
-  if (user_access('access content')) {
-    return TRUE;
+  // Only if user has access to website.
+  if (!user_access('access content')) {
+    return FALSE;
   }
+  $ip = ip_address();
+  foreach (variable_get('crm_campaignmonitor_webhook_whitelist', array()) as $range) {
+    if (_crm_campaignmonitor_webhook_ip_match($ip, $range)) {
+      return TRUE;
+    }
+  }
+  watchdog('crm_campaignmonitor', 'Access attempt from unregistered IP address: @ip', array('@ip' => $ip), WATCHDOG_ERROR);
   return FALSE;
 }
 
@@ -187,9 +203,10 @@ function crm_campaignmonitor_sync($channel_old) {
 }
 
 /**
- * @todo: Encapsulate singe event process.
- * @todo: consider using Queue.
- * @todo: Check inline todo's.
+ * @todo Encapsulate singe event process.
+ * @todo consider using Queue.
+ * @todo Use serializer available in library
+ * @todo Check inline todo's.
  */
 function crm_campaignmonitor_webhook($type) {
   $data = file_get_contents('php://input');
@@ -320,7 +337,6 @@ function crm_campaignmonitor_webhook($type) {
     }
 
     $tmp = crm_contact_get_channels($contact);
-    // @todo: Add new created channel here.
     if (isset($new_entity) && $tmp) {
       if (!in_array($new_entity->channel_id, $tmp)) {
         $wrapper->crm_channel[] = $new_entity;
@@ -468,4 +484,19 @@ function _crm_campaignmonitor_keyed_custom_fields($custom_fields) {
     }
   }
   return $array;
+}
+
+/**
+ * Check if IP address is in range.
+ */
+function _crm_campaignmonitor_webhook_ip_match($ip, $range) {
+  if (strpos($range, '/') == FALSE) {
+    $range .= '/32';
+  }
+  list($range, $netmask) = explode('/', $range, 2);
+  $range_decimal = ip2long($range);
+  $ip_decimal = ip2long($ip);
+  $wildcard_decimal = pow(2, (32 - $netmask)) - 1;
+  $netmask_decimal = ~ $wildcard_decimal;
+  return (($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal));
 }
