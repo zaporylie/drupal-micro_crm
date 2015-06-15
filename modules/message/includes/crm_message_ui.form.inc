@@ -110,7 +110,7 @@ function crm_message_ui_form_submit($form, &$form_state) {
     drupal_set_message(t('Message has been saved'));
   }
   catch (Exception $e) {
-    watchdog_exception('crm_channel', $e);
+    watchdog_exception('crm_message', $e);
     $form_state['rebuild'] = TRUE;
     drupal_set_message(t('Unable to save message'), 'error');
   }

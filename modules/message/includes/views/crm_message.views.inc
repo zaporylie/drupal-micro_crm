@@ -105,6 +105,24 @@ function crm_message_views_data() {
     ),
   );
 
+  $data['crm_message']['status'] = array(
+    'title' => t('Status'),
+    'help' => t('The human-readable name of the status of the message.'),
+    'field' => array(
+      'handler' => 'crm_message_handler_field_message_status',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'crm_message_handler_filter_message_status',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
   $data['crm_message']['empty_text'] = array(
     'title' => t('Empty text'),
     'help' => t('Displays an appropriate empty text message for message lists.'),

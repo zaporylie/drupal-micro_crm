@@ -139,6 +139,18 @@ function crm_message_statuses() {
 }
 
 /**
+ * @param $status
+ * @return null
+ */
+function crm_message_status_get_name($status) {
+  $statuses = crm_message_statuses();
+  if (isset($statuses[$status]['title'])) {
+    return $statuses[$status]['title'];
+  }
+  return NULL;
+}
+
+/**
  * Returns list of available statuses.
  */
 function crm_message_status_options_list() {

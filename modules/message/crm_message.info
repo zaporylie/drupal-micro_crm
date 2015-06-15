@@ -8,6 +8,8 @@ files[] = includes/views/handlers/crm_message_handler_field_message.inc
 files[] = includes/views/handlers/crm_message_handler_field_message_label.inc
 files[] = includes/views/handlers/crm_message_handler_field_message_operations.inc
 files[] = includes/views/handlers/crm_message_handler_field_message_type.inc
+files[] = includes/views/handlers/crm_message_handler_field_message_status.inc
 files[] = includes/views/handlers/crm_message_handler_filter_message_type.inc
+files[] = includes/views/handlers/crm_message_handler_filter_message_status.inc
 
 dependencies[] = crm_channel
