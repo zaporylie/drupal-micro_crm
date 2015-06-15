@@ -1,0 +1,164 @@
+<?php
+
+/**
+ * @file
+ * Holds Message Template Entity schema.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function crm_message_template_schema() {
+
+  $schema['crm_message_template'] = array(
+    'description' => 'message entity',
+    'fields' => array(
+      'template_id' => array(
+        'description' => 'The primary identifier for a table.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'template_name' => array(
+        'description' => 'Unique machine name.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'type' => array(
+        'description' => 'The type of message template.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'revision_id' => array(
+        'description' => 'The current {crm_message_template_revision}.revision_id version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'created' => array(
+        'description' => 'Modification date',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'Modification date',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'language' => array(
+        'description' => 'The {languages}.language of this record.',
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('template_id'),
+    'unique keys' => array(
+      'revision_id' => array('revision_id'),
+      'crm_message_template' => array('template_name', 'type', 'language'),
+    ),
+    'foreign keys' => array(
+      'crm_message_template_revision' => array(
+        'table' => 'crm_message_template_revision',
+        'columns' => array('revision_id' => 'revision_id'),
+      ),
+    ),
+    'indexes' => array(
+      'crm_message_template_name' => array('template_name'),
+      'crm_message_template_type' => array('type'),
+      'language' => array('language'),
+    ),
+  );
+
+  $schema['crm_message_template_revision'] = array(
+    'description' => 'message entity revision',
+    'fields' => array(
+      'revision_id' => array(
+        'description' => 'The primary identifier for a table.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'template_id' => array(
+        'description' => 'Parent {crm_message_template}.template_id message template identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'template_name' => array(
+        'description' => 'Parent {crm_message_template}.template_name message identifier.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+      'type' => array(
+        'description' => 'The type of message template.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'language' => array(
+        'description' => 'The {languages}.language of this record.',
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'revision_uid' => array(
+        'description' => 'Revision author {users}.uid',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'revision_timestamp' => array(
+        'description' => 'Revision date of creation',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'log' => array(
+        'description' => 'The log entry explaining the changes in this version.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'big',
+      ),
+    ),
+    'primary key' => array('revision_id'),
+    'foreign keys' => array(
+      'crm_message_template' => array(
+        'table' => 'crm_message_template',
+        'columns' => array(
+          'template_id' => 'template_id',
+        ),
+      ),
+    ),
+    'indexes' => array(
+      'crm_message_template_name' => array('template_name'),
+      'crm_message_template_type' => array('type'),
+      'language' => array('language'),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function crm_message_template_install() {
+
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function crm_message_template_uninstall() {
+
+}

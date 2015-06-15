@@ -1,0 +1,120 @@
+<?php
+
+/**
+ * @file
+ *
+ */
+
+module_load_include('inc', 'crm_message_template', 'crm_message_template.entity');
+
+/**
+ * Implements hook_views_api().
+ */
+function crm_message_template_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'crm_message_template') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_hook_info().
+ */
+function crm_message_template_hook_info() {
+  $hooks = array(
+    'crm_message_template_uri' => array(
+      'group' => 'crm',
+    ),
+    'crm_message_template_view' => array(
+      'group' => 'crm',
+    ),
+    'crm_message_template_presave' => array(
+      'group' => 'crm',
+    ),
+    'crm_message_template_update' => array(
+      'group' => 'crm',
+    ),
+    'crm_message_template_insert' => array(
+      'group' => 'crm',
+    ),
+    'crm_message_template_delete' => array(
+      'group' => 'crm',
+    ),
+  );
+  return $hooks;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function crm_message_template_permission() {
+  return array(
+    'crm message template overview' => array(
+      'title' => t('Access to message list'),
+    ),
+    'crm message template create' => array(
+      'title' => t('Create new message'),
+    ),
+    'crm message template view' => array(
+      'title' => t('View message'),
+    ),
+    'crm message template update' => array(
+      'title' => t('Update message'),
+    ),
+    'crm message template delete' => array(
+      'title' => t('Delete message'),
+    ),
+  );
+}
+
+/**
+ * Returns boolean value if channel is supported by message module or not.
+ *
+ * @param $type
+ * @return bool
+ */
+function _crm_message_template_channel_supported($type) {
+  $entity = entity_get_info('crm_message_template');
+  if (isset($entity['bundles'][$type])) {
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Returns list of types (bundles) in key => title format.
+ *
+ * @return array
+ */
+function crm_message_template_types() {
+  // First check the static cache for a product types array.
+  $message_types = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the types now.
+  if (!isset($message_types)) {
+    $message_types = array();
+
+    $entity = entity_get_info('crm_message_template');
+    if (isset($entity['bundles'])) {
+      foreach ($entity['bundles'] as $key => $bundle) {
+        // @todo: add something here or simplify it.
+        $message_types[$key] = $bundle['label'];
+      }
+    }
+  }
+
+  return $message_types;
+}
+
+/**
+ * Returns type label.
+ */
+function crm_message_template_type_get_name($type) {
+  $types = crm_message_template_types();
+  if (isset($types[$type])) {
+    return $types[$type];
+  }
+  return NULL;
+}

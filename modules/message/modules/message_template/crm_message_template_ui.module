@@ -1,0 +1,129 @@
+<?php
+
+/**
+ * @file
+ * Implements some hooks to create admin interface for contact messages.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function crm_message_template_ui_menu() {
+  $items = array();
+
+  $items['admin/people/crm/config/message/template'] = array(
+    'title' => 'Template',
+    'page callback' => 'crm_index',
+    'page arguments' => array(),
+    'access arguments' => array('crm administer'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  foreach (crm_message_template_types() as $type => $bundle) {
+    $type_arg = strtr($type, '_', '-');
+    $items['admin/people/crm/config/message/template/' . $type_arg] = array(
+      'title' => $bundle,
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('crm_message_template_ui_settings', $type),
+      'access arguments' => array('crm administer'),
+      'type' => MENU_NORMAL_ITEM,
+    );
+  }
+
+  $items['admin/people/crm/message/template/%crm_message'] = array(
+    'title callback' => 'crm_message_template_label',
+    'title arguments' => array(5),
+    'page callback' => 'crm_message_template_view',
+    'page arguments' => array(5),
+    'access callback' => 'crm_message_template_access',
+    'access arguments' => array('view', 5),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/people/crm/message/template/%crm_message/view'] = array(
+    'title' => 'View',
+    'page callback' => 'crm_message_template_view',
+    'page arguments' => array(5),
+    'access callback' => 'crm_message_template_access',
+    'access arguments' => array('view', 5),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'weight' => -2,
+  );
+
+  $items['admin/people/crm/message/template/%crm_message/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'crm_message_template_ui_form_wrapper',
+    'page arguments' => array(5),
+    'access callback' => 'crm_message_template_access',
+    'access arguments' => array('update', 5),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_message_template_ui.form.inc',
+    'weight' => -1,
+  );
+
+  $items['admin/people/crm/message/template/%crm_message/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'crm_message_template_ui_form_wrapper',
+    'page arguments' => array(5, TRUE),
+    'access callback' => 'crm_message_template_access',
+    'access arguments' => array('delete', 5),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_message_template_ui.form.inc',
+    'weight' => 99,
+  );
+
+  $items['admin/people/crm/message/template/add'] = array(
+    'title' => 'Add message template',
+    'page callback' => 'crm_message_template_ui_add',
+    'page arguments' => array(),
+    'access callback' => 'crm_message_template_access',
+    'access arguments' => array('create'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'includes/crm_message_template_ui.form.inc',
+  );
+
+  $items['admin/people/crm/message/template/add/%'] = array(
+    'title' => 'Add message template',
+    'page callback' => 'crm_message_template_ui_form_wrapper',
+    'page arguments' => array(NULL, FALSE, 6),
+    'access callback' => 'crm_message_template_access',
+    'access arguments' => array('create'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/crm_message_template_ui.form.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function crm_message_template_ui_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'crm_message_template_ui') . '/includes/views',
+  );
+}
+
+/**
+ * Settings form.
+ */
+function crm_message_template_ui_settings($form, &$form_state, $bundle) {
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function crm_message_template_ui_entity_info_alter(&$entity_info) {
+  // Expose the admin UI for product fields.
+  foreach ($entity_info['crm_message_template']['bundles'] as $type => &$bundle) {
+    $bundle['admin'] = array(
+      'path' => 'admin/people/crm/config/message/template/' . strtr($type, '_', '-'),
+      'access arguments' => array('crm manage'),
+    );
+  }
+}

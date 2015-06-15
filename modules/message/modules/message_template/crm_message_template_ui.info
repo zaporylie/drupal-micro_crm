@@ -1,0 +1,7 @@
+name = Message Template UI
+description = Allows you to create re-usable message templates
+core = 7.x
+package = CRM
+
+dependencies[] = crm_message_template
+dependencies[] = crm_message_ui
