@@ -75,6 +75,25 @@ function crm_channel_views_data() {
     ),
   );
 
+  // Expose the channel type.
+  $data['crm_channel']['status'] = array(
+    'title' => t('Status'),
+    'help' => t('The human-readable channel status.'),
+    'field' => array(
+      'handler' => 'crm_channel_handler_field_channel_status',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'crm_channel_handler_filter_channel_status',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
   $data['crm_channel']['created'] = array(
     'title' => t('Created date'),
     'help' => t('The date the channel was created.'),

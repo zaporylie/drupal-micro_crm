@@ -183,6 +183,20 @@ function crm_channel_statuses() {
 }
 
 /**
+ * Returns status label.
+ *
+ * @param $status
+ * @return null
+ */
+function crm_channel_status_get_name($status) {
+  $statuses = crm_channel_statuses();
+  if (isset($statuses[$status]['title'])) {
+    return $statuses[$status]['title'];
+  }
+  return NULL;
+}
+
+/**
  * Returns list of available statuses in #options format.
  *
  * @see hook_options_list()

@@ -8,7 +8,9 @@ files[] = includes/CRMChannelInlineFormController.class.php
 files[] = includes/views/handlers/crm_channel_handler_field_channel.inc
 files[] = includes/views/handlers/crm_channel_handler_field_channel_label.inc
 files[] = includes/views/handlers/crm_channel_handler_field_channel_operations.inc
+files[] = includes/views/handlers/crm_channel_handler_field_channel_status.inc
 files[] = includes/views/handlers/crm_channel_handler_field_channel_type.inc
+files[] = includes/views/handlers/crm_channel_handler_filter_channel_status.inc
 files[] = includes/views/handlers/crm_channel_handler_filter_channel_type.inc
 files[] = tests/crm_channel.test
 
