@@ -49,6 +49,9 @@ class CRMMessageTemplateController extends EntityAPIController {
     if ($op !== 'create' && !$entity) {
       return FALSE;
     }
+    if ($op === 'create' && (!empty($entity) && !crm_message_template_type_get_name($entity))) {
+      return FALSE;
+    }
     // The administer permission is a blanket override.
     if (user_access('crm bypass access')) {
       return TRUE;

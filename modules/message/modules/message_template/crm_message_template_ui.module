@@ -30,7 +30,7 @@ function crm_message_template_ui_menu() {
     );
   }
 
-  $items['admin/people/crm/message/template/%crm_message'] = array(
+  $items['admin/people/crm/message/template/%crm_message_template'] = array(
     'title callback' => 'crm_message_template_label',
     'title arguments' => array(5),
     'page callback' => 'crm_message_template_view',
@@ -40,7 +40,7 @@ function crm_message_template_ui_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items['admin/people/crm/message/template/%crm_message/view'] = array(
+  $items['admin/people/crm/message/template/%crm_message_template/view'] = array(
     'title' => 'View',
     'page callback' => 'crm_message_template_view',
     'page arguments' => array(5),
@@ -51,7 +51,7 @@ function crm_message_template_ui_menu() {
     'weight' => -2,
   );
 
-  $items['admin/people/crm/message/template/%crm_message/edit'] = array(
+  $items['admin/people/crm/message/template/%crm_message_template/edit'] = array(
     'title' => 'Edit',
     'page callback' => 'crm_message_template_ui_form_wrapper',
     'page arguments' => array(5),
@@ -63,10 +63,10 @@ function crm_message_template_ui_menu() {
     'weight' => -1,
   );
 
-  $items['admin/people/crm/message/template/%crm_message/delete'] = array(
+  $items['admin/people/crm/message/template/%crm_message_template/delete'] = array(
     'title' => 'Delete',
-    'page callback' => 'crm_message_template_ui_form_wrapper',
-    'page arguments' => array(5, TRUE),
+    'page callback' => 'crm_message_template_ui_delete_form_wrapper',
+    'page arguments' => array(5),
     'access callback' => 'crm_message_template_access',
     'access arguments' => array('delete', 5),
     'type' => MENU_LOCAL_TASK,
@@ -87,10 +87,10 @@ function crm_message_template_ui_menu() {
 
   $items['admin/people/crm/message/template/add/%'] = array(
     'title' => 'Add message template',
-    'page callback' => 'crm_message_template_ui_form_wrapper',
-    'page arguments' => array(NULL, FALSE, 6),
+    'page callback' => 'crm_message_template_ui_add_form_wrapper',
+    'page arguments' => array(6),
     'access callback' => 'crm_message_template_access',
-    'access arguments' => array('create'),
+    'access arguments' => array('create', 6),
     'type' => MENU_CALLBACK,
     'file' => 'includes/crm_message_template_ui.form.inc',
   );
@@ -126,4 +126,9 @@ function crm_message_template_ui_entity_info_alter(&$entity_info) {
       'access arguments' => array('crm manage'),
     );
   }
+
+  // Add callbacks and urls for administer translations.
+  $entity_info['crm_message_template']['translation']['entity_translation'] += array(
+    'base path' => 'admin/people/crm/message/template/%crm_message_template',
+  );
 }

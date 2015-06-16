@@ -118,3 +118,24 @@ function crm_message_template_type_get_name($type) {
   }
   return NULL;
 }
+
+/**
+ *
+ */
+function crm_message_template_menu_name_exists($value) {
+  return db_query_range('SELECT 1 FROM {crm_message_template} WHERE name = :name', 0, 1, array(':name' => $value))->fetchField();
+}
+
+/**
+ * Access callback: determines access to a product's translation tab.
+ */
+function crm_message_template_entity_translation_tab_access($template) {
+  return entity_translation_tab_access('crm_message_template', $template);
+}
+
+/**
+ * Access callback: determines access to a product's translation tab.
+ */
+function crm_message_template_entity_translation_supported_type($type) {
+  return TRUE;
+}

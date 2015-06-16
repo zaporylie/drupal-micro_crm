@@ -27,24 +27,39 @@ function crm_message_template_ui_add() {
 }
 
 /**
- * Form wrapper for create, update and delete.
+ * Form wrapper for entity addition.
+ *
+ * @param null $type
+ *
+ * @return array|mixed
+ */
+function crm_message_template_ui_add_form_wrapper($type) {
+  $template = entity_create('crm_message_template', array(
+    'type' => $type,
+  ));
+  return drupal_get_form('crm_message_template_ui_form', $template);
+}
+
+/**
+ * Form wrapper for entity deletion.
+ *
+ * @param null $type
+ *
+ * @return array|mixed
+ */
+function crm_message_template_ui_delete_form_wrapper($template) {
+  return drupal_get_form('crm_message_template_ui_delete_form', $template);
+}
+
+/**
+ * Form wrapper for entity update.
  *
  * @param array $template
  *   Message object or array of default values.
- * @param bool $delete
- *   Boolean indicator if create/edit or delete form should be displayed.
  *
  * @return array
  */
-function crm_message_template_ui_form_wrapper($template = array(), $delete = FALSE, $type = NULL) {
-  if ($delete == TRUE && isset($template->template_id)) {
-    return drupal_get_form('crm_message_template_ui_delete_form', $template);
-  }
-  if (empty($template))  {
-    $template = entity_create('crm_message_template', array(
-      'type' => $type,
-    ));
-  }
+function crm_message_template_ui_form_wrapper($template) {
   return drupal_get_form('crm_message_template_ui_form', $template);
 }
 
@@ -53,29 +68,34 @@ function crm_message_template_ui_form_wrapper($template = array(), $delete = FAL
  */
 function crm_message_template_ui_form($form, &$form_state, $template) {
 
-  $form['message_template'] = array(
-    '#type' => 'value',
-    '#value' => $template,
+  $form_state['crm_message_template'] = $template;
+
+  $form['name'] = array(
+    '#type' => 'machine_name',
+    '#title' => t('Template name'),
+    '#required' => TRUE,
+    '#default_value' => isset($template->name) ? $template->name : NULL,
+    '#machine_name' => array(
+      'exists' => 'crm_message_template_menu_name_exists',
+    ),
   );
 
-  field_attach_form('crm_message_template', $template, $form, $form_state);
+  $langcode = entity_language('crm_message_template', $template);
+
+  if (empty($langcode)) {
+    $langcode = LANGUAGE_NONE;
+  }
+
+  field_attach_form('crm_message_template', $template, $form, $form_state, $langcode);
+
+  $form['language'] = array(
+    '#type' => 'value',
+    '#value' => $langcode,
+  );
 
   $form['settings'] = array(
     '#type' => 'vertical_tabs',
     '#weight' => 98,
-  );
-  $form['settings']['options'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Options'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-  $form['settings']['options']['language'] = array(
-    '#type' => 'select',
-    '#title' => t('Language'),
-    '#required' => TRUE,
-    '#default_value' => $template->language,
-    '#options' => array(LANGUAGE_NONE => t('Undefined')) + crm_language_list(),
   );
   $form['settings']['revision'] = array(
     '#type' => 'fieldset',
@@ -100,15 +120,16 @@ function crm_message_template_ui_form($form, &$form_state, $template) {
  * Message form validation
  */
 function crm_message_template_ui_form_validate($form, &$form_state) {
-  field_attach_form_validate('crm_message_template', $form_state['values']['message_template'], $form, $form_state);
+  field_attach_form_validate('crm_message_template', $form_state['crm_message_template'], $form, $form_state);
 }
 
 /**
  * Message form submit callback.
  */
 function crm_message_template_ui_form_submit($form, &$form_state) {
-  $template = $form_state['values']['message_template'];
+  $template = $form_state['crm_message_template'];
 
+  $template->name = $form_state['values']['name'];
   $template->language = $form_state['values']['language'];
   $template->log = $form_state['values']['log'];
   if (!isset($template->revision)) {

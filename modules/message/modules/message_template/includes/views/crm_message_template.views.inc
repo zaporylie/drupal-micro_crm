@@ -27,7 +27,7 @@ function crm_message_template_views_data() {
     ),
   );
   $data['crm_message_template']['template_id'] = array(
-    'title' => t('Message template', array(), array('context' => 'crm')),
+    'title' => t('Message template ID', array(), array('context' => 'crm')),
     'help' => t('The unique internal identifier of the message.'),
     'field' => array(
       'handler' => 'views_handler_field',

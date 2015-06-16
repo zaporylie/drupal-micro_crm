@@ -11,7 +11,7 @@
 function crm_message_template_schema() {
 
   $schema['crm_message_template'] = array(
-    'description' => 'message entity',
+    'description' => 'message template entity',
     'fields' => array(
       'template_id' => array(
         'description' => 'The primary identifier for a table.',
@@ -19,10 +19,10 @@ function crm_message_template_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'template_name' => array(
-        'description' => 'Unique machine name.',
+      'name' => array(
+        'description' => 'Unique identifier for a table.',
         'type' => 'varchar',
-        'length' => 255,
+        'length' => 128,
         'not null' => TRUE,
       ),
       'type' => array(
@@ -39,7 +39,7 @@ function crm_message_template_schema() {
         'not null' => FALSE,
       ),
       'created' => array(
-        'description' => 'Modification date',
+        'description' => 'Creation date',
         'type' => 'int',
         'unsigned' => TRUE,
         'default' => 0,
@@ -61,7 +61,7 @@ function crm_message_template_schema() {
     'primary key' => array('template_id'),
     'unique keys' => array(
       'revision_id' => array('revision_id'),
-      'crm_message_template' => array('template_name', 'type', 'language'),
+      'name' => array('name'),
     ),
     'foreign keys' => array(
       'crm_message_template_revision' => array(
@@ -70,7 +70,8 @@ function crm_message_template_schema() {
       ),
     ),
     'indexes' => array(
-      'crm_message_template_name' => array('template_name'),
+      'crm_message_template_id' => array('template_id'),
+      'crm_message_template_name' => array('name'),
       'crm_message_template_type' => array('type'),
       'language' => array('language'),
     ),
@@ -86,16 +87,16 @@ function crm_message_template_schema() {
         'not null' => TRUE,
       ),
       'template_id' => array(
-        'description' => 'Parent {crm_message_template}.template_id message template identifier.',
+        'description' => 'Parent {crm_message_template}.template_id message identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
-        'not null' => FALSE,
+        'not null' => TRUE,
       ),
-      'template_name' => array(
-        'description' => 'Parent {crm_message_template}.template_name message identifier.',
+      'name' => array(
+        'description' => 'Unique {crm_message_template}.name message key.',
         'type' => 'varchar',
-        'length' => 255,
-        'not null' => FALSE,
+        'length' => 128,
+        'not null' => TRUE,
       ),
       'type' => array(
         'description' => 'The type of message template.',
@@ -140,7 +141,8 @@ function crm_message_template_schema() {
       ),
     ),
     'indexes' => array(
-      'crm_message_template_name' => array('template_name'),
+      'crm_message_template_id' => array('template_id'),
+      'crm_message_template_name' => array('name'),
       'crm_message_template_type' => array('type'),
       'language' => array('language'),
     ),

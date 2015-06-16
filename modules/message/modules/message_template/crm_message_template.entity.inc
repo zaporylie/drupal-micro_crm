@@ -10,7 +10,7 @@
  */
 function crm_message_template_entity_info() {
   $entities['crm_message_template'] = array(
-    'label' => t('Message', array(), array('context' => 'crm')),
+    'label' => t('Message template', array(), array('context' => 'crm')),
     'controller class' => 'CRMMessageTemplateController',
     'base table' => 'crm_message_template',
     'revision table' => 'crm_message_template_revision',
@@ -22,6 +22,7 @@ function crm_message_template_entity_info() {
       'id' => 'template_id',
       'bundle' => 'type',
       'revision' => 'revision_id',
+      'language' => 'language',
     ),
     'bundle keys' => array(
       'bundle' => 'type',
@@ -31,6 +32,18 @@ function crm_message_template_entity_info() {
       'administrator' => array(
         'label' => t('Administrator'),
         'custom settings' => FALSE,
+      ),
+    ),
+    'translation' => array(
+      'entity_translation' => array(
+        'class' => 'EntityTranslationDefaultHandler',
+        'bundle callback' => 'crm_message_template_entity_translation_supported_type',
+        'default settings' => array(
+          'default_language' => LANGUAGE_NONE,
+          'hide_language_selector' => TRUE,
+          'lock_language' => TRUE,
+        ),
+//        'access callback' => 'crm_message_template_entity_translation_tab_access',
       ),
     ),
     'access callback' => 'crm_message_template_access',
@@ -84,7 +97,7 @@ function crm_message_template_delete_multiple($ids) {
  */
 function crm_message_template_view($template, $view_mode = 'administrator') {
   if (!is_array($template)) {
-    $template = array($template->message_template_id => $template);
+    $template = array($template->template_id => $template);
   }
   return entity_get_controller('crm_message_template')->view($template, $view_mode);
 }
@@ -102,5 +115,5 @@ function crm_message_template_uri($template) {
  *
  */
 function crm_message_template_label($template) {
-  return $template->template_name;
+  return $template->name;
 }
