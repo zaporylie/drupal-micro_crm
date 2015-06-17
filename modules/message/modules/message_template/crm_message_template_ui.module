@@ -127,8 +127,8 @@ function crm_message_template_ui_entity_info_alter(&$entity_info) {
     );
   }
 
-  // Add callbacks and urls for administer translations.
-  $entity_info['crm_message_template']['translation']['entity_translation'] += array(
-    'base path' => 'admin/people/crm/message/template/%crm_message_template',
-  );
+//  // Add callbacks and urls for administer translations.
+//  $entity_info['crm_message_template']['translation']['entity_translation'] += array(
+//    'base path' => 'admin/people/crm/message/template/%crm_message_template',
+//  );
 }

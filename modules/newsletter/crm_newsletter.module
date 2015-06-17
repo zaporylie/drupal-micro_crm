@@ -562,3 +562,54 @@ function _crm_newsletter_get_custom_fields() {
   }
   return $custom_fields;
 }
+
+/**
+ * Implements hook_modules_enabled().
+ *
+ * @todo Create crm-channel tokens!
+ */
+function crm_newsletter_modules_enabled($modules) {
+  _crm_newsletter_create_messages();
+}
+
+/**
+ * Implements hook_enable().
+ */
+function crm_newsletter_enable() {
+  _crm_newsletter_create_messages();
+}
+
+/**
+ *
+ */
+function _crm_newsletter_create_messages() {
+
+  $types = crm_channel_types(TRUE);
+  foreach ($types as $key => $type) {
+    // @todo Check if message exists or not.
+    if (!crm_message_template_menu_name_exists('subscribe_' . $key)) {
+      $subscribe = array(
+        'subject' => t('Confirm your subscription'),
+        'body' => t('Click link to confirm [crm-channel:subscribe-url]'),
+      );
+      if ($message = module_invoke($type['module'], 'crm_message_create', $subscribe, 'crm_message_template')) {
+        $message->name = 'subscribe_' . $key;
+        $message->locked = 1;
+        $message->log = 'Create default newsletter message.';
+        entity_save('crm_message_template', $message);
+      }
+    }
+    if (!crm_message_template_menu_name_exists('unsubscribe_' . $key)) {
+      $subscribe = array(
+        'subject' => t('Cancel your newsletter subscription'),
+        'body' => t('Thank you for being with us. Click to confirm [crm-channel:unsubscribe-url]'),
+      );
+      if ($message = module_invoke($type['module'], 'crm_message_create', $subscribe, 'crm_message_template')) {
+        $message->name = 'unsubscribe_' . $key;
+        $message->locked = 1;
+        $message->log = 'Create default newsletter message.';
+        entity_save('crm_message_template', $message);
+      }
+    }
+  }
+}

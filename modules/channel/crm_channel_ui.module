@@ -27,10 +27,10 @@ function crm_channel_ui_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  foreach (crm_channel_types() as $type => $bundle) {
+  foreach (crm_channel_type_option_list() as $type => $name) {
     $type_arg = strtr($type, '_', '-');
     $items['admin/people/crm/config/channel/' . $type_arg] = array(
-      'title' => $bundle,
+      'title' => $name,
       'page callback' => 'drupal_get_form',
       'page arguments' => array('crm_channel_ui_settings', $type),
       'access arguments' => array('crm administer'),

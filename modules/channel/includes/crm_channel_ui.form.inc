@@ -141,7 +141,7 @@ function crm_channel_ui_add() {
   $build = array();
   $items = array();
 
-  foreach (crm_channel_types() as $type => $name) {
+  foreach (crm_channel_type_option_list() as $type => $name) {
     $type_arg = strtr($type, '_', '-');
     $items[] = array(
       'data' => l($name, 'admin/people/crm/channel/add/' . $type_arg),

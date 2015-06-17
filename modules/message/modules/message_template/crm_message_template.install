@@ -57,6 +57,11 @@ function crm_message_template_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
+      'locked' => array(
+        'description' => 'Defines if entity is locked so it cannot be deleted.',
+        'type' => 'int',
+        'default' => 0,
+      ),
     ),
     'primary key' => array('template_id'),
     'unique keys' => array(
@@ -129,6 +134,11 @@ function crm_message_template_schema() {
         'type' => 'text',
         'not null' => TRUE,
         'size' => 'big',
+      ),
+      'locked' => array(
+        'description' => 'Defines if entity is locked so it cannot be deleted.',
+        'type' => 'int',
+        'default' => 0,
       ),
     ),
     'primary key' => array('revision_id'),

@@ -18,7 +18,7 @@ function crm_newsletter_settings($form, &$form_state) {
     '#title' => t('Channels'),
     '#description' => t('Which channels should be available in newsletter form'),
     '#default_value' => _crm_newsletter_get_channels(),
-    '#options' => crm_channel_types(),
+    '#options' => crm_channel_type_option_list(),
   );
   return system_settings_form($form);
 }

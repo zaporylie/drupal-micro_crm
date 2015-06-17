@@ -34,18 +34,17 @@ function crm_message_template_entity_info() {
         'custom settings' => FALSE,
       ),
     ),
-    'translation' => array(
-      'entity_translation' => array(
-        'class' => 'EntityTranslationDefaultHandler',
-        'bundle callback' => 'crm_message_template_entity_translation_supported_type',
-        'default settings' => array(
-          'default_language' => LANGUAGE_NONE,
-          'hide_language_selector' => TRUE,
-          'lock_language' => TRUE,
-        ),
-//        'access callback' => 'crm_message_template_entity_translation_tab_access',
-      ),
-    ),
+//    'translation' => array(
+//      'entity_translation' => array(
+//        'class' => 'EntityTranslationDefaultHandler',
+//        'bundle callback' => 'crm_message_template_entity_translation_supported_type',
+//        'default settings' => array(
+//          'default_language' => LANGUAGE_NONE,
+//          'hide_language_selector' => TRUE,
+//          'lock_language' => TRUE,
+//        ),
+//      ),
+//    ),
     'access callback' => 'crm_message_template_access',
   );
   return $entities;

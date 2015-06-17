@@ -14,6 +14,12 @@ function crm_email_entity_info_alter(&$entity_info) {
     'module' => 'crm_email',
   );
   $entity_info['crm_channel']['bundles']['email'] = $bundle;
+  if (isset($entity_info['crm_message'])) {
+    $entity_info['crm_message']['bundles']['email'] = $bundle;
+  }
+  if (isset($entity_info['crm_message_template'])) {
+    $entity_info['crm_message_template']['bundles']['email'] = $bundle;
+  }
 }
 
 /**
@@ -107,4 +113,316 @@ function crm_email_crm_channel_set_value(&$channel, $value) {
   }
   $wrapper->crm_email->set($value);
   return TRUE;
+}
+
+/**
+ * Implements hook_crm_channel_fields().
+ *
+ * Do not assume that field or instance already exists - declare it from scratch
+ * anyway.
+ */
+function crm_email_crm_channel_fields($type = NULL) {
+  // Be sure that fields and instances elements are there.
+  $array['fields'] = array();
+  $array['instances'] = array();
+  switch ($type) {
+    case 'crm_message':
+      // Prepare fields.
+      $array['fields']['crm_message_email'] = array(
+        'settings' => array(
+          'target_type' => 'crm_channel',
+          'handler' => 'base',
+          'handler_settings' => array(
+            'target_bundles' => array(
+              'email' => 'email',
+            ),
+            'sort' => array(
+              'type' => 'none',
+            ),
+            'behaviors' => array(
+              'entityqueue' => array(
+                'status' => 0,
+              ),
+              'views-select-list' => array(
+                'status' => 0,
+              ),
+            ),
+          ),
+        ),
+        'field_name' => 'crm_message_email',
+        'type' => 'entityreference',
+        'module' => 'entityreference',
+        'active' => 1,
+        'locked' => 0,
+        'cardinality' => 1,
+        'deleted' => 0,
+      );
+      $array['fields']['crm_message_email_subject'] = array(
+        'settings' => array(
+          'max_length' => '255',
+        ),
+        'field_name' => 'crm_message_email_subject',
+        'type' => 'text',
+        'module' => 'text',
+        'active' => 1,
+        'locked' => 0,
+        'cardinality' => 1,
+        'deleted' => 0,
+      );
+      $array['fields']['crm_message_email_body'] = array(
+        'settings' => array(),
+        'field_name' => 'crm_message_email_body',
+        'type' => 'text_long',
+        'module' => 'text',
+        'active' => 1,
+        'locked' => 0,
+        'cardinality' => 1,
+        'deleted' => 0,
+      );
+      // Prepare instances.
+      $array['instances']['crm_message_email'] = array(
+        'label' => t('E-mail'),
+        'widget' => array(
+          'weight' => '1',
+          'type' => 'inline_entity_form',
+          'module' => 'inline_entity_form',
+          'active' => 1,
+          'settings' => array(
+            'fields' => array(),
+            'type_settings' => array(
+              'allow_existing' => 1,
+              'match_operator' => 'CONTAINS',
+              'delete_references' => 0,
+              'override_labels' => 0,
+              'label_singular' => 'Channel',
+              'label_plural' => 'Channels',
+            ),
+          ),
+        ),
+        'settings' => array(
+          'user_register_form' => FALSE,
+        ),
+        'display' => array(
+          'default' => array(
+            'label' => 'above',
+            'type' => 'entityreference_label',
+            'settings' => array(
+              'link' => FALSE,
+            ),
+            'module' => 'entityreference',
+            'weight' => 0,
+          ),
+        ),
+        'required' => 1,
+        'description' => '',
+        'field_name' => 'crm_message_email',
+        'entity_type' => 'crm_message',
+        'bundle' => 'email',
+        'deleted' => 0,
+      );
+      $array['instances']['crm_message_email_subject'] = array(
+        'label' => t('Subject'),
+        'widget' => array(
+          'weight' => '2',
+          'type' => 'text_textfield',
+          'module' => 'text',
+          'active' => 1,
+          'settings' => array(
+            'size' => '60',
+          ),
+        ),
+        'settings' => array(
+          'text_processing' => '0',
+          'user_register_form' => FALSE,
+        ),
+        'display' => array(
+          'default' => array(
+            'label' => 'above',
+            'type' => 'text_default',
+            'settings' => array(),
+            'module' => 'text',
+            'weight' => 1,
+          ),
+        ),
+        'required' => 1,
+        'description' => '',
+        'default_value' => NULL,
+        'field_name' => 'crm_message_email_subject',
+        'entity_type' => 'crm_message',
+        'bundle' => 'email',
+        'deleted' => 0,
+      );
+      $array['instances']['crm_message_email_body'] = array(
+        'label' => t('Body'),
+        'widget' => array(
+          'weight' => '3',
+          'type' => 'text_textarea',
+          'module' => 'text',
+          'active' => 1,
+          'settings' => array(
+            'rows' => '5',
+          ),
+        ),
+        'settings' => array(
+          'text_processing' => '1',
+          'user_register_form' => FALSE,
+        ),
+        'display' => array(
+          'default' => array(
+            'label' => 'above',
+            'type' => 'text_default',
+            'settings' => array(),
+            'module' => 'text',
+            'weight' => 2,
+          ),
+        ),
+        'required' => 1,
+        'description' => '',
+        'default_value' => NULL,
+        'field_name' => 'crm_message_email_body',
+        'entity_type' => 'crm_message',
+        'bundle' => 'email',
+        'deleted' => 0,
+      );
+      break;
+
+    case 'crm_message_template':
+      // Prepare fields.
+      $array['fields']['crm_message_email_subject'] = array(
+        'settings' => array(
+          'max_length' => '255',
+        ),
+        'field_name' => 'crm_message_email_subject',
+        'type' => 'text',
+        'module' => 'text',
+        'active' => 1,
+        'locked' => 0,
+        'cardinality' => 1,
+        'deleted' => 0,
+      );
+      $array['fields']['crm_message_email_body'] = array(
+        'settings' => array(),
+        'field_name' => 'crm_message_email_body',
+        'type' => 'text_long',
+        'module' => 'text',
+        'active' => 1,
+        'locked' => 0,
+        'cardinality' => 1,
+        'deleted' => 0,
+      );
+      // Prepare instances.
+      $array['instances']['crm_message_email_subject'] = array(
+        'label' => t('Subject'),
+        'widget' => array(
+          'weight' => '2',
+          'type' => 'text_textfield',
+          'module' => 'text',
+          'active' => 1,
+          'settings' => array(
+            'size' => '60',
+          ),
+        ),
+        'settings' => array(
+          'text_processing' => '0',
+          'user_register_form' => FALSE,
+        ),
+        'display' => array(
+          'default' => array(
+            'label' => 'above',
+            'type' => 'text_default',
+            'settings' => array(),
+            'module' => 'text',
+            'weight' => 1,
+          ),
+        ),
+        'required' => 1,
+        'description' => '',
+        'default_value' => NULL,
+        'field_name' => 'crm_message_email_subject',
+        'entity_type' => 'crm_message_template',
+        'bundle' => 'email',
+        'deleted' => 0,
+      );
+      $array['instances']['crm_message_email_body'] = array(
+        'label' => t('Body'),
+        'widget' => array(
+          'weight' => '3',
+          'type' => 'text_textarea',
+          'module' => 'text',
+          'active' => 1,
+          'settings' => array(
+            'rows' => '5',
+          ),
+        ),
+        'settings' => array(
+          'text_processing' => '1',
+          'user_register_form' => FALSE,
+        ),
+        'display' => array(
+          'default' => array(
+            'label' => 'above',
+            'type' => 'text_default',
+            'settings' => array(),
+            'module' => 'text',
+            'weight' => 2,
+          ),
+        ),
+        'required' => 1,
+        'description' => '',
+        'default_value' => NULL,
+        'field_name' => 'crm_message_email_body',
+        'entity_type' => 'crm_message_template',
+        'bundle' => 'email',
+        'deleted' => 0,
+      );
+      break;
+
+    default:
+      return FALSE;
+  }
+  return $array;
+}
+
+/**
+ * Implements hook_message_create().
+ */
+function crm_email_crm_message_create($values, $entity_type = 'crm_message') {
+  try {
+    $message = entity_create($entity_type, array(
+      'type' => 'email',
+    ));
+    $wrapper = entity_metadata_wrapper('crm_message_template', $message);
+    if (isset($values['channel']) && $wrapper->__isset('crm_message_email')) {
+      $wrapper->crm_message_email->set($values['channel']);
+    }
+    if (isset($values['subject']) && $wrapper->__isset('crm_message_email_subject')) {
+      $wrapper->crm_message_email_subject->set($values['subject']);
+    }
+    if (isset($values['body']) && $wrapper->__isset('crm_message_email_body')) {
+      $wrapper->crm_message_email_body->set($values['body']);
+    }
+    foreach ($values as $key => $value) {
+      if ($wrapper->__isset($key)) {
+        $wrapper->{$key}->set($value);
+      }
+    }
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_email', $e);
+    return FALSE;
+  }
+  return $message;
+}
+
+/**
+ * Implements hook_mail().
+ */
+function crm_email_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'message':
+      $message['subject'] = $params['subject'];
+      $formatted_text = $params['body'];
+      $message['body'] = check_markup($formatted_text['value'], $formatted_text['format']);
+      break;
+  }
 }
