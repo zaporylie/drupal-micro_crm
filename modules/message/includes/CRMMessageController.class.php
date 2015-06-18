@@ -83,7 +83,7 @@ class CRMMessageController extends EntityAPIController {
    */
   public function create(array $values = array()) {
     $values += array(
-      'status' => CRM_MESSAGE_STATUS_REGISTERED,
+      'status' => CRM_MESSAGE_STATUS_DRAFT,
       'language' => LANGUAGE_NONE,
     );
     return parent::create($values);

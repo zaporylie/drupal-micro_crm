@@ -80,6 +80,10 @@ function crm_message_ui_form($form, &$form_state, $message) {
     '#type' => 'submit',
     '#value' => t('Save'),
   );
+  $form['actions']['send'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save & send'),
+  );
   return $form;
 }
 
@@ -106,7 +110,12 @@ function crm_message_ui_form_submit($form, &$form_state) {
     field_attach_submit('crm_message', $message, $form, $form_state);
     entity_save('crm_message', $message);
     $uri = entity_uri('crm_message', $message);
-    $form_state['redirect'] = $uri['path'];
+    if ($form_state['triggering_element']['#value'] == t('Save & send')) {
+      $form_state['redirect'] = $uri['path'] . '/send';
+    }
+    else {
+      $form_state['redirect'] = $uri['path'];
+    }
     drupal_set_message(t('Message has been saved'));
   }
   catch (Exception $e) {
@@ -125,10 +134,11 @@ function crm_message_ui_send($form, &$form_state, $message) {
     '#type' => 'value',
     '#value' => $message,
   );
+  $uri = entity_uri('crm_message', $message);
   return confirm_form(
     $form,
     t('Do you want to send the message?'),
-    'admin/people/crm/message'
+    $uri['path']
   );
 }
 

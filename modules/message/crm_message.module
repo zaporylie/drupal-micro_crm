@@ -5,7 +5,7 @@
  *
  */
 
-define('CRM_MESSAGE_STATUS_REGISTERED', 'registered');
+define('CRM_MESSAGE_STATUS_DRAFT', 'draft');
 define('CRM_MESSAGE_STATUS_SENT', 'sent');
 
 module_load_include('inc', 'crm_message', 'crm_message.entity');
@@ -86,7 +86,7 @@ function crm_message_permission() {
  * Implements hook_crm_message_update().
  */
 function crm_message_crm_message_update($message) {
-  if (isset($message->original->status) && $message->original->status == CRM_MESSAGE_STATUS_REGISTERED && $message->status == CRM_MESSAGE_STATUS_SENT) {
+  if (isset($message->original->status) && $message->original->status == CRM_MESSAGE_STATUS_DRAFT && $message->status == CRM_MESSAGE_STATUS_SENT) {
     watchdog('crm_message', 'Message (message_id: @message) has been sent', array('@message' => $message->message_id), WATCHDOG_NOTICE, l('view', 'admin/people/crm/message/' . $message->message_id));
   }
   else {
@@ -100,9 +100,9 @@ function crm_message_crm_message_update($message) {
 function crm_message_crm_message_status_info() {
   $status = array();
 
-  $status[CRM_MESSAGE_STATUS_REGISTERED] = array(
-    'title' => t('Registered'),
-    'description' => t('Registered, unprocessed message'),
+  $status[CRM_MESSAGE_STATUS_DRAFT] = array(
+    'title' => t('Draft'),
+    'description' => t('Draft message'),
     'weight' => -99,
   );
 
