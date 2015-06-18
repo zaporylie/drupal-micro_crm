@@ -82,21 +82,21 @@ function crm_message_template_views_data() {
     'title' => t('Operations links'),
     'help' => t('Display all the available operations links for the message.'),
     'field' => array(
-      'handler' => 'crm_message_template_handler_field_message_operations',
+      'handler' => 'crm_message_template_handler_field_message_template_operations',
     ),
   );
 
   // Expose the message type.
-  $data['crm_message_template']['template_name'] = array(
+  $data['crm_message_template']['name'] = array(
     'title' => t('Name'),
     'help' => t('Message template unique machine name.'),
     'field' => array(
       'handler' => 'crm_message_template_handler_field_message_template_name',
       'click sortable' => TRUE,
     ),
-//    'filter' => array(
-//      'handler' => 'crm_message_template_handler_filter_message_type',
-//    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
     'sort' => array(
       'handler' => 'views_handler_sort',
     ),
@@ -110,11 +110,11 @@ function crm_message_template_views_data() {
     'title' => t('Type'),
     'help' => t('The human-readable name of the type of the message.'),
     'field' => array(
-      'handler' => 'crm_message_template_handler_field_message_type',
+      'handler' => 'crm_message_template_handler_field_message_template_type',
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'crm_message_template_handler_filter_message_type',
+      'handler' => 'crm_message_template_handler_filter_message_template_type',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',

@@ -308,7 +308,7 @@ function crm_phone_crm_message_create($values, $entity_type = 'crm_message') {
       $wrapper->crm_message_phone->set($values['channel']);
     }
     if (isset($values['body']) && $wrapper->__isset('crm_message_phone_body')) {
-      $wrapper->crm_message_phone_body->set($values['body']);
+      $wrapper->crm_message_phone_body->set(array('value' => $values['body'], 'format' => 'plain_text'));
     }
     foreach ($values as $key => $value) {
       if ($wrapper->__isset($key)) {
