@@ -124,6 +124,10 @@ function crm_channel_label($channel) {
  * @return bool|mixed
  */
 function crm_channel_load_contact($ids) {
+  // If it's not an array - make it an array.
+  if (!is_array($ids)) {
+    $ids = array($ids);
+  }
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'crm_contact')
     ->fieldCondition('crm_channel', 'target_id', $ids, 'IN');

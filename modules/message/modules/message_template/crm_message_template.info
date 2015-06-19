@@ -11,3 +11,4 @@ files[] = includes/views/handlers/crm_message_template_handler_field_message_tem
 files[] = includes/views/handlers/crm_message_template_handler_filter_message_template_type.inc
 
 dependencies[] = crm_message
+dependencies[] = token

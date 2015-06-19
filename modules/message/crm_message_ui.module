@@ -118,6 +118,17 @@ function crm_message_ui_menu() {
     'file' => 'includes/crm_message_ui.form.inc',
   );
 
+  $items['admin/people/crm/channel/%crm_channel/send'] = array(
+    'title' => 'Send',
+    'page callback' => 'crm_message_ui_send_channel_form_wrapper',
+    'page arguments' => array(4),
+    'access callback' => 'crm_message_ui_channel_access',
+    'access arguments' => array('create', 4),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_message_ui.form.inc',
+  );
+
   return $items;
 }
 
@@ -149,4 +160,17 @@ function crm_message_ui_entity_info_alter(&$entity_info) {
       'access arguments' => array('crm manage'),
     );
   }
+}
+
+/**
+ * @param $channel
+ */
+function crm_message_ui_channel_access($op, $channel) {
+  if (!isset($channel->type)) {
+    return FALSE;
+  }
+  if (!_crm_message_channel_supported($channel->type)) {
+    return FALSE;
+  }
+  return crm_message_access($op);
 }

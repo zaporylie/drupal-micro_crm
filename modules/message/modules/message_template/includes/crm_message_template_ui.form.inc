@@ -88,6 +88,11 @@ function crm_message_template_ui_form($form, &$form_state, $template) {
 
   field_attach_form('crm_message_template', $template, $form, $form_state, $langcode);
 
+  $form['tokens'] = array(
+    '#theme' => 'token_tree',
+    '#token_types' => array('crm_channel', 'crm_contact'),
+  );
+
   $form['language'] = array(
     '#type' => 'value',
     '#value' => $langcode,

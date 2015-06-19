@@ -75,6 +75,18 @@ function crm_message_template_ui_menu() {
     'weight' => 99,
   );
 
+  $items['admin/people/crm/message/template/%crm_message_template/apply/%crm_channel'] = array(
+    'title' => 'Apply',
+    'page callback' => 'crm_message_template_apply',
+    'page arguments' => array(5, 7),
+    'access callback' => 'crm_message_template_access',
+    'access arguments' => array('edit', 5),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_message_template_ui.form.inc',
+    'weight' => 99,
+  );
+
   $items['admin/people/crm/message/template/add'] = array(
     'title' => 'Add message template',
     'page callback' => 'crm_message_template_ui_add',
@@ -131,4 +143,14 @@ function crm_message_template_ui_entity_info_alter(&$entity_info) {
 //  $entity_info['crm_message_template']['translation']['entity_translation'] += array(
 //    'base path' => 'admin/people/crm/message/template/%crm_message_template',
 //  );
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function crm_message_template_ui_form_alter(&$form, &$form_state, $form_id) {
+  if (isset($form['crm_message_template'])) {
+    // Hide all occurrences of crm_message_template field.
+    $form['crm_message_template']['#access'] = FALSE;
+  }
 }

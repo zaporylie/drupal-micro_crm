@@ -241,3 +241,28 @@ function crm_message_type_get_name($type) {
   }
   return NULL;
 }
+
+/**
+ * @param $values
+ * @param string $entity_type
+ */
+function crm_message_create($values, $entity_type = 'crm_message') {
+  if (isset($values['channel']) && isset($values['channel']->type)) {
+    $bundle = $values['channel']->type;
+  }
+  elseif ($values['type']) {
+    $bundle = $values['type'];
+  }
+  else {
+    return FALSE;
+  }
+  $entity = entity_get_info($entity_type);
+  if (!isset($entity['bundles'][$bundle]['module'])) {
+    return FALSE;
+  }
+  $module = $entity['bundles'][$bundle]['module'];
+  if (!function_exists($module . '_crm_message_create')) {
+    return FALSE;
+  }
+  return module_invoke($module, 'crm_message_create', $values, $entity_type);
+}

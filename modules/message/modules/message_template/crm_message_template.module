@@ -139,3 +139,47 @@ function crm_message_template_entity_translation_tab_access($template) {
 function crm_message_template_entity_translation_supported_type($type) {
   return TRUE;
 }
+
+/**
+ * @param $template
+ * @param $channel
+ * @param bool $send
+ *
+ * @todo Add antiflood check?
+ */
+function crm_message_template_apply($template, $channel, $send = FALSE) {
+  $message = crm_message_create(array(
+    'channel' => $channel,
+  ), 'crm_message');
+  $template_wrapper = entity_metadata_wrapper('crm_message_template', $template);
+  $message_wrapper = entity_metadata_wrapper('crm_message', $message);
+  $fields = $template_wrapper->getPropertyInfo();
+  $context = array(
+    'crm_channel' => $channel,
+    'crm_contact' => crm_channel_load_contact($channel->channel_id),
+  );
+  foreach ($fields as $key => $field) {
+    if (!isset($field['field']) || $field['field'] !== TRUE) {
+      continue;
+    }
+    try {
+      $value = $template_wrapper->{$key}->value();
+      // @todo Figure out better to use token replacement.
+      if (is_string($value)) {
+        $value = token_replace($value, $context);
+      }
+      elseif (is_array($value) && isset($value['value']) && is_string($value['value'])) {
+        $value['value'] = token_replace($value['value'], $context);
+      }
+      $message_wrapper->{$key}->set($value);
+    }
+    catch (Exception $e) {
+      // Meh, whatever ;)
+    }
+  }
+
+  $message_wrapper->crm_message_template->set($template);
+  $message->log = 'New message created from template ' . $template->template_id;
+  entity_save('crm_message', $message);
+  return $send ? crm_message_send($message) : $message;
+}
