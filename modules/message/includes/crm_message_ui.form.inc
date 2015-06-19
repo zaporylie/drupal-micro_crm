@@ -28,6 +28,20 @@ function crm_message_ui_form_wrapper($message = array(), $delete = FALSE, $type 
 }
 
 /**
+ * @param $channel
+ */
+function crm_message_ui_send_channel_form_wrapper($channel) {
+  $message = crm_message_create(array(
+    'channel' => $channel,
+  ), 'crm_message');
+  if (!$message) {
+    drupal_set_message(t('Unable to create a new message'), 'error');
+    drupal_goto();
+  }
+  return drupal_get_form('crm_message_ui_form', $message);
+}
+
+/**
  * Message form.
  */
 function crm_message_ui_form($form, &$form_state, $message) {
@@ -55,6 +69,7 @@ function crm_message_ui_form($form, &$form_state, $message) {
     '#required' => TRUE,
     '#default_value' => $message->status,
     '#options' => crm_message_status_options_list(),
+    '#disabled' => TRUE,
   );
 
   $form['settings']['options']['language'] = array(
@@ -78,7 +93,11 @@ function crm_message_ui_form($form, &$form_state, $message) {
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['save'] = array(
     '#type' => 'submit',
-    '#value' => t('Save'),
+    '#value' => t('Save as Draft'),
+  );
+  $form['actions']['send'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save & send'),
   );
   return $form;
 }
@@ -106,8 +125,16 @@ function crm_message_ui_form_submit($form, &$form_state) {
     field_attach_submit('crm_message', $message, $form, $form_state);
     entity_save('crm_message', $message);
     $uri = entity_uri('crm_message', $message);
-    $form_state['redirect'] = $uri['path'];
     drupal_set_message(t('Message has been saved'));
+    if ($form_state['triggering_element']['#value'] == t('Save & send')) {
+      if (isset($_GET['destination'])) {
+        unset($_GET['destination']);
+      }
+      $form_state['redirect'] = $uri['path'] . '/send';
+    }
+    else {
+      $form_state['redirect'] = $uri['path'];
+    }
   }
   catch (Exception $e) {
     watchdog_exception('crm_message', $e);
@@ -125,10 +152,11 @@ function crm_message_ui_send($form, &$form_state, $message) {
     '#type' => 'value',
     '#value' => $message,
   );
+  $uri = entity_uri('crm_message', $message);
   return confirm_form(
     $form,
     t('Do you want to send the message?'),
-    'admin/people/crm/message'
+    $uri['path']
   );
 }
 

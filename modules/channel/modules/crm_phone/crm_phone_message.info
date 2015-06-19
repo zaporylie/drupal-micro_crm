@@ -1,7 +1,0 @@
-name = Phone Message Channel
-core = 7.x
-package = CRM
-
-dependencies[] = crm_phone
-dependencies[] = crm_message
-dependencies[] = sms

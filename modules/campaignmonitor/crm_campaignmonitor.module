@@ -95,7 +95,7 @@ function crm_campaignmonitor_libraries_info() {
  * Implements hook_crm_channel_update().
  */
 function crm_campaignmonitor_crm_channel_update($channel) {
-  if ($channel->type == 'email' && (isset($channel->newsletter) || isset($channel->newsletter_confirmation))) {
+  if ($channel->type == 'email' && (isset($channel->newsletter) || isset($channel->skip_confirmation))) {
     if (variable_get('crm_campaignmonitor_queue_outgoing', TRUE)) {
       $queue = DrupalQueue::get('crm_campaignmonitor_outgoing');
       $queue->createQueue();

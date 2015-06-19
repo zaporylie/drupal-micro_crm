@@ -8,7 +8,7 @@
 /**
  * Class CRMMessageController
  */
-class CRMMessageController extends EntityAPIController {
+class CRMMessageTemplateController extends EntityAPIController {
 
   /**
    * Overrides EntityAPIController::buildQuery().
@@ -24,7 +24,7 @@ class CRMMessageController extends EntityAPIController {
   /**
    * Overrides EntityAPIController::buildContent().
    */
-  public function buildContent($entity, $view_mode = 'customer', $langcode = NULL) {
+  public function buildContent($entity, $view_mode = 'administrator', $langcode = NULL) {
     return parent::buildContent($entity, $view_mode, $langcode);
   }
 
@@ -49,7 +49,7 @@ class CRMMessageController extends EntityAPIController {
     if ($op !== 'create' && !$entity) {
       return FALSE;
     }
-    if (!in_array($op, array('create', 'view')) && $entity->status == CRM_MESSAGE_STATUS_SENT) {
+    if ($op === 'create' && (!empty($entity) && !crm_message_template_type_get_name($entity))) {
       return FALSE;
     }
     // The administer permission is a blanket override.
@@ -58,15 +58,13 @@ class CRMMessageController extends EntityAPIController {
     }
     switch ($op) {
       case 'create':
-        return user_access('crm message create');
-      case 'send':
-        return user_access('crm message send');
+        return user_access('crm message template create');
       case 'view':
-        return user_access('crm message view');
+        return user_access('crm message template view');
       case 'update':
-        return user_access('crm message update');
+        return user_access('crm message template update');
       case 'delete':
-        return user_access('crm message delete');
+        return user_access('crm message template delete');
     }
     return FALSE;
   }
@@ -74,7 +72,7 @@ class CRMMessageController extends EntityAPIController {
   /**
    * Overrides EntityAPIController::view().
    */
-  public function view($entities, $view_mode = 'customer', $langcode = NULL, $page = NULL) {
+  public function view($entities, $view_mode = 'administrator', $langcode = NULL, $page = NULL) {
     return parent::view($entities, $view_mode, $langcode, $page);
   }
 
@@ -83,7 +81,6 @@ class CRMMessageController extends EntityAPIController {
    */
   public function create(array $values = array()) {
     $values += array(
-      'status' => CRM_MESSAGE_STATUS_DRAFT,
       'language' => LANGUAGE_NONE,
     );
     return parent::create($values);
@@ -96,7 +93,7 @@ class CRMMessageController extends EntityAPIController {
 
     // If we are going to save new message data needs to be validated against
     // uniqueness.
-    if (isset($entity->is_new) && $entity->is_new == TRUE && !isset($entity->message_id)) {
+    if (isset($entity->is_new) && $entity->is_new == TRUE && !isset($entity->template_id)) {
       $entity->created = REQUEST_TIME;
     }
     // Set changed time arbitrary.

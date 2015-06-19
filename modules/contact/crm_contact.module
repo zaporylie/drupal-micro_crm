@@ -114,6 +114,20 @@ function crm_contact_statuses() {
 }
 
 /**
+ * Returns status label.
+ *
+ * @param $status
+ * @return null
+ */
+function crm_contact_status_get_name($status) {
+  $statuses = crm_contact_statuses();
+  if (isset($statuses[$status]['title'])) {
+    return $statuses[$status]['title'];
+  }
+  return NULL;
+}
+
+/**
  * Returns list of available statuses.
  */
 function crm_contact_status_options_list() {

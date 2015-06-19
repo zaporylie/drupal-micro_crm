@@ -57,6 +57,9 @@ function crm_channel_hook_info() {
     'crm_channel_is_empty' => array(
       'group' => 'crm',
     ),
+    'crm_channel_fields' => array(
+      'group' => 'crm',
+    ),
   );
   return $hooks;
 }
@@ -220,20 +223,40 @@ function crm_channel_status_option_list() {
  *
  * @return array
  */
-function crm_channel_types() {
+function crm_channel_types($reset = FALSE) {
   // First check the static cache for a product types array.
   $channel_types = &drupal_static(__FUNCTION__);
 
   // If it did not exist, fetch the types now.
-  if (!isset($channel_types)) {
+  if (!isset($channel_types) || $reset) {
+    if ($reset) {
+      entity_info_cache_clear();
+    }
     $channel_types = array();
 
     $entity = entity_get_info('crm_channel');
     if (isset($entity['bundles'])) {
       foreach ($entity['bundles'] as $key => $bundle) {
-        // @todo: add something here or simplify it.
-        $channel_types[$key] = $bundle['label'];
+        $channel_types[$key] = $bundle;
       }
+    }
+  }
+
+  return $channel_types;
+}
+
+/**
+ * @param bool $reset
+ * @return array
+ */
+function crm_channel_type_option_list($reset = FALSE) {
+  // First check the static cache for a product types array.
+  $channel_types = &drupal_static(__FUNCTION__);
+  // If it did not exist, fetch the types now.
+  if (!isset($channel_types) || $reset) {
+    $channel_types = crm_channel_types($reset);
+    foreach ($channel_types as $key => $bundle) {
+      $channel_types[$key] = $bundle['label'];
     }
   }
 
@@ -244,7 +267,7 @@ function crm_channel_types() {
  * Returns name of type (bundle).
  */
 function crm_channel_type_get_name($type) {
-  $channels = crm_channel_types();
+  $channels = crm_channel_type_option_list();
   if (isset($channels[$type])) {
     return $channels[$type];
   }
@@ -357,4 +380,99 @@ function crm_channel_crm_channel_presave($channel) {
 function _crm_channel_generate_token($channel) {
   $channel->token_created = REQUEST_TIME;
   $channel->token = drupal_hash_base64(drupal_random_bytes(64));
+}
+
+/**
+ * Implements hook_modules_installed().
+ */
+function crm_channel_modules_installed($modules) {
+  $types = crm_channel_types(TRUE);
+  $list = module_list();
+  foreach ($types as $key => $bundle) {
+    foreach ($list as $module) {
+      if ($fields = module_invoke($bundle['module'], 'crm_channel_fields', $module)) {
+        crm_channel_install_fields($fields);
+      }
+    }
+  }
+//  foreach ($modules as $module) {
+//    foreach ($types as $key => $bundle) {
+//      if ($fields = module_invoke($bundle['module'], 'crm_channel_fields', $module)) {
+//        crm_channel_install_fields($fields);
+//      }
+//    }
+//  }
+}
+
+/**
+ * @param $array
+ * @throws \Exception
+ * @throws \FieldException
+ */
+function crm_channel_install_fields($array) {
+  foreach ($array['fields'] as $field) {
+    if (!field_info_field($field['field_name'])) {
+      field_create_field($field);
+    }
+  }
+  foreach ($array['instances'] as $instance) {
+    if (!field_info_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
+      field_create_instance($instance);
+    }
+  }
+}
+
+/**
+ * Implements hook_modules_uninstalled().
+ */
+function crm_channel_modules_uninstalled($modules) {
+  $types = crm_channel_types();
+  $list = module_list();
+
+  // First remove support for all uninstalled modules (if channel is still
+  // there).drush
+  // Get channel one by one.
+  foreach ($types as $key => $bundle) {
+    // Then get uninstalled modules - one by one.
+    foreach ($modules as $module) {
+      // Then check if module is on the list (only if module implements hook).
+      if ($fields = module_invoke($bundle['module'], 'crm_channel_fields', $module)) {
+        // If correct - uninstall all fields.
+        crm_channel_uninstall_fields($fields);
+      }
+    }
+  }
+
+  // What if chanel module is on the list?
+  // Make also a full list, including uninstalled modules.
+  $list_full = $list + drupal_map_assoc($modules);
+  // Get all uninstalled modules, one by one.
+  foreach ($modules as $module) {
+    // Load module file.
+    module_load_include('module', $module);
+    // Check if module implements hook_crm_channel_fields.
+    if (function_exists($module . '_crm_channel_fields')) {
+      // If yes, get all modules, including uninstalled one.
+      foreach ($list_full as $to_uninstall) {
+        // Check if implementation of hook returns some fields for this module.
+        if ($fields = call_user_func_array($module . '_crm_channel_fields', array($to_uninstall))) {
+          // If yes - remove all fields.
+          crm_channel_uninstall_fields($fields);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * @param $array
+ * @throws \Exception
+ * @throws \FieldException
+ */
+function crm_channel_uninstall_fields($array) {
+  foreach ($array['instances'] as $instance) {
+    if (field_info_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
+      field_delete_instance($instance);
+    }
+  }
 }

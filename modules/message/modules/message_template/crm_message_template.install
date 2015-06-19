@@ -2,39 +2,44 @@
 
 /**
  * @file
- * Holds Message Entity schema.
+ * Holds Message Template Entity schema.
  */
 
 /**
  * Implements hook_schema().
  */
-function crm_message_schema() {
+function crm_message_template_schema() {
 
-  module_load_include('module', 'crm_message', 'crm_message');
-  $schema['crm_message'] = array(
-    'description' => 'message entity',
+  $schema['crm_message_template'] = array(
+    'description' => 'message template entity',
     'fields' => array(
-      'message_id' => array(
+      'template_id' => array(
         'description' => 'The primary identifier for a table.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
+      'name' => array(
+        'description' => 'Unique identifier for a table.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
       'type' => array(
-        'description' => 'The type of this message.',
+        'description' => 'The type of message template.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
       ),
       'revision_id' => array(
-        'description' => 'The current {crm_message_revision}.revision_id version identifier.',
+        'description' => 'The current {crm_message_template_revision}.revision_id version identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
       ),
       'created' => array(
-        'description' => 'Modification date',
+        'description' => 'Creation date',
         'type' => 'int',
         'unsigned' => TRUE,
         'default' => 0,
@@ -45,13 +50,6 @@ function crm_message_schema() {
         'unsigned' => TRUE,
         'default' => 0,
       ),
-      'status' => array(
-        'description' => 'Plain text record status',
-        'type' => 'varchar',
-        'length' => 32,
-        'not null' => TRUE,
-        'default' => CRM_MESSAGE_STATUS_DRAFT,
-      ),
       'language' => array(
         'description' => 'The {languages}.language of this record.',
         'type' => 'varchar',
@@ -59,25 +57,32 @@ function crm_message_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
+      'locked' => array(
+        'description' => 'Defines if entity is locked so it cannot be deleted.',
+        'type' => 'int',
+        'default' => 0,
+      ),
     ),
-    'primary key' => array('message_id'),
+    'primary key' => array('template_id'),
     'unique keys' => array(
       'revision_id' => array('revision_id'),
+      'name' => array('name'),
     ),
     'foreign keys' => array(
-      'crm_message_revision' => array(
-        'table' => 'crm_message_revision',
+      'crm_message_template_revision' => array(
+        'table' => 'crm_message_template_revision',
         'columns' => array('revision_id' => 'revision_id'),
       ),
     ),
     'indexes' => array(
-      'crm_message_id' => array('message_id'),
-      'crm_status' => array('status'),
+      'crm_message_template_id' => array('template_id'),
+      'crm_message_template_name' => array('name'),
+      'crm_message_template_type' => array('type'),
       'language' => array('language'),
     ),
   );
 
-  $schema['crm_message_revision'] = array(
+  $schema['crm_message_template_revision'] = array(
     'description' => 'message entity revision',
     'fields' => array(
       'revision_id' => array(
@@ -86,18 +91,24 @@ function crm_message_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'message_id' => array(
-        'description' => 'Parent {crm_message}.message_id message identifier.',
+      'template_id' => array(
+        'description' => 'Parent {crm_message_template}.template_id message identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
-        'not null' => FALSE,
-      ),
-      'status' => array(
-        'description' => 'Plain text record status',
-        'type' => 'varchar',
-        'length' => 32,
         'not null' => TRUE,
-        'default' => CRM_MESSAGE_STATUS_DRAFT,
+      ),
+      'name' => array(
+        'description' => 'Unique {crm_message_template}.name message key.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+      'type' => array(
+        'description' => 'The type of message template.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
       ),
       'language' => array(
         'description' => 'The {languages}.language of this record.',
@@ -124,16 +135,26 @@ function crm_message_schema() {
         'not null' => TRUE,
         'size' => 'big',
       ),
+      'locked' => array(
+        'description' => 'Defines if entity is locked so it cannot be deleted.',
+        'type' => 'int',
+        'default' => 0,
+      ),
     ),
     'primary key' => array('revision_id'),
     'foreign keys' => array(
-      'crm_message' => array(
-        'table' => 'crm_message',
-        'columns' => array('message_id' => 'message_id'),
+      'crm_message_template' => array(
+        'table' => 'crm_message_template',
+        'columns' => array(
+          'template_id' => 'template_id',
+        ),
       ),
     ),
     'indexes' => array(
-      'message_id' => array('message_id'),
+      'crm_message_template_id' => array('template_id'),
+      'crm_message_template_name' => array('name'),
+      'crm_message_template_type' => array('type'),
+      'language' => array('language'),
     ),
   );
 
@@ -143,13 +164,13 @@ function crm_message_schema() {
 /**
  * Implements hook_install().
  */
-function crm_message_install() {
+function crm_message_template_install() {
 
 }
 
 /**
  * Implements hook_uninstall().
  */
-function crm_message_uninstall() {
+function crm_message_template_uninstall() {
 
 }
