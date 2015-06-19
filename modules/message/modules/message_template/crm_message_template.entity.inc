@@ -71,6 +71,14 @@ function crm_message_template_load($id) {
 }
 
 /**
+ * @param $machine_name
+ */
+function crm_channel_template_name_load($machine_name) {
+  $id = db_query('SELECT template_id FROM {crm_message_template} WHERE name = :name', array(':name' => $machine_name))->fetchField();
+  return crm_message_template_load($id);
+}
+
+/**
  *
  */
 function crm_message_template_load_multiple($ids) {

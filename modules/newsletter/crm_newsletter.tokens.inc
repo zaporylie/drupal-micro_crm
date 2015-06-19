@@ -37,7 +37,7 @@ function crm_newsletter_tokens($type, $tokens, array $data = array(), array $opt
           $replacements[$original] = url('crm/newsletter/subscribe/' . $channel->token, $url_options);
           break;
         case 'unsubscribe-url':
-          $replacements[$original] = url('crm/newsletter/subscribe/' . $channel->token, $url_options);
+          $replacements[$original] = url('crm/newsletter/unsubscribe/' . $channel->token, $url_options);
           break;
       }
     }

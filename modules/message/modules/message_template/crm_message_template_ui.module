@@ -75,18 +75,6 @@ function crm_message_template_ui_menu() {
     'weight' => 99,
   );
 
-  $items['admin/people/crm/message/template/%crm_message_template/apply/%crm_channel'] = array(
-    'title' => 'Apply',
-    'page callback' => 'crm_message_template_apply',
-    'page arguments' => array(5, 7),
-    'access callback' => 'crm_message_template_access',
-    'access arguments' => array('edit', 5),
-    'type' => MENU_LOCAL_TASK,
-    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'file' => 'includes/crm_message_template_ui.form.inc',
-    'weight' => 99,
-  );
-
   $items['admin/people/crm/message/template/add'] = array(
     'title' => 'Add message template',
     'page callback' => 'crm_message_template_ui_add',
