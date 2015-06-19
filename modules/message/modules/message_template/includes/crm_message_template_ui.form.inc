@@ -91,6 +91,7 @@ function crm_message_template_ui_form($form, &$form_state, $template) {
   $form['tokens'] = array(
     '#theme' => 'token_tree',
     '#token_types' => array('crm_channel', 'crm_contact'),
+    '#weight' => 97,
   );
 
   $form['language'] = array(

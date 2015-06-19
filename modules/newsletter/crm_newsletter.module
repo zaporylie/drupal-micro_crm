@@ -590,7 +590,7 @@ function _crm_newsletter_create_messages() {
     if (!crm_message_template_menu_name_exists('subscribe_' . $key)) {
       $subscribe = array(
         'subject' => t('Confirm your subscription'),
-        'body' => t('Click link to confirm [crm-channel:subscribe-url]'),
+        'body' => t('Click link to confirm [crm_channel:subscribe-url]'),
       );
       // @todo Use wrapper function instead of calling module_invoke directly.
       if ($message = module_invoke($type['module'], 'crm_message_create', $subscribe, 'crm_message_template')) {
@@ -603,7 +603,7 @@ function _crm_newsletter_create_messages() {
     if (!crm_message_template_menu_name_exists('unsubscribe_' . $key)) {
       $subscribe = array(
         'subject' => t('Cancel your newsletter subscription'),
-        'body' => t('Thank you for being with us. Click to confirm [crm-channel:unsubscribe-url]'),
+        'body' => t('Thank you for being with us. Click to confirm [crm_channel:unsubscribe-url]'),
       );
       // @todo Use wrapper function instead of calling module_invoke directly.
       if ($message = module_invoke($type['module'], 'crm_message_create', $subscribe, 'crm_message_template')) {
