@@ -26,7 +26,7 @@ function crm_message_ui_add() {
   foreach (crm_message_types() as $type => $name) {
     $type_arg = strtr($type, '_', '-');
     $items[] = array(
-      'data' => l($name, 'admin/people/crm/message/add/' . $type_arg),
+      'data' => l($name, 'admin/crm/message/add/' . $type_arg),
     );
   }
 

@@ -10,7 +10,7 @@
 function crm_campaignmonitor_menu() {
   $items = array();
 
-  $items['admin/people/crm/config/newsletter/campaignmonitor'] = array(
+  $items['admin/crm/config/newsletter/campaignmonitor'] = array(
     'title' => 'Campaign Monitor',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('crm_campaignmonitor_settings'),
@@ -19,7 +19,7 @@ function crm_campaignmonitor_menu() {
     'file' => 'crm_campaignmonitor.admin.inc',
   );
 
-  $items['admin/people/crm/config/newsletter/campaignmonitor/settings'] = array(
+  $items['admin/crm/config/newsletter/campaignmonitor/settings'] = array(
     'title' => 'Campaign Monitor',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('crm_campaignmonitor_settings'),
@@ -28,7 +28,7 @@ function crm_campaignmonitor_menu() {
     'file' => 'crm_campaignmonitor.admin.inc',
   );
 
-  $items['admin/people/crm/config/newsletter/campaignmonitor/webhooks'] = array(
+  $items['admin/crm/config/newsletter/campaignmonitor/webhooks'] = array(
     'title' => 'Webhooks',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('crm_campaignmonitor_webhooks'),

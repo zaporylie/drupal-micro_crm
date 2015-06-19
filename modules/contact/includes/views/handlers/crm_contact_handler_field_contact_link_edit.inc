@@ -19,6 +19,6 @@ class crm_contact_handler_field_contact_link_edit extends crm_contact_handler_fi
 
     $text = !empty($this->options['text']) ? $this->options['text'] : t('edit');
 
-    return l($text, 'admin/people/crm/contact/' . $contact->contact_id . '/edit', array('query' => drupal_get_destination()));
+    return l($text, 'admin/crm/contact/' . $contact->contact_id . '/edit', array('query' => drupal_get_destination()));
   }
 }

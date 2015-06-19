@@ -126,7 +126,7 @@ function crm_contact_ui_delete_form($form, &$form_state, $contact) {
   return confirm_form(
     $form,
     t('Do you want to delete contact?'),
-    'admin/people/crm/contact'
+    'admin/crm/contact'
   );
 }
 

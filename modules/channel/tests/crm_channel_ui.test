@@ -34,25 +34,25 @@ class CRMChannelUITestCase extends CRMBaseTestCase {
     // Login with normal user.
     $this->drupalLogin($this->user);
 
-    $this->drupalGet('admin/people/crm/config/channel');
+    $this->drupalGet('admin/crm/config/channel');
     $this->assertResponse(403, t('Normal user is not able to access the config page'));
-    $this->drupalGet('admin/people/crm/channel');
+    $this->drupalGet('admin/crm/channel');
     $this->assertResponse(403, t('Normal user is not able to access the admin page'));
-    $this->drupalGet('admin/people/crm/channel/add');
+    $this->drupalGet('admin/crm/channel/add');
     $this->assertResponse(403, t('Normal user is not able to access the add page'));
 
     // Login with store admin.
     $this->drupalLogin($this->admin);
 
-    $this->drupalGet('admin/people/crm/config/channel');
+    $this->drupalGet('admin/crm/config/channel');
     $this->assertResponse(200, t('Admin user is not able to access the config page'));
     $this->assertText(t('Channel'), t('%title title present in the admin list page', array('%title' => t('Channel'))));
 
-    $this->drupalGet('admin/people/crm/channel');
+    $this->drupalGet('admin/crm/channel');
     $this->assertResponse(200, t('Admin user is not able to access the admin page'));
     $this->assertText(t('Channel'), t('%title title present in the admin list page', array('%title' => t('Channel'))));
 
-    $this->drupalGet('admin/people/crm/channel/add');
+    $this->drupalGet('admin/crm/channel/add');
     $this->assertResponse(200, t('Admin user is not able to access the add page'));
     $this->assertText(t('Add new channel'), t('%title title present in the add page', array('%title' => t('Add new channel'))));
   }

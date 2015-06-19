@@ -85,7 +85,7 @@ function crm_contact_ui_views_default_views() {
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['path'] = 'admin/people/crm/contact';
+  $handler->display->display_options['path'] = 'admin/crm/contact';
   $handler->display->display_options['menu']['type'] = 'normal';
   $handler->display->display_options['menu']['title'] = 'Contact';
   $handler->display->display_options['menu']['weight'] = '0';

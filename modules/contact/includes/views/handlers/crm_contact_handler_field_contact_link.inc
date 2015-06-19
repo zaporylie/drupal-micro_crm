@@ -37,6 +37,6 @@ class crm_contact_handler_field_contact_link extends views_handler_field {
     $text = !empty($this->options['text']) ? $this->options['text'] : t('view');
     $contact_id = $this->get_value($values, 'contact_id');
 
-    return l($text, 'admin/people/crm/contact/' . $contact_id);
+    return l($text, 'admin/crm/contact/' . $contact_id);
   }
 }

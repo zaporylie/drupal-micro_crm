@@ -100,7 +100,7 @@ function crm_channel_view($channel, $view_mode = 'administrator') {
  */
 function crm_channel_uri($channel) {
   return array(
-    'path' => 'admin/people/crm/channel/' . $channel->channel_id,
+    'path' => 'admin/crm/channel/' . $channel->channel_id,
   );
 }
 

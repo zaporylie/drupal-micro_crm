@@ -164,7 +164,7 @@ function crm_contact_merge($contacts) {
  */
 function crm_contact_uri($contact) {
   return array(
-    'path' => 'admin/people/crm/contact/' . $contact->contact_id,
+    'path' => 'admin/crm/contact/' . $contact->contact_id,
   );
 
 }

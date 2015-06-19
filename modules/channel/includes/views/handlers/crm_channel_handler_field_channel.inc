@@ -48,7 +48,7 @@ class crm_channel_handler_field_channel extends views_handler_field {
     if (!empty($this->options['link_to_channel']) && $data !== NULL && $data !== '') {
       $channel_id = $this->get_value($values, 'channel_id');
       $this->options['alter']['make_link'] = TRUE;
-      $this->options['alter']['path'] = 'admin/people/crm/channel/' . $channel_id;
+      $this->options['alter']['path'] = 'admin/crm/channel/' . $channel_id;
     }
 
     return $data;

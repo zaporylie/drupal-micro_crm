@@ -15,7 +15,7 @@ function crm_message_template_ui_add() {
   foreach (crm_message_template_types() as $type => $name) {
     $type_arg = strtr($type, '_', '-');
     $items[] = array(
-      'data' => l($name, 'admin/people/crm/message/template/add/' . $type_arg),
+      'data' => l($name, 'admin/crm/message/template/add/' . $type_arg),
     );
   }
 
@@ -167,7 +167,7 @@ function crm_message_template_ui_delete_form($form, &$form_state, $template) {
   return confirm_form(
     $form,
     t('Do you want to delete message template?'),
-    'admin/people/crm/message/template'
+    'admin/crm/message/template'
   );
 }
 

@@ -40,7 +40,7 @@ class CRMEmailTestCase extends CRMBaseTestCase {
 
     // Login with normal user.
     $this->drupalLogin($this->user);
-    $this->drupalGet('admin/people/crm/channel/add/email');
+    $this->drupalGet('admin/crm/channel/add/email');
     $this->assertResponse(403, t('Normal user is not able to access the add page'));
 
     $this->drupalGet($uri['path'] . '/view');
@@ -55,18 +55,18 @@ class CRMEmailTestCase extends CRMBaseTestCase {
     // Login with store admin.
     $this->drupalLogin($this->admin);
 
-    $this->drupalGet('admin/people/crm/channel/add');
+    $this->drupalGet('admin/crm/channel/add');
     $this->assertResponse(200, t('Admin user is not able to access the add page'));
     $this->assertText(t('E-mail'), t('%title title present in the add page', array('%title' => t('E-mail'))));
 
-    $this->drupalGet('admin/people/crm/channel/add/email');
+    $this->drupalGet('admin/crm/channel/add/email');
     $this->assertResponse(200, t('Admin user is not able to access the email add page'));
 
     // @todo move to separate test case.
     $langcode = LANGUAGE_NONE;
     $this->assertFieldByName("crm_email[$langcode][0][email]", NULL, t('%title field present in the add page', array('%title' => t('E-mail'))));
 
-    $this->drupalGet('admin/people/crm/channel');
+    $this->drupalGet('admin/crm/channel');
     $this->assertLinkByHref($uri['path'] . '/view');
     $this->assertLinkByHref($uri['path'] . '/edit');
     $this->assertLinkByHref($uri['path'] . '/delete');
@@ -88,7 +88,7 @@ class CRMEmailTestCase extends CRMBaseTestCase {
     $edit["crm_email[$langcode][0][email]"] = $this->randomEmail();
     $edit["status"] = CRM_CHANNEL_STATUS_UNREGISTERED;
     $edit["log"] = $this->randomString(32);
-    $this->drupalPost('admin/people/crm/channel/add/email', $edit, t('Save'));
+    $this->drupalPost('admin/crm/channel/add/email', $edit, t('Save'));
 
     // Check that the Basic page has been created.
     $this->assertRaw(t('Channel has been saved'));
@@ -108,7 +108,7 @@ class CRMEmailTestCase extends CRMBaseTestCase {
     $edit["crm_email[$langcode][0][email]"] = $this->randomEmail();
     $edit["status"] = CRM_CHANNEL_STATUS_UNREGISTERED;
     $edit["log"] = $this->randomString(32);
-    $this->drupalPost('admin/people/crm/channel/' . $channel->channel_id . '/edit', $edit, t('Save'));
+    $this->drupalPost('admin/crm/channel/' . $channel->channel_id . '/edit', $edit, t('Save'));
 
     // Check that the Basic page has been created.
     $this->assertRaw(t('Channel has been saved'));

@@ -19,6 +19,6 @@ class crm_contact_handler_field_contact_link_delete extends crm_contact_handler_
 
     $text = !empty($this->options['text']) ? $this->options['text'] : t('delete');
 
-    return l($text, 'admin/people/crm/contact/' . $contact->contact_id . '/delete', array('query' => drupal_get_destination()));
+    return l($text, 'admin/crm/contact/' . $contact->contact_id . '/delete', array('query' => drupal_get_destination()));
   }
 }

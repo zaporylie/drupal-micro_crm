@@ -38,7 +38,7 @@ class crm_message_template_handler_field_message_template_operations extends vie
     $template_id = $this->get_value($values, 'template_id');
 
     // Get the operations links.
-    $links = menu_contextual_links('crm-message-template', 'admin/people/crm/message/template', array($template_id));
+    $links = menu_contextual_links('crm-message-template', 'admin/crm/message/template', array($template_id));
 
     if (!empty($links)) {
       // Add the destination to the links if specified.

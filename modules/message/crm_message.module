@@ -87,10 +87,10 @@ function crm_message_permission() {
  */
 function crm_message_crm_message_update($message) {
   if (isset($message->original->status) && $message->original->status == CRM_MESSAGE_STATUS_DRAFT && $message->status == CRM_MESSAGE_STATUS_SENT) {
-    watchdog('crm_message', 'Message (message_id: @message) has been sent', array('@message' => $message->message_id), WATCHDOG_NOTICE, l('view', 'admin/people/crm/message/' . $message->message_id));
+    watchdog('crm_message', 'Message (message_id: @message) has been sent', array('@message' => $message->message_id), WATCHDOG_NOTICE, l('view', 'admin/crm/message/' . $message->message_id));
   }
   else {
-    watchdog('crm_message', 'Message (message_id: @message) has been saved', array('@message' => $message->message_id), WATCHDOG_NOTICE, l('view', 'admin/people/crm/message/' . $message->message_id));
+    watchdog('crm_message', 'Message (message_id: @message) has been saved', array('@message' => $message->message_id), WATCHDOG_NOTICE, l('view', 'admin/crm/message/' . $message->message_id));
   }
 }
 

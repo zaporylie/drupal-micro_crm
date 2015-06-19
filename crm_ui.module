@@ -11,7 +11,7 @@
 function crm_ui_menu() {
   $items = array();
 
-  $items['admin/people/crm'] = array(
+  $items['admin/crm'] = array(
     'title' => 'CRM',
     'page callback' => 'crm_index',
     'page arguments' => array(),
@@ -19,7 +19,7 @@ function crm_ui_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['admin/people/crm/config'] = array(
+  $items['admin/crm/config'] = array(
     'title' => 'Config',
     'page callback' => 'crm_index',
     'page arguments' => array(),

@@ -114,7 +114,7 @@ function crm_message_template_view($template, $view_mode = 'administrator') {
  */
 function crm_message_template_uri($template) {
   return array(
-    'path' => 'admin/people/crm/message/template/' . $template->template_id,
+    'path' => 'admin/crm/message/template/' . $template->template_id,
   );
 }
 

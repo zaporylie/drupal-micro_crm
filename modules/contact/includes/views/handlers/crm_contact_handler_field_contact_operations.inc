@@ -37,7 +37,7 @@ class crm_contact_handler_field_contact_operations extends views_handler_field {
     $contact_id = $this->get_value($values, 'contact_id');
 
     // Get the operations links.
-    $links = menu_contextual_links('crm-contact', 'admin/people/crm/contact', array($contact_id));
+    $links = menu_contextual_links('crm-contact', 'admin/crm/contact', array($contact_id));
 
     if (!empty($links)) {
       // Add the destination to the links if specified.

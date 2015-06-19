@@ -38,7 +38,7 @@ class crm_message_handler_field_message_operations extends views_handler_field {
     $message_id = $this->get_value($values, 'message_id');
 
     // Get the operations links.
-    $links = menu_contextual_links('crm-message', 'admin/people/crm/message', array($message_id));
+    $links = menu_contextual_links('crm-message', 'admin/crm/message', array($message_id));
 
     if (!empty($links)) {
       // Add the destination to the links if specified.

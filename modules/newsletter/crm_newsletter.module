@@ -14,7 +14,7 @@ define('CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT', 'double_opt');
  */
 function crm_newsletter_menu() {
   $items = array();
-  $items['admin/people/crm/config/newsletter'] = array(
+  $items['admin/crm/config/newsletter'] = array(
     'title' => 'Newsletter',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('crm_newsletter_settings'),

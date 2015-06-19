@@ -49,7 +49,7 @@ class crm_message_template_handler_field_message_template extends views_handler_
     if (!empty($this->options['link_to_message_template']) && $data !== NULL && $data !== '') {
       $template_id = $this->get_value($values, 'template_id');
       $this->options['alter']['make_link'] = TRUE;
-      $this->options['alter']['path'] = 'admin/people/crm/message/template/' . $template_id;
+      $this->options['alter']['path'] = 'admin/crm/message/template/' . $template_id;
     }
 
     return $data;

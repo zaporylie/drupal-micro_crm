@@ -120,7 +120,7 @@ function crm_channel_ui_delete_form($form, &$form_state, $channel) {
   return confirm_form(
     $form,
     t('Do you want to delete channel?'),
-    'admin/people/crm/channel'
+    'admin/crm/channel'
   );
 }
 
@@ -144,7 +144,7 @@ function crm_channel_ui_add() {
   foreach (crm_channel_type_option_list() as $type => $name) {
     $type_arg = strtr($type, '_', '-');
     $items[] = array(
-      'data' => l($name, 'admin/people/crm/channel/add/' . $type_arg),
+      'data' => l($name, 'admin/crm/channel/add/' . $type_arg),
     );
   }
 

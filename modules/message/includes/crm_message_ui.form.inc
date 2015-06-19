@@ -186,7 +186,7 @@ function crm_message_ui_delete_form($form, &$form_state, $message) {
   return confirm_form(
     $form,
     t('Do you want to delete message?'),
-    'admin/people/crm/message'
+    'admin/crm/message'
   );
 }
 

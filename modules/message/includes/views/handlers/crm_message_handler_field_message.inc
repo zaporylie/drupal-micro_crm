@@ -48,7 +48,7 @@ class crm_message_handler_field_message extends views_handler_field {
     if (!empty($this->options['link_to_message']) && $data !== NULL && $data !== '') {
       $message_id = $this->get_value($values, 'message_id');
       $this->options['alter']['make_link'] = TRUE;
-      $this->options['alter']['path'] = 'admin/people/crm/message/' . $message_id;
+      $this->options['alter']['path'] = 'admin/crm/message/' . $message_id;
     }
 
     return $data;

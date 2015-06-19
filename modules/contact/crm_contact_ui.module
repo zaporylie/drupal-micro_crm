@@ -11,7 +11,7 @@
 function crm_contact_ui_menu() {
   $items = array();
 
-  $items['admin/people/crm/contact'] = array(
+  $items['admin/crm/contact'] = array(
     'title' => 'Contact',
     'page callback' => 'crm_contact_ui_list',
     'page arguments' => array(),
@@ -20,54 +20,54 @@ function crm_contact_ui_menu() {
     'file' => 'includes/crm_contact_ui.list.inc',
   );
 
-  $items['admin/people/crm/contact/%crm_contact'] = array(
+  $items['admin/crm/contact/%crm_contact'] = array(
     'title callback' => 'crm_contact_label',
-    'title arguments' => array(4),
+    'title arguments' => array(3),
     'page callback' => 'crm_contact_view',
-    'page arguments' => array(4),
+    'page arguments' => array(3),
     'access callback' => 'crm_contact_access',
-    'access arguments' => array('view', 4),
+    'access arguments' => array('view', 3),
     'type' => MENU_CALLBACK,
     'file' => 'includes/crm_contact_ui.list.inc',
   );
 
-  $items['admin/people/crm/contact/%crm_contact/view'] = array(
+  $items['admin/crm/contact/%crm_contact/view'] = array(
     'title' => 'View',
     'page callback' => 'crm_contact_view',
-    'page arguments' => array(4),
+    'page arguments' => array(3),
     'access callback' => 'crm_contact_access',
-    'access arguments' => array('view', 4),
+    'access arguments' => array('view', 3),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'file' => 'includes/crm_contact_ui.list.inc',
     'weight' => -2,
   );
 
-  $items['admin/people/crm/contact/%crm_contact/edit'] = array(
+  $items['admin/crm/contact/%crm_contact/edit'] = array(
     'title' => 'Edit',
     'page callback' => 'crm_contact_ui_form_wrapper',
-    'page arguments' => array(4),
+    'page arguments' => array(3),
     'access callback' => 'crm_contact_access',
-    'access arguments' => array('update', 4),
+    'access arguments' => array('update', 3),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'file' => 'includes/crm_contact_ui.form.inc',
     'weight' => -1,
   );
 
-  $items['admin/people/crm/contact/%crm_contact/delete'] = array(
+  $items['admin/crm/contact/%crm_contact/delete'] = array(
     'title' => 'Delete',
     'page callback' => 'crm_contact_ui_form_wrapper',
-    'page arguments' => array(4, TRUE),
+    'page arguments' => array(3, TRUE),
     'access callback' => 'crm_contact_access',
-    'access arguments' => array('delete', 4),
+    'access arguments' => array('delete', 3),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'file' => 'includes/crm_contact_ui.form.inc',
     'weight' => 99,
   );
 
-  $items['admin/people/crm/contact/add'] = array(
+  $items['admin/crm/contact/add'] = array(
     'title' => 'Add contact',
     'page callback' => 'crm_contact_ui_form_wrapper',
     'page arguments' => array(),
@@ -77,7 +77,7 @@ function crm_contact_ui_menu() {
     'file' => 'includes/crm_contact_ui.form.inc',
   );
 
-  $items['admin/people/crm/config/contact'] = array(
+  $items['admin/crm/config/contact'] = array(
     'title' => 'Contact',
     'page callback' => 'crm_index',
     'page arguments' => array(),
@@ -108,8 +108,8 @@ function crm_contact_ui_entity_info_alter(&$entity_info) {
 
   // Expose the order UI for order fields.
   $entity_info['crm_contact']['bundles']['crm_contact']['admin'] = array(
-    'path' => 'admin/people/crm/config/contact',
-    'real path' => 'admin/people/crm/config/contact',
+    'path' => 'admin/crm/config/contact',
+    'real path' => 'admin/crm/config/contact',
     'access arguments' => array('crm contact administer'),
   );
 }
@@ -131,7 +131,7 @@ function crm_contact_ui_uri($contact) {
   // Only return a value if the user has permission to view the order.
   if (crm_contact_access('view', $contact)) {
     return array(
-      'path' => 'admin/people/crm/contact/' . entity_id('crm_contact', $contact),
+      'path' => 'admin/crm/contact/' . entity_id('crm_contact', $contact),
     );
   }
 
