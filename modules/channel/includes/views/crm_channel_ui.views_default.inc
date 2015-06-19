@@ -36,6 +36,8 @@ function crm_channel_ui_views_default_views() {
   $handler->display->display_options['style_options']['columns'] = array(
     'channel_id' => 'channel_id',
     'label' => 'label',
+    'type' => 'type',
+    'status' => 'status',
     'created' => 'created',
     'changed' => 'changed',
     'operations' => 'operations',
@@ -54,8 +56,22 @@ function crm_channel_ui_views_default_views() {
       'separator' => '',
       'empty_column' => 0,
     ),
+    'type' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'status' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
     'created' => array(
-      'sortable' => 0,
+      'sortable' => 1,
       'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',

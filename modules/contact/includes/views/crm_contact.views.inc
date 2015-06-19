@@ -76,6 +76,23 @@ function crm_contact_views_data() {
       'handler' => 'views_handler_filter_date',
     ),
   );
+  $data['crm_contact']['status'] = array(
+    'title' => t('Status'),
+    'help' => t('The human-readable contact status.'),
+    'field' => array(
+      'handler' => 'crm_contact_handler_field_contact_status',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'crm_contact_handler_filter_contact_status',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
 
   // Expose links to operate on the product.
   $data['crm_contact']['view_contact'] = array(
