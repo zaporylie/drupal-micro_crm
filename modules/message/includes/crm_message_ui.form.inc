@@ -125,13 +125,16 @@ function crm_message_ui_form_submit($form, &$form_state) {
     field_attach_submit('crm_message', $message, $form, $form_state);
     entity_save('crm_message', $message);
     $uri = entity_uri('crm_message', $message);
+    drupal_set_message(t('Message has been saved'));
     if ($form_state['triggering_element']['#value'] == t('Save & send')) {
+      if (isset($_GET['destination'])) {
+        unset($_GET['destination']);
+      }
       $form_state['redirect'] = $uri['path'] . '/send';
     }
     else {
       $form_state['redirect'] = $uri['path'];
     }
-    drupal_set_message(t('Message has been saved'));
   }
   catch (Exception $e) {
     watchdog_exception('crm_message', $e);

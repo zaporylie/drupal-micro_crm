@@ -262,13 +262,14 @@ function crm_newsletter_form_submit($form, &$form_state) {
 
     // If contact status was in disabled state, bump it to registered.
     $entity->status = CRM_CONTACT_STATUS_REGISTERED;
-
-    foreach ($form_state['values']['fields'] as $key => $field) {
-      $info = field_info_field($key);
-      $entity->{$key} = $field;
-      // Check if field is empty and, if so, skip it.
-      if (module_invoke($info['module'], 'field_is_empty', $entity->{$key}[LANGUAGE_NONE][0], $info)) {
-        unset($entity->{$key});
+    if (isset($form_state['values']['fields']) && is_array($form_state['values']['fields'])) {
+      foreach ($form_state['values']['fields'] as $key => $field) {
+        $info = field_info_field($key);
+        $entity->{$key} = $field;
+        // Check if field is empty and, if so, skip it.
+        if (module_invoke($info['module'], 'field_is_empty', $entity->{$key}[LANGUAGE_NONE][0], $info)) {
+          unset($entity->{$key});
+        }
       }
     }
     $wrapper = entity_metadata_wrapper('crm_contact', $entity);
