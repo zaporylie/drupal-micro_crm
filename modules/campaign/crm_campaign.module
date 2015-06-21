@@ -1,0 +1,196 @@
+<?php
+
+/**
+ * @file
+ */
+
+define('CRM_CAMPAIGN_STATUS_REGISTERED', 'registered');
+define('CRM_CAMPAIGN_STATUS_QUEUED', 'queued');
+define('CRM_CAMPAIGN_STATUS_SENT', 'sent');
+
+module_load_include('inc', 'crm_campaign', 'crm_campaign.entity');
+
+/**
+ * Implements hook_menu().
+ */
+function crm_campaign_menu() {
+  $items = array();
+
+  $items['admin/crm/campaign/%crm_campaign'] = array(
+    'title callback' => 'crm_campaign_label',
+    'title arguments' => array(3),
+    'page callback' => 'crm_campaign_view',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('view', 3),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/crm/campaign/%crm_campaign/view'] = array(
+    'title' => 'View',
+    'page callback' => 'crm_campaign_view',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('view', 3),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'weight' => -2,
+  );
+
+  $items['admin/crm/campaign/%crm_campaign/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'crm_campaign_edit_form_wrapper',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('update', 3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_campaign.form.inc',
+    'weight' => -1,
+  );
+
+  $items['admin/crm/campaign/%crm_campaign/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'crm_campaign_delete_form_wrapper',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('delete', 3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_campaign.form.inc',
+    'weight' => 99,
+  );
+
+  $items['admin/crm/campaign/add'] = array(
+    'title' => 'Add campaign',
+    'page callback' => 'crm_campaign_add_form_wrapper',
+    'page arguments' => array(),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('create'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'includes/crm_campaign.form.inc',
+  );
+
+  $items['admin/crm/config/campaign'] = array(
+    'title' => 'Campaign',
+    'page callback' => 'crm_index',
+    'page arguments' => array(),
+    'access arguments' => array('crm administer'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function crm_campaign_permission() {
+  return array(
+    'crm campaign overview' => array(
+      'title' => t('Access to campaign list'),
+    ),
+    'crm campaign create' => array(
+      'title' => t('Create new campaign'),
+    ),
+    'crm campaign view' => array(
+      'title' => t('View campaign'),
+    ),
+    'crm campaign update' => array(
+      'title' => t('Update campaign'),
+    ),
+    'crm campaign delete' => array(
+      'title' => t('Delete campaign'),
+    ),
+  );
+}
+
+
+
+/**
+ * Implements hook_views_api().
+ */
+function crm_campaign_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'crm_campaign') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_crm_campaign_status_info().
+ */
+function crm_campaign_crm_campaign_status_info() {
+  $status = array();
+
+  $status[CRM_CAMPAIGN_STATUS_REGISTERED] = array(
+    'title' => t('Registered'),
+    'description' => t('Registered, unprocessed campaign'),
+    'weight' => -99,
+  );
+
+  $status[CRM_CAMPAIGN_STATUS_QUEUED] = array(
+    'title' => t('Queued'),
+    'description' => t('Campaign queued to send.'),
+    'weight' => 0,
+  );
+
+  $status[CRM_CAMPAIGN_STATUS_SENT] = array(
+    'title' => t('Sent'),
+    'description' => t('Fully sent campaign.'),
+    'weight' => 99,
+  );
+
+  return $status;
+}
+
+/**
+ * Returns all statuses campaign declared by modules.
+ *
+ * @return array
+ *   List of statuses
+ */
+function crm_campaign_statuses() {
+  // First check the static cache for an order states array.
+  $statuses = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the statuses now.
+  if (empty($statuses)) {
+    $statuses = module_invoke_all('crm_campaign_status_info');
+
+    // Give other modules a chance to alter the order states.
+    drupal_alter('crm_campaign_status_info', $statuses);
+
+    uasort($statuses, 'drupal_sort_weight');
+  }
+
+  return $statuses;
+}
+
+/**
+ * Returns status label.
+ *
+ * @param $status
+ * @return null
+ */
+function crm_campaign_status_get_name($status) {
+  $statuses = crm_campaign_statuses();
+  if (isset($statuses[$status]['title'])) {
+    return $statuses[$status]['title'];
+  }
+  return NULL;
+}
+
+/**
+ * Returns list of available statuses.
+ */
+function crm_campaign_status_options_list() {
+
+  $options = array();
+
+  foreach (crm_campaign_statuses() as $key => $status) {
+    $options[$key] = $status['title'];
+  }
+
+  return $options;
+}

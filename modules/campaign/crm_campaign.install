@@ -1,0 +1,158 @@
+<?php
+
+/**
+ * @file
+ * Holds Campaign Entity schema.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function crm_campaign_schema() {
+
+  module_load_include('module', 'crm_campaign', 'crm_campaign');
+  $schema['crm_campaign'] = array(
+    'description' => 'Campaign entity',
+    'fields' => array(
+      'campaign_id' => array(
+        'description' => 'The primary identifier for a table.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'revision_id' => array(
+        'description' => 'The current {crm_campaign_revision}.revision_id version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'title' => array(
+        'description' => 'Title',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'Modification date',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'Modification date',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'description' => 'Plain text record status',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => CRM_CAMPAIGN_STATUS_REGISTERED,
+      ),
+    ),
+    'primary key' => array('campaign_id'),
+    'unique keys' => array(
+      'revision_id' => array('revision_id'),
+    ),
+    'foreign keys' => array(
+      'crm_campaign_revision' => array(
+        'table' => 'crm_campaign_revision',
+        'columns' => array('revision_id' => 'revision_id'),
+      ),
+    ),
+    'indexes' => array(
+      'crm_campaign_id' => array('campaign_id'),
+      'crm_status' => array('status'),
+    ),
+  );
+  
+  $schema['crm_campaign_revision'] = array(
+    'description' => 'Campaign entity revision',
+    'fields' => array(
+      'revision_id' => array(
+        'description' => 'The primary identifier for a table.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'campaign_id' => array(
+        'description' => 'Parent {crm_campaign}.campaign_id campaign identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'title' => array(
+        'description' => 'Title',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+      'status' => array(
+        'description' => 'Plain text record status',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => CRM_CAMPAIGN_STATUS_REGISTERED,
+      ),
+      'revision_uid' => array(
+        'description' => 'Revision author {users}.uid',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'revision_timestamp' => array(
+        'description' => 'Revision date of creation',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'log' => array(
+        'description' => 'The log entry explaining the changes in this version.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'big',
+      ),
+    ),
+    'primary key' => array('revision_id'),
+    'foreign keys' => array(
+      'crm_campaign' => array(
+        'table' => 'crm_campaign',
+        'columns' => array('campaign_id' => 'campaign_id'),
+      ),
+    ),
+    'indexes' => array(
+      'campaign_id' => array('campaign_id'),
+    ),
+  );
+  
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function crm_campaign_install() {
+  _field_info_collate_types(TRUE);
+
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function crm_campaign_uninstall() {
+
+  $instance = array(
+    'entity_type' => 'crm_campaign',
+    'field_name' => 'crm_channel',
+    'bundle' => 'crm_campaign',
+  );
+  field_delete_instance($instance);
+  $instance = array(
+    'entity_type' => 'crm_campaign',
+    'field_name' => 'crm_message_template',
+    'bundle' => 'crm_campaign',
+  );
+  field_delete_instance($instance);
+}
