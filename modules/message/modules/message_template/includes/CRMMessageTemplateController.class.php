@@ -49,6 +49,7 @@ class CRMMessageTemplateController extends EntityAPIController {
     if ($op !== 'create' && !$entity) {
       return FALSE;
     }
+    // @todo Do it better. It throws errors.
     if ($op === 'create' && (!empty($entity) && !crm_message_template_type_get_name($entity))) {
       return FALSE;
     }

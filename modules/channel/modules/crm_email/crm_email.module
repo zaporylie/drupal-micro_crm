@@ -484,3 +484,20 @@ function crm_email_mail($key, &$message, $params) {
       break;
   }
 }
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function crm_email_query_entityreference_alter(QueryAlterableInterface $query) {
+  $handler = $query->getMetaData('entityreference_selection_handler');
+  if ($handler->field['settings']['target_type'] == 'crm_channel') {
+    if (in_array('email', $handler->field['settings']['handler_settings']['target_bundles'])) {
+
+    }
+    elseif (empty($handler->field['settings']['handler_settings']['target_bundles'])) {
+      $query->leftJoin('field_data_crm_email', 'crm_email', 'crm_email.entity_id = crm_channel.channel_id AND crm_email.entity_type = :entity_type');
+      $query->condition('crm_email.crm_email_email', 'testewf');
+      dpm((string) $query);
+    }
+  }
+}
