@@ -134,8 +134,114 @@ function crm_campaign_schema() {
  * Implements hook_install().
  */
 function crm_campaign_install() {
+  $t = get_t();
   _field_info_collate_types(TRUE);
 
+  $field = array(
+    'settings' => array(
+      'target_type' => 'crm_message_template',
+      'handler' => 'base',
+      'handler_settings' => array(
+        'target_bundles' => array(),
+        'sort' => array(
+          'type' => 'none',
+        ),
+        'behaviors' => array(
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+      ),
+    ),
+    'field_name' => 'crm_message_template',
+    'type' => 'entityreference',
+    'module' => 'entityreference',
+    'active' => 1,
+    'locked' => 0,
+    'cardinality' => 1,
+    'deleted' => 0,
+  );
+  field_create_field($field);
+
+  $instance = array(
+    'label' => $t('Message Template'),
+    'widget' => array(
+      'weight' => '0',
+      'type' => 'inline_entity_form',
+      'module' => 'inline_entity_form',
+      'active' => 1,
+      'settings' => array(
+        'fields' => array(),
+        'type_settings' => array(
+          'allow_new' => 1,
+          'allow_existing' => 0,
+          'match_operator' => 'CONTAINS',
+          'delete_references' => 1,
+          'override_labels' => 0,
+          'label_singular' => 'node',
+          'label_plural' => 'nodes',
+        ),
+      ),
+    ),
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'entityreference_label',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'module' => 'entityreference',
+        'weight' => 1,
+      ),
+    ),
+    'required' => 0,
+    'description' => "",
+    'field_name' => 'crm_message_template',
+    'entity_type' => 'crm_campaign',
+    'bundle' => 'crm_campaign',
+    'deleted' => 0,
+  );
+  field_create_instance($instance);
+
+  $instance = array(
+    'label' => $t('Channel'),
+    'widget' => array(
+      'weight' => '1',
+      'type' => 'entityreference_autocomplete',
+      'module' => 'entityreference',
+      'active' => 1,
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'size' => '60',
+        'path' => '',
+      ),
+    ),
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'entityreference_label',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'module' => 'entityreference',
+        'weight' => 0,
+      ),
+    ),
+    'required' => 0,
+    'description' => "",
+    'default_value' => NULL,
+    'field_name' => 'crm_channel',
+    'entity_type' => 'crm_campaign',
+    'bundle' => 'crm_campaign',
+    'deleted' => 0,
+  );
+  field_create_instance($instance);
 }
 
 /**

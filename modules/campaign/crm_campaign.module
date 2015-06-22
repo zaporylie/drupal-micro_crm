@@ -105,7 +105,112 @@ function crm_campaign_permission() {
   );
 }
 
+/**
+ * Implements hook_action_info().
+ */
+function crm_campaign_action_info() {
+  return array(
+    'crm_campaign_add_to_campaign_action' => array(
+      'type' => 'crm_channel',
+      'label' => t('Add to Campaign'),
+      'configurable' => TRUE,
+      'permissions' => array('crm campaign update'),
+      'aggregate' => TRUE,
+//      'triggers' => array('any'),
+    ),
+    'crm_campaign_remove_from_campaign_action' => array(
+      'type' => 'crm_channel',
+      'label' => t('Remove from Campaign'),
+      'configurable' => TRUE,
+      'permissions' => array('crm campaign update'),
+      'aggregate' => TRUE,
+//      'triggers' => array('any'),
+    ),
+  );
+}
 
+function crm_campaign_add_to_campaign_action_form($settings, &$form_state) {
+  $form = array();
+//  dpm($settings);
+//  dpm($form_state);
+  $form['campaign'] = array(
+    '#type' => 'select',
+    '#title' => t('Choose campaign'),
+    '#options' => array(NULL => t('- Choose -')) + crm_campaign_get_option_list(CRM_CAMPAIGN_STATUS_REGISTERED),
+    '#required' => TRUE,
+    '#default_value' => !empty($settings['settings']['campaign']) ? $settings['settings']['campaign'] : NULL,
+  );
+  return $form;
+}
+
+function crm_campaign_add_to_campaign_action_submit($form, $form_state) {
+  $return = array();
+  $return['crm_campaign'] = entity_load_single('crm_campaign', $form_state['values']['campaign']);
+  return $return; //Note, return value here must be an array.
+}
+
+function crm_campaign_add_to_campaign_action(&$entities, &$context) {
+  $campaign = &$context['crm_campaign'];
+  crm_campaign_add_channel_to_campaign($entities, $campaign);
+  $campaign->revision = TRUE;
+  $campaign->log = 'Campaign channels list has been updated';
+  entity_save('crm_campaign', $campaign);
+}
+
+function crm_campaign_add_channel_to_campaign($channels, &$campaign) {
+  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+  $values = $wrapper->crm_channel->raw();
+  $keys = array_keys($channels);
+  $diff = array_diff($keys, $values);
+  $values = array_merge($values, $diff);
+  asort($values);
+  $wrapper->crm_channel->set($values);
+}
+
+
+function crm_campaign_remove_from_campaign_action_form($settings, &$form_state) {
+  $form = array();
+  $form['campaign'] = array(
+    '#type' => 'select',
+    '#title' => t('Choose campaign'),
+    '#options' => array(NULL => t('- Choose -')) + crm_campaign_get_option_list(CRM_CAMPAIGN_STATUS_REGISTERED),
+    '#required' => TRUE,
+    '#default_value' => !empty($settings['settings']['campaign']) ? $settings['settings']['campaign'] : NULL,
+  );
+  return $form;
+}
+
+function crm_campaign_remove_from_campaign_action_submit($form, $form_state) {
+  $return = array();
+  $return['crm_campaign'] = entity_load_single('crm_campaign', $form_state['values']['campaign']);
+  return $return; //Note, return value here must be an array.
+}
+
+function crm_campaign_remove_from_campaign_action(&$entities, &$context) {
+  $campaign = &$context['crm_campaign'];
+  crm_campaign_remove_channel_from_campaign($entities, $campaign);
+  $campaign->log = 'Campaign channels list has been updated.';
+  entity_save('crm_campaign', $campaign);
+}
+
+function crm_campaign_remove_channel_from_campaign($channels, &$campaign) {
+  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+  $values = $wrapper->crm_channel->raw();
+  $keys = array_keys($channels);
+  $values = array_diff($values, $keys);
+  asort($values);
+  $wrapper->crm_channel->set($values);
+}
+
+function _crm_campaign_channel_exists($campaign, $channel) {
+  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+  foreach ($wrapper->crm_channel->raw() as $id) {
+    if ($id == $channel->channel_id) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
 
 /**
  * Implements hook_views_api().
@@ -193,4 +298,40 @@ function crm_campaign_status_options_list() {
   }
 
   return $options;
+}
+
+/**
+ * @param null $status
+ * @return null
+ */
+function crm_campaign_campaigns($status = NULL) {
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'crm_campaign');
+  if ($status) {
+    $query->propertyCondition('status', $status);
+  }
+  $query->propertyOrderBy('title', 'ASC')
+    ->addTag('crm_campaign_get_option_list')
+    ->addMetaData('crm_campaign_status', $status);
+
+  $result = $query->execute();
+  if (!isset($result['crm_campaign'])) {
+    return NULL;
+  }
+  return entity_load('crm_campaign', array_keys($result['crm_campaign']));
+}
+
+/**
+ * @param null $status
+ */
+function crm_campaign_get_option_list($status = NULL) {
+  $array = array();
+  if (!($campaigns = crm_campaign_campaigns($status))) {
+    return $array;
+  }
+  foreach ($campaigns as $campaign) {
+    $array[$campaign->campaign_id] = $campaign->title;
+  }
+  return $array;
 }

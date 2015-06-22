@@ -49,7 +49,7 @@ class CRMMessageTemplateController extends EntityAPIController {
     if ($op !== 'create' && !$entity) {
       return FALSE;
     }
-    if ($op === 'create' && (!empty($entity) && !crm_message_template_type_get_name($entity))) {
+    if ($op === 'delete' && $entity->locked) {
       return FALSE;
     }
     // The administer permission is a blanket override.
@@ -82,6 +82,7 @@ class CRMMessageTemplateController extends EntityAPIController {
   public function create(array $values = array()) {
     $values += array(
       'language' => LANGUAGE_NONE,
+      'locked' => FALSE,
     );
     return parent::create($values);
   }

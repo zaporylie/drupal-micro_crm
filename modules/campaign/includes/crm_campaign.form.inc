@@ -29,6 +29,17 @@ function crm_campaign_delete_form_wrapper($campaign) {
 }
 
 /**
+ * Form wrapper over entity form.
+ *
+ * @param $campaign
+ *
+ * @return array
+ */
+function crm_campaign_edit_form_wrapper($campaign) {
+  return crm_campaign_form_wrapper($campaign);
+}
+
+/**
  * Form wrapper for entity update.
  *
  * @param array $campaign
@@ -55,6 +66,7 @@ function crm_campaign_form($form, &$form_state, $campaign) {
   );
 
   field_attach_form('crm_campaign', $campaign, $form, $form_state);
+  $form['crm_channel']['#access'] = FALSE;
 
   $form['settings'] = array(
     '#type' => 'vertical_tabs',
