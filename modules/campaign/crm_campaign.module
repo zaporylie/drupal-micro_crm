@@ -49,6 +49,18 @@ function crm_campaign_menu() {
     'weight' => -1,
   );
 
+  $items['admin/crm/campaign/%crm_campaign/send'] = array(
+    'title' => 'Send',
+    'page callback' => 'crm_campaign_send_form_wrapper',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('send', 3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_campaign.form.inc',
+    'weight' => 98,
+  );
+
   $items['admin/crm/campaign/%crm_campaign/delete'] = array(
     'title' => 'Delete',
     'page callback' => 'crm_campaign_delete_form_wrapper',
@@ -73,10 +85,11 @@ function crm_campaign_menu() {
 
   $items['admin/crm/config/campaign'] = array(
     'title' => 'Campaign',
-    'page callback' => 'crm_index',
-    'page arguments' => array(),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_campaign_settings'),
     'access arguments' => array('crm administer'),
     'type' => MENU_NORMAL_ITEM,
+    'file' => 'crm_campaign.admin.inc',
   );
 
   return $items;
@@ -116,7 +129,6 @@ function crm_campaign_action_info() {
       'configurable' => TRUE,
       'permissions' => array('crm campaign update'),
       'aggregate' => TRUE,
-//      'triggers' => array('any'),
     ),
     'crm_campaign_remove_from_campaign_action' => array(
       'type' => 'crm_channel',
@@ -124,39 +136,57 @@ function crm_campaign_action_info() {
       'configurable' => TRUE,
       'permissions' => array('crm campaign update'),
       'aggregate' => TRUE,
-//      'triggers' => array('any'),
     ),
   );
 }
 
+/**
+ * Action form callback.
+ */
 function crm_campaign_add_to_campaign_action_form($settings, &$form_state) {
   $form = array();
-//  dpm($settings);
-//  dpm($form_state);
   $form['campaign'] = array(
     '#type' => 'select',
     '#title' => t('Choose campaign'),
     '#options' => array(NULL => t('- Choose -')) + crm_campaign_get_option_list(CRM_CAMPAIGN_STATUS_REGISTERED),
     '#required' => TRUE,
-    '#default_value' => !empty($settings['settings']['campaign']) ? $settings['settings']['campaign'] : NULL,
+    '#default_value' => isset($settings['view']->args[0]) ? $settings['view']->args[0] : NULL,
   );
   return $form;
 }
 
+/**
+ * Action form submit handler.
+ */
 function crm_campaign_add_to_campaign_action_submit($form, $form_state) {
   $return = array();
   $return['crm_campaign'] = entity_load_single('crm_campaign', $form_state['values']['campaign']);
-  return $return; //Note, return value here must be an array.
+  return $return;
 }
 
+/**
+ * Action callback: crm_campaign_add_to_campaign_action.
+ */
 function crm_campaign_add_to_campaign_action(&$entities, &$context) {
   $campaign = &$context['crm_campaign'];
-  crm_campaign_add_channel_to_campaign($entities, $campaign);
-  $campaign->revision = TRUE;
-  $campaign->log = 'Campaign channels list has been updated';
-  entity_save('crm_campaign', $campaign);
+  try {
+    crm_campaign_add_channel_to_campaign($entities, $campaign);
+    $campaign->revision = TRUE;
+    $campaign->log = 'Campaign channels list has been updated';
+    entity_save('crm_campaign', $campaign);
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_campaign', $e);
+    drupal_set_message('Unable to add channels to campaign.', 'error');
+  }
 }
 
+/**
+ * Compares and adds missing channels to campaign tree.
+ *
+ * @param $channels
+ * @param $campaign
+ */
 function crm_campaign_add_channel_to_campaign($channels, &$campaign) {
   $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
   $values = $wrapper->crm_channel->raw();
@@ -167,7 +197,9 @@ function crm_campaign_add_channel_to_campaign($channels, &$campaign) {
   $wrapper->crm_channel->set($values);
 }
 
-
+/**
+ * Action form callback.
+ */
 function crm_campaign_remove_from_campaign_action_form($settings, &$form_state) {
   $form = array();
   $form['campaign'] = array(
@@ -175,17 +207,23 @@ function crm_campaign_remove_from_campaign_action_form($settings, &$form_state) 
     '#title' => t('Choose campaign'),
     '#options' => array(NULL => t('- Choose -')) + crm_campaign_get_option_list(CRM_CAMPAIGN_STATUS_REGISTERED),
     '#required' => TRUE,
-    '#default_value' => !empty($settings['settings']['campaign']) ? $settings['settings']['campaign'] : NULL,
+    '#default_value' => isset($settings['view']->args[0]) ? $settings['view']->args[0] : NULL,
   );
   return $form;
 }
 
+/**
+ * Action form submit handler.
+ */
 function crm_campaign_remove_from_campaign_action_submit($form, $form_state) {
   $return = array();
   $return['crm_campaign'] = entity_load_single('crm_campaign', $form_state['values']['campaign']);
   return $return; //Note, return value here must be an array.
 }
 
+/**
+ * Action callback: crm_campaign_remove_from_campaign_action.
+ */
 function crm_campaign_remove_from_campaign_action(&$entities, &$context) {
   $campaign = &$context['crm_campaign'];
   crm_campaign_remove_channel_from_campaign($entities, $campaign);
@@ -193,6 +231,12 @@ function crm_campaign_remove_from_campaign_action(&$entities, &$context) {
   entity_save('crm_campaign', $campaign);
 }
 
+/**
+ * Compares and removes channels from campaign.
+ *
+ * @param $channels
+ * @param $campaign
+ */
 function crm_campaign_remove_channel_from_campaign($channels, &$campaign) {
   $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
   $values = $wrapper->crm_channel->raw();
@@ -200,16 +244,6 @@ function crm_campaign_remove_channel_from_campaign($channels, &$campaign) {
   $values = array_diff($values, $keys);
   asort($values);
   $wrapper->crm_channel->set($values);
-}
-
-function _crm_campaign_channel_exists($campaign, $channel) {
-  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
-  foreach ($wrapper->crm_channel->raw() as $id) {
-    if ($id == $channel->channel_id) {
-      return TRUE;
-    }
-  }
-  return FALSE;
 }
 
 /**
