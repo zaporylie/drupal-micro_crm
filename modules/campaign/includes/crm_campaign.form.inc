@@ -83,6 +83,19 @@ function crm_campaign_form($form, &$form_state, $campaign) {
     '#type' => 'vertical_tabs',
     '#weight' => 98,
   );
+  $form['settings']['options'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Options'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['settings']['options']['status'] = array(
+    '#type' => 'select',
+    '#title' => t('Status'),
+    '#default_value' => $campaign->status,
+    '#options' => crm_campaign_status_options_list(),
+    '#access' => user_access('crm administer'),
+  );
   $form['settings']['revision'] = array(
     '#type' => 'fieldset',
     '#title' => t('Revision'),
@@ -116,6 +129,9 @@ function crm_campaign_form_submit($form, &$form_state) {
   $campaign = $form_state['crm_campaign'];
   $campaign->title = $form_state['values']['title'];
   $campaign->log = $form_state['values']['log'];
+  if (isset($form_state['values']['status'])) {
+    $campaign->status = $form_state['values']['status'];
+  }
   if (!isset($campaign->revision)) {
     $campaign->revision = TRUE;
   }

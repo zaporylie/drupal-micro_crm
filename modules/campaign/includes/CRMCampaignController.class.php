@@ -57,6 +57,8 @@ class CRMCampaignController extends EntityAPIController {
         return user_access('crm campaign update');
       case 'delete':
         return user_access('crm campaign delete');
+      case 'send':
+        return user_access('crm campaign send');
     }
     return FALSE;
   }

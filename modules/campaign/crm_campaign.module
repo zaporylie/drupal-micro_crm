@@ -115,6 +115,9 @@ function crm_campaign_permission() {
     'crm campaign delete' => array(
       'title' => t('Delete campaign'),
     ),
+    'crm campaign send' => array(
+      'title' => t('Send campaign'),
+    ),
   );
 }
 
