@@ -4,6 +4,7 @@ core = 7.x
 package = CRM
 
 dependencies[] = crm_message_template_ui
+dependencies[] = views_bulk_operations
 
 files[] = includes/CRMCampaignController.class.php
 files[] = includes/views/handlers/crm_campaign_handler_field_campaign.inc

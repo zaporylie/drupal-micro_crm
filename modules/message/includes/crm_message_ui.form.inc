@@ -52,7 +52,9 @@ function crm_message_ui_form($form, &$form_state, $message) {
   );
 
   field_attach_form('crm_message', $message, $form, $form_state);
-
+//  $form_state['field']['field_test'][LANGUAGE_NONE]['field']['settings']['handler_settings']['view']['args'][] = $message->type;
+dpm($form);
+dpm($form_state);
   $form['settings'] = array(
     '#type' => 'vertical_tabs',
     '#weight' => 98,

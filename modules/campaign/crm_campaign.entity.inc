@@ -15,6 +15,7 @@ function crm_campaign_entity_info() {
     'base table' => 'crm_campaign',
     'revision table' => 'crm_campaign_revision',
     'load hook' => 'crm_campaign_load',
+    'uri callback' => 'crm_campaign_uri',
     'label callback' => 'crm_campaign_label',
     'fieldable' => TRUE,
     'entity keys' => array(

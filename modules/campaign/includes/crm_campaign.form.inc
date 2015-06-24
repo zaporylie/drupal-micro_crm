@@ -106,7 +106,7 @@ function crm_campaign_form($form, &$form_state, $campaign) {
     '#type' => 'textarea',
     '#title' => t('Revision log'),
   );
-
+dpm($form);
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['save'] = array(
     '#type' => 'submit',
@@ -228,7 +228,7 @@ function crm_campaign_send_form_submit($form, &$form_state) {
     $batch = array(
       'operations' => $batch_operations,
       'finished' => 'crm_campaign_send_batch_finished',
-      'file' => drupal_get_path('module', 'crm_campaign') . '/crm_campaign.form.inc',
+      'file' => drupal_get_path('module', 'crm_campaign') . '/includes/crm_campaign.form.inc',
     );
     batch_set($batch);
   }
@@ -247,26 +247,37 @@ function crm_campaign_send_form_submit($form, &$form_state) {
 
 function crm_campaign_send_batch_item($campaign, $channel_id, &$context) {
   $channel = entity_load_single('crm_channel', $channel_id);
-  $result = crm_campaign_channel_send($campaign, $channel);
-  if (!isset($context['results']['campaign'])) {
-    $context['results']['campaign'] = $campaign;
+  $message = _crm_campaign_message_exists($campaign, $channel);
+  if (!$message) {
+    $result = crm_campaign_channel_send($campaign, $channel);
   }
+  elseif ($message->status != CRM_MESSAGE_STATUS_SENT) {
+    $result = crm_message_send($message);
+  }
+  else {
+    $result = TRUE;
+  }
+  $context['results']['campaign'] = $campaign->campaign_id;
   $context['results']['iterations'][] = array(
     $result,
     $channel_id,
+    $campaign->campaign_id,
   );
 }
 
 function crm_campaign_send_batch_finished($success, $results, $operations) {
   if ($success) {
-    drupal_set_message(t('@count messages has been sent.', array('@count' => count($results['iterations']))));
     $count = count(array_filter($results['iterations'], function ($value) { return !$value[0]; }));
+    drupal_set_message(t('@count messages has been sent.', array('@count' => count($results['iterations']) - $count)));
     if ($count === 0) {
-      $campaign = $results['campaign'];
+      $campaign = entity_load_single('crm_campaign', $results['campaign']);
       $campaign->log = 'Campaign has been sent';
       $campaign->revision = TRUE;
       $campaign->status = CRM_CAMPAIGN_STATUS_SENT;
       entity_save('crm_campaign', $campaign);
+    }
+    else {
+      drupal_set_message(t('@count messages could not been sent.', array('@count' => $count)), 'error');
     }
   }
   else {
@@ -285,22 +296,53 @@ function crm_campaign_send_batch_finished($success, $results, $operations) {
   }
 }
 
+function crm_campaign_channel_send($campaign, $channel) {
+  $message = crm_campaign_channel_prepare_message($campaign, $channel, FALSE);
+  if (!is_object($message)) {
+    return FALSE;
+  }
+  $wrapper = entity_metadata_wrapper('crm_message', $message);
+  $wrapper->crm_campaign->set($campaign);
+  entity_save('crm_message', $message);
+  return crm_message_send($message);
+}
+
 function crm_campaign_channel_prepare_message($campaign, $channel, $send = FALSE) {
   $type = $channel->type;
   $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
-  foreach ($wrapper->crm_message_template->getIterator() as $template_wrapper) {
-    if ($template_wrapper->bundle() == $type) {
-      $template = $template_wrapper->value();
-      break;
+  $templates = $wrapper->crm_message_template->raw();
+  if (!is_array($templates) && is_numeric($templates)) {
+    if ($wrapper->crm_message_template->getBundle() == $type) {
+      $template = $wrapper->crm_message_template->value();
+    }
+  }
+  elseif (is_array($templates)) {
+    foreach ($wrapper->crm_message_template as $template_wrapper) {
+      if ($template_wrapper->getBundle() == $type) {
+        $template = $template_wrapper->value();
+        break;
+      }
     }
   }
   if (!isset($template)) {
     return FALSE;
   }
-  return FALSE;
   return crm_message_template_apply($template, $channel, $send);
 }
 
-function crm_campaign_channel_send($campaign, $channel) {
-  return crm_campaign_channel_prepare_message($campaign, $channel, TRUE);
+function _crm_campaign_message_exists($campaign, $channel) {
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'crm_message')
+    ->fieldCondition('crm_campaign', 'target_id', $campaign->campaign_id, '=')
+    ->fieldCondition('crm_channel', 'target_id', $channel->channel_id, '=')
+    ->range(0, 1);
+
+  $result = $query->execute();
+
+  if (isset($result['crm_message'])) {
+    $ids = array_keys($result['crm_message']);
+    return entity_load_single('crm_message', reset($ids));
+  }
+  return FALSE;
 }
