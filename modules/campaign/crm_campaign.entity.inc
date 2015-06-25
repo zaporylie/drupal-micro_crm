@@ -107,7 +107,7 @@ function crm_campaign_load_multiple($ids) {
  * @return string
  */
 function crm_campaign_label($campaign) {
-  return '';
+  return $campaign->title;
 }
 
 /**

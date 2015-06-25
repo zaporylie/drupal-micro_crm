@@ -14,6 +14,8 @@ files[] = includes/views/handlers/crm_channel_handler_filter_channel_status.inc
 files[] = includes/views/handlers/crm_channel_handler_filter_channel_type.inc
 files[] = tests/crm_channel.test
 
-dependencies[] = crm_contact
-dependencies[] = inline_entity_form
-dependencies[] = entityreference
+dependencies[] = crm
+dependencies[] = crm_reference
+;dependencies[] = crm_contact
+;dependencies[] = inline_entity_form
+;dependencies[] = entityreference

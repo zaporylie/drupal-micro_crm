@@ -4,5 +4,5 @@ core = 7.x
 package = CRM
 
 dependencies[] = crm_message
-dependencies[] = crm_ui
+dependencies[] = crm_channel_ui
 dependencies[] = views

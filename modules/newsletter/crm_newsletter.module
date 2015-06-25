@@ -238,7 +238,7 @@ function crm_newsletter_form_submit($form, &$form_state) {
     }
     catch (Exception $e) {
       watchdog_exception('crm_newsletter', $e);
-      drupal_set_message(t('!channel: Unable to submit form. Please try again or contact administrator.', array('!channel' => crm_channel_channel($entity))), 'error');
+      drupal_set_message(t('!channel: Unable to submit form. Please try again or contact administrator.', array('!channel' => crm_channel_label($entity))), 'error');
       $form_state['redirect'] = TRUE;
       return;
     }
@@ -249,7 +249,7 @@ function crm_newsletter_form_submit($form, &$form_state) {
 
   if (count($channels)) {
     // Process entity only if there is something to process.
-    $entity = crm_channel_load_contact(array_keys($channels));
+    $entity = crm_contact_load_by_channels(array_keys($channels));
 
     if (is_array($entity) && count($entity) > 1) {
       // If more than one contact found - merge it together.

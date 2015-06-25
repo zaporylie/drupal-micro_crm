@@ -139,13 +139,9 @@ function crm_campaign_install() {
 
   $field = array(
     'settings' => array(
-      'target_type' => 'crm_message_template',
-      'handler' => 'base',
+      'target_type' => 'crm_campaign',
+      'handler' => 'CRMReference_SelectionHandler',
       'handler_settings' => array(
-        'target_bundles' => array(),
-        'sort' => array(
-          'type' => 'none',
-        ),
         'behaviors' => array(
           'views-select-list' => array(
             'status' => 0,
@@ -153,14 +149,19 @@ function crm_campaign_install() {
         ),
       ),
     ),
-    'field_name' => 'crm_message_template',
+    'field_name' => 'crm_campaign',
     'type' => 'entityreference',
     'module' => 'entityreference',
     'active' => 1,
     'locked' => 0,
-    'cardinality' => 1,
+    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
     'deleted' => 0,
   );
+  if (!field_info_field($field['field_name'])) {
+    field_create_field($field);
+  }
+  $field['cardinality'] = 1;
+  $field['field_name'] = 'crm_campaign_single';
   if (!field_info_field($field['field_name'])) {
     field_create_field($field);
   }
@@ -211,9 +212,9 @@ function crm_campaign_install() {
   }
 
   $instance = array(
-    'label' => $t('Channel'),
+    'label' => t('Recipients (Channels)'),
     'widget' => array(
-      'weight' => '1',
+      'weight' => 1,
       'type' => 'entityreference_autocomplete',
       'module' => 'entityreference',
       'active' => 1,
@@ -234,11 +235,11 @@ function crm_campaign_install() {
           'link' => FALSE,
         ),
         'module' => 'entityreference',
-        'weight' => 0,
+        'weight' => -99,
       ),
     ),
-    'required' => 0,
-    'description' => "",
+    'required' => 1,
+    'description' => $t('Each recipient has to be registered and valid channel.'),
     'default_value' => NULL,
     'field_name' => 'crm_channel',
     'entity_type' => 'crm_campaign',

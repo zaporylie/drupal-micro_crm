@@ -57,6 +57,11 @@ class CRMMessageTemplateInlineFormController extends EntityInlineEntityFormContr
       '#type' => 'value',
       '#value' => '',
     );
+    $entity_form['tokens'] = array(
+      '#theme' => 'token_tree',
+      '#token_types' => array('crm_channel', 'crm_contact'),
+      '#weight' => 97,
+    );
     return parent::entityForm($entity_form, $form_state);
   }
 }

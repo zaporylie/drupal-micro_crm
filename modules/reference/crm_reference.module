@@ -1,0 +1,76 @@
+<?php
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function crm_reference_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'entityreference') {
+    return 'plugins/entityreference/' . $plugin;
+  }
+}
+
+/**
+ * Implements hook_inline_entity_form_settings_alter().
+ */
+function crm_reference_inline_entity_form_settings_alter(&$settings, $field, $instance) {
+  if (isset($field['settings']['handler']) && $field['settings']['handler'] == 'CRMReference_SelectionHandler') {
+    $entities = entity_get_info();
+    if (isset($entities[$field['settings']['target_type']]['bundles'][$instance['bundle']]) && isset($entities[$instance['entity_type']]['bundles'][$instance['bundle']])) {
+      $settings['bundles'][] = $instance['bundle'];
+    }
+  }
+}
+
+/**
+ * @param null $bundle
+ * @return array
+ */
+function crm_reference_search_field_info() {
+  $fields = module_invoke_all('crm_reference_search_field_info');
+  drupal_alter('crm_reference_search_field_info', $fields);
+  return $fields;
+}
+
+function crm_reference_get_search_field($entity_type, $bundle = NULL) {
+  $fields = crm_reference_search_field_info();
+  if ($bundle !== NULL) {
+    return isset($fields[$entity_type][$bundle]) ? $fields[$entity_type][$bundle] : array();
+  }
+  else {
+    return isset($fields[$entity_type]) ? $fields[$entity_type] : array();
+  }
+}
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function crm_reference_query_crm_reference_alter(QueryAlterableInterface $query) {
+  $match = $query->getMetaData('crm_reference_match');
+  $handler = $query->getMetaData('entityreference_selection_handler');
+  if (isset($match['match'])) {
+    $fields = array();
+    $target_entity_type = $handler->field['settings']['target_type'];
+    $target_entity_bundle = $handler->instance['bundle'];
+    $info = entity_get_info($target_entity_type);
+    $target_entity_primary_key = $info['entity keys']['id'];
+
+    if ($fields = crm_reference_get_search_field($target_entity_type, $target_entity_bundle)) {
+      // Do nothing.
+    }
+    elseif ($tmp = crm_reference_get_search_field($target_entity_type)) {
+      // Flatten array.
+      foreach ($tmp as $field) {
+        $fields += $field;
+      }
+    }
+    $or = db_or();
+
+    foreach ($fields as $field) {
+      $query->leftJoin('field_data_' . $field['name'], 'field_data_' . $field['name'], 'field_data_' . $field['name'] . '.entity_id = crm_channel.' . $target_entity_primary_key);
+      $or->condition('field_data_' . $field['name'] . '.' . $field['name'] . '_' . $field['column'], '%' . db_like($match['match']) . '%', 'LIKE');
+    }
+    if ($or->count()) {
+      $query->condition($or);
+    }
+  }
+}

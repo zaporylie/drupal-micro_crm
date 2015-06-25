@@ -5,6 +5,7 @@ package = CRM
 
 dependencies[] = crm_message_template_ui
 dependencies[] = views_bulk_operations
+dependencies[] = inline_entity_form
 
 files[] = includes/CRMCampaignController.class.php
 files[] = includes/views/handlers/crm_campaign_handler_field_campaign.inc

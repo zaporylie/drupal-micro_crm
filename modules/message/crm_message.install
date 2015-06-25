@@ -144,12 +144,40 @@ function crm_message_schema() {
  * Implements hook_install().
  */
 function crm_message_install() {
-
+  $field = array(
+    'settings' => array(
+      'target_type' => 'crm_message',
+      'handler' => 'CRMReference_SelectionHandler',
+      'handler_settings' => array(
+        'behaviors' => array(
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+      ),
+    ),
+    'field_name' => 'crm_message',
+    'type' => 'entityreference',
+    'module' => 'entityreference',
+    'active' => 1,
+    'locked' => 0,
+    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    'deleted' => 0,
+  );
+  if (!field_info_field($field['field_name'])) {
+    field_create_field($field);
+  }
+  $field['cardinality'] = 1;
+  $field['field_name'] = 'crm_message_single';
+  if (!field_info_field($field['field_name'])) {
+    field_create_field($field);
+  }
 }
 
 /**
  * Implements hook_uninstall().
  */
 function crm_message_uninstall() {
-
+  field_delete_field('crm_message');
+  field_delete_field('crm_message_single');
 }

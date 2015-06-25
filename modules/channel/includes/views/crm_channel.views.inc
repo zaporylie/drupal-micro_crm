@@ -127,7 +127,7 @@ function crm_channel_views_data() {
   // Expose links to operate on the product.
   $data['crm_channel']['operations'] = array(
     'title' => t('Operations links'),
-    'help' => t('Display all the available operations links for the contact.'),
+    'help' => t('Display all the available operations links for the channel.'),
     'field' => array(
       'handler' => 'crm_channel_handler_field_channel_operations',
     ),

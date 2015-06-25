@@ -1,10 +1,9 @@
 name = Channel UI
-description = Adds UI to contact channel.
+description = Adds UI to channel.
 core = 7.x
 package = CRM
 
 dependencies[] = crm_channel
 dependencies[] = crm_ui
-dependencies[] = views
 
 files[] = tests/crm_channel_ui.test

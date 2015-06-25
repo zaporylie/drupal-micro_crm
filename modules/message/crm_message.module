@@ -266,13 +266,3 @@ function crm_message_create($values, $entity_type = 'crm_message') {
   }
   return module_invoke($module, 'crm_message_create', $values, $entity_type);
 }
-
-/**
- * Implements hook_field_attach_form().
- */
-function crm_message_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
-  if (isset($form_state['field']['field_test'][LANGUAGE_NONE]['field']['settings']['handler_settings']['view']['args'])) {
-    $form_state['field']['field_test'][LANGUAGE_NONE]['field']['settings']['handler_settings']['view']['args'][] = 'email';
-  }
-  dpm($form_state);
-}

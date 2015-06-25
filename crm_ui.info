@@ -4,5 +4,6 @@ core = 7.x
 package = CRM
 
 dependencies[] = crm
+dependencies[] = views
 
 files[] = tests/crm_ui.test

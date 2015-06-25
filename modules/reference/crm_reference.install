@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_install().
+ */
+function crm_channel_reference_install() {
+}

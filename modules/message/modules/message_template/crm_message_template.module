@@ -156,8 +156,11 @@ function crm_message_template_apply($template, $channel, $send = FALSE) {
   $fields = $template_wrapper->getPropertyInfo();
   $context = array(
     'crm_channel' => $channel,
-    'crm_contact' => crm_channel_load_contact($channel->channel_id),
   );
+  // If contact exists - load it as a context.
+  if (function_exists('crm_contact_load_by_channels')) {
+    $context['crm_contact'] = crm_contact_load_by_channels($channel->channel_id);
+  }
   foreach ($fields as $key => $field) {
     if (!isset($field['field']) || $field['field'] !== TRUE) {
       continue;
@@ -178,7 +181,7 @@ function crm_message_template_apply($template, $channel, $send = FALSE) {
     }
   }
 
-  $message_wrapper->crm_message_template->set($template);
+  $message_wrapper->crm_message_template_single->set($template);
   $message->log = 'New message created from template ' . $template->template_id;
   entity_save('crm_message', $message);
   return $send ? crm_message_send($message) : $message;

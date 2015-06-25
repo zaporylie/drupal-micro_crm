@@ -9,7 +9,7 @@
  * Form wrapper for create, update and delete.
  *
  * @param array $channel
- *   Contact object or array of default values.
+ *   Channel object or array of default values.
  * @param bool $delete
  *   Boolean indicator if create/edit or delete form should be displayed.
  *
@@ -28,7 +28,7 @@ function crm_channel_ui_form_wrapper($channel = array(), $delete = FALSE, $type 
 }
 
 /**
- * Contact form.
+ * Channel form.
  */
 function crm_channel_ui_form($form, &$form_state, $channel) {
 
@@ -77,14 +77,14 @@ function crm_channel_ui_form($form, &$form_state, $channel) {
 }
 
 /**
- * Contact form validation
+ * Channel form validation
  */
 function crm_channel_ui_form_validate($form, &$form_state) {
   field_attach_form_validate('crm_channel', $form_state['values']['channel'], $form, $form_state);
 }
 
 /**
- * Contact form submit callback.
+ * Channel form submit callback.
  */
 function crm_channel_ui_form_submit($form, &$form_state) {
   $channel = $form_state['values']['channel'];
@@ -130,7 +130,7 @@ function crm_channel_ui_delete_form($form, &$form_state, $channel) {
 function crm_channel_ui_delete_form_submit($form, &$form_state) {
   $channel_id = entity_id('crm_channel', $form_state['values']['channel']);
   if (entity_delete('crm_channel', $channel_id) !== FALSE) {
-    drupal_set_message(t('Contact @channel has been deleted', array('@channel' => $channel_id)));
+    drupal_set_message(t('Channel @channel has been deleted', array('@channel' => $channel_id)));
   }
 }
 

@@ -144,7 +144,7 @@ function crm_campaignmonitor_sync($channel_old) {
   // Load channel into wrapper.
   $wrapper = entity_metadata_wrapper('crm_channel', $channel);
   // Load contact.
-  $contact = crm_channel_load_contact(array($channel->channel_id));
+  $contact = crm_contact_load_by_channels(array($channel->channel_id));
 
   // Connect to Campaign Monitor API.
   $cm = CampaignMonitor::getConnector();
@@ -282,7 +282,7 @@ function crm_campaignmonitor_webhook($type) {
       watchdog_exception('crm_campaignmonitor', $e);
     }
 
-    $contact = crm_channel_load_contact(array($channel->channel_id));
+    $contact = crm_contact_load_by_channels(array($channel->channel_id));
     $wrapper = entity_metadata_wrapper('crm_contact', $contact);
 
     if (isset($map['Name']['field']) && $wrapper->__isset($map['Name']['field']) && $item->Name) {

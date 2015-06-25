@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Defines contact channel entity controller.
+ * Defines channel entity controller.
  */
 
 /**

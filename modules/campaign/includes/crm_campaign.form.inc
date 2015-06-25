@@ -106,7 +106,6 @@ function crm_campaign_form($form, &$form_state, $campaign) {
     '#type' => 'textarea',
     '#title' => t('Revision log'),
   );
-dpm($form);
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['save'] = array(
     '#type' => 'submit',
@@ -302,7 +301,7 @@ function crm_campaign_channel_send($campaign, $channel) {
     return FALSE;
   }
   $wrapper = entity_metadata_wrapper('crm_message', $message);
-  $wrapper->crm_campaign->set($campaign);
+  $wrapper->crm_campaign_single->set($campaign);
   entity_save('crm_message', $message);
   return crm_message_send($message);
 }
@@ -334,8 +333,8 @@ function _crm_campaign_message_exists($campaign, $channel) {
   $query = new EntityFieldQuery();
 
   $query->entityCondition('entity_type', 'crm_message')
-    ->fieldCondition('crm_campaign', 'target_id', $campaign->campaign_id, '=')
-    ->fieldCondition('crm_channel', 'target_id', $channel->channel_id, '=')
+    ->fieldCondition('crm_campaign_single', 'target_id', $campaign->campaign_id, '=')
+    ->fieldCondition('crm_channel_single', 'target_id', $channel->channel_id, '=')
     ->range(0, 1);
 
   $result = $query->execute();
