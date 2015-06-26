@@ -75,25 +75,26 @@ function crm_message_ui_views_default_views() {
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
   $handler->display->display_options['empty']['area']['content'] = 'No message found';
   $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
+  /* Relationship: Entity Reference: Referenced Entity */
+  $handler->display->display_options['relationships']['crm_channel_single_target_id']['id'] = 'crm_channel_single_target_id';
+  $handler->display->display_options['relationships']['crm_channel_single_target_id']['table'] = 'field_data_crm_channel_single';
+  $handler->display->display_options['relationships']['crm_channel_single_target_id']['field'] = 'crm_channel_single_target_id';
   /* Field: Message: Message ID */
   $handler->display->display_options['fields']['message_id']['id'] = 'message_id';
   $handler->display->display_options['fields']['message_id']['table'] = 'crm_message';
   $handler->display->display_options['fields']['message_id']['field'] = 'message_id';
+  /* Field: Channel: Label */
+  $handler->display->display_options['fields']['label']['id'] = 'label';
+  $handler->display->display_options['fields']['label']['table'] = 'crm_channel';
+  $handler->display->display_options['fields']['label']['field'] = 'label';
+  $handler->display->display_options['fields']['label']['relationship'] = 'crm_channel_single_target_id';
+  $handler->display->display_options['fields']['label']['label'] = 'To';
   /* Field: Message: Type */
   $handler->display->display_options['fields']['type']['id'] = 'type';
   $handler->display->display_options['fields']['type']['table'] = 'crm_message';
   $handler->display->display_options['fields']['type']['field'] = 'type';
   $handler->display->display_options['fields']['type']['link_to_message'] = 0;
   $handler->display->display_options['fields']['type']['use_raw_value'] = 0;
-  /* Field: Message: Rendered Message */
-  $handler->display->display_options['fields']['rendered_entity']['id'] = 'rendered_entity';
-  $handler->display->display_options['fields']['rendered_entity']['table'] = 'views_entity_crm_message';
-  $handler->display->display_options['fields']['rendered_entity']['field'] = 'rendered_entity';
-  $handler->display->display_options['fields']['rendered_entity']['label'] = 'Message';
-  $handler->display->display_options['fields']['rendered_entity']['link_to_entity'] = 1;
-  $handler->display->display_options['fields']['rendered_entity']['display'] = 'view';
-  $handler->display->display_options['fields']['rendered_entity']['view_mode'] = 'administrator';
-  $handler->display->display_options['fields']['rendered_entity']['bypass_access'] = 0;
   /* Field: Message: Status */
   $handler->display->display_options['fields']['status']['id'] = 'status';
   $handler->display->display_options['fields']['status']['table'] = 'crm_message';
@@ -155,8 +156,6 @@ function crm_message_ui_views_default_views() {
   $handler->display->display_options['menu']['name'] = 'management';
   $handler->display->display_options['menu']['context'] = 0;
   $handler->display->display_options['menu']['context_only_inline'] = 0;
-
-
 
   $views[$view->name] = $view;
 
