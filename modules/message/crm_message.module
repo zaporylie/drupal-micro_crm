@@ -6,6 +6,7 @@
  */
 
 define('CRM_MESSAGE_STATUS_DRAFT', 'draft');
+define('CRM_MESSAGE_STATUS_QUEUED', 'queued');
 define('CRM_MESSAGE_STATUS_SENT', 'sent');
 
 module_load_include('inc', 'crm_message', 'crm_message.entity');
@@ -54,6 +55,17 @@ function crm_message_hook_info() {
     ),
   );
   return $hooks;
+}
+
+/**
+ * Implements hook_cron_queue_info().
+ */
+function crm_message_cron_queue_info() {
+  $queues['crm_message_queue'] = array(
+    'worker callback' => 'crm_message_send_worker',
+    'time' => '300',
+  );
+  return $queues;
 }
 
 /**
@@ -106,10 +118,16 @@ function crm_message_crm_message_status_info() {
     'weight' => -99,
   );
 
+  $status[CRM_MESSAGE_STATUS_QUEUED] = array(
+    'title' => t('Queued'),
+    'description' => t('Message has been queued and will be sent soon.'),
+    'weight' => 0,
+  );
+
   $status[CRM_MESSAGE_STATUS_SENT] = array(
     'title' => t('Sent'),
     'description' => t('Message has been sent'),
-    'weight' => -99,
+    'weight' => 99,
   );
 
   return $status;
@@ -169,6 +187,7 @@ function crm_message_status_options_list() {
  */
 function crm_message_send($message) {
   if (!isset($message->type)) {
+    watchdog('crm_message', 'Message (message_id: @message_id) has incorrect type.', array('@message_id' => $message->message_id), WATCHDOG_ERROR);
     return FALSE;
   }
   $type = $message->type;
@@ -178,14 +197,14 @@ function crm_message_send($message) {
   }
   $module = $entity['bundles'][$type]['module'];
   if ($value = module_invoke($module, 'crm_message_send', $message)) {
-    // @todo change status and save.
     if ($value == TRUE) {
       $message->status = CRM_MESSAGE_STATUS_SENT;
       $message->revision = TRUE;
-      $message->log = 'Message ' . $message->message_id . ' has been sent';
+      $message->log = format_string('Message (message_id: @message_id) has been sent', array('@message_id' => $message->message_id));
       entity_save('crm_message', $message);
+      watchdog('crm_message', 'Message (message_id: @message_id) has been sent', array('@message_id' => $message->message_id), WATCHDOG_NOTICE);
+      return TRUE;
     }
-    return $value;
   }
   return FALSE;
 }
@@ -265,4 +284,116 @@ function crm_message_create($values, $entity_type = 'crm_message') {
     return FALSE;
   }
   return module_invoke($module, 'crm_message_create', $values, $entity_type);
+}
+
+/**
+ *
+ *
+ * It takes only queued messages!
+ *
+ * @param $field
+ */
+function crm_message_queue_populate($conditions = NULL) {
+  $queue = DrupalQueue::get('crm_message_queue');
+  $queue->createQueue();
+
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'crm_message')
+    ->propertyCondition('status', CRM_MESSAGE_STATUS_QUEUED)
+    ->propertyOrderBy('updated', 'ASC');
+
+  foreach ($conditions as $condition) {
+    if ($condition['type'] == 'property') {
+      $query->propertyCondition($condition['column'], $condition['value']);
+    }
+    elseif ($condition['type'] == 'entity') {
+      $query->entityCondition($condition['name'], $condition['value']);
+    }
+    elseif ($condition['type'] == 'field') {
+      $query->fieldCondition($condition['field'], $condition['column'], $condition['value']);
+    }
+  }
+
+  $result = $query->execute();
+
+  if (isset($result['crm_message'])) {
+    foreach(array_keys($result['crm_message']) as $key) {
+      $queue->createItem($key);
+    }
+  }
+
+}
+
+/**
+ * @param $message_id
+ * @return bool
+ */
+function crm_message_send_worker($message_id) {
+  $message = entity_load_single('crm_message', $message_id);
+  if (!$message || !is_object($message)) {
+    watchdog('crm_message', 'Message (message_id: @message_id) looks incorrect. Worker will not try to send it anymore. Debug: @message', array('@message_id' => $message_id, '@message' => print_r($message, TRUE)), WATCHDOG_ALERT);
+    return -1;
+  }
+  try {
+    $result = crm_message_send_worker_iteration($message);
+  }
+  catch (Exception $e) {
+    crm_message_send_worker_iteration_requeue($message, $e->getMessage());
+    return FALSE;
+  }
+  if (!$result) {
+    crm_message_send_worker_iteration_requeue($message);
+    return FALSE;
+  }
+  return $result;
+}
+
+function crm_message_send_worker_batch_wrapper($message_id, &$context) {
+  $result = crm_message_send_worker($message_id);
+  if ($result === -1) {
+    // Error, skip.
+  }
+  elseif ($result) {
+    // Sent.
+    $context['results']['iterations'][] = array(
+      'message_id' => $message_id,
+      'status' => CRM_MESSAGE_STATUS_SENT,
+    );
+  }
+  else {
+    // Re-queued.
+    $context['results']['iterations'][] = array(
+      'message_id' => $message_id,
+      'status' => CRM_MESSAGE_STATUS_QUEUED,
+    );
+  }
+}
+
+/**
+ * @param $message
+ * @return bool
+ */
+function crm_message_send_worker_iteration($message) {
+  if ($message->status <> CRM_MESSAGE_STATUS_QUEUED) {
+    return TRUE;
+  }
+  return crm_message_send($message);
+}
+
+/**
+ * @param $message
+ * @param null $error_message
+ */
+function crm_message_send_worker_iteration_requeue($message, $error_message = NULL) {
+  $queue = DrupalQueue::get('crm_message_queue');
+  $queue->createQueue();
+  // In case Drupal couldn't send message - re-queue it.
+  if ($error_message) {
+    watchdog('crm_message', 'Unable to send message (message_id: @message_id). Error: @error_message', array('@message_id' => $message->message_id, '@error_message' => $error_message), WATCHDOG_ALERT);
+  }
+  else {
+    watchdog('crm_message', 'Unable to send message (message_id: @message_id)', array('@message_id' => $message->message_id), WATCHDOG_ALERT);
+  }
+  $queue->createItem($message->message_id);
 }

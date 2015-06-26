@@ -110,7 +110,7 @@ function crm_channel_uri($channel) {
 function crm_channel_label($channel) {
   $entity = entity_get_info('crm_channel');
   if (!isset($channel->type) || !isset($entity['bundles'][$channel->type]['module'])) {
-    return NULL;
+    return t('Undefined');
   }
   $module = $entity['bundles'][$channel->type]['module'];
   if ($value = module_invoke($module, 'crm_channel_label', $channel)) {

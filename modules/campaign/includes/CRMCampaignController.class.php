@@ -44,6 +44,9 @@ class CRMCampaignController extends EntityAPIController {
     if ($op !== 'create' && !$entity) {
       return FALSE;
     }
+    if (!in_array($op, array('view', 'create')) && $entity->status != CRM_CAMPAIGN_STATUS_REGISTERED) {
+//      return FALSE;
+    }
     // The administer permission is a blanket override.
     if (user_access('crm bypass access')) {
       return TRUE;

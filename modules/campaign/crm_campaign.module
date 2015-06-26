@@ -373,7 +373,6 @@ function crm_campaign_get_option_list($status = NULL) {
   return $array;
 }
 
-
 /**
  * Implements hook_form_alter().
  */

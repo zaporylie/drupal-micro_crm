@@ -73,7 +73,7 @@ function crm_contact_tokens($type, $tokens, array $data = array(), array $option
       switch ($name) {
         // Simple key values on the node.
         case 'contact_id':
-          $replacements[$original] = $contact->nid;
+          $replacements[$original] = $contact->contact_id;
           break;
 
         case 'revision_id':
