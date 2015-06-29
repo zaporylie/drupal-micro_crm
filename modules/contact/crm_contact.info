@@ -2,8 +2,6 @@ name = Contact
 description = Creates CRM Contact Base Entity
 core = 7.x
 package = CRM
-dependencies[] = crm
-dependencies[] = entityreference
 
 files[] = includes/CRMContactController.class.php
 
@@ -14,3 +12,6 @@ files[] = includes/views/handlers/crm_contact_handler_field_contact_link_edit.in
 files[] = includes/views/handlers/crm_contact_handler_field_contact_operations.inc
 files[] = includes/views/handlers/crm_contact_handler_field_contact_status.inc
 files[] = includes/views/handlers/crm_contact_handler_filter_contact_status.inc
+
+dependencies[] = crm
+dependencies[] = crm_channel

@@ -52,6 +52,9 @@ class CRMMessageController extends EntityAPIController {
     if (!in_array($op, array('create', 'view')) && $entity->status == CRM_MESSAGE_STATUS_SENT) {
       return FALSE;
     }
+    if (!in_array($op, array('create', 'view', 'delete')) && $entity->status == CRM_MESSAGE_STATUS_QUEUED) {
+      return FALSE;
+    }
     // The administer permission is a blanket override.
     if (user_access('crm bypass access')) {
       return TRUE;

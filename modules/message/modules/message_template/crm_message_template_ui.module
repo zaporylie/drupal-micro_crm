@@ -137,8 +137,8 @@ function crm_message_template_ui_entity_info_alter(&$entity_info) {
  * Implements hook_form_alter().
  */
 function crm_message_template_ui_form_alter(&$form, &$form_state, $form_id) {
-  if (isset($form['crm_message_template'])) {
+  if (isset($form['crm_message_template_single']) && isset($form['#entity_type']) && $form['#entity_type'] == 'crm_message') {
     // Hide all occurrences of crm_message_template field.
-    $form['crm_message_template']['#access'] = FALSE;
+    $form['crm_message_template_single']['#access'] = FALSE;
   }
 }

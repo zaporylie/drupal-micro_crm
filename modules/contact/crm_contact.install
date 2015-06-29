@@ -211,17 +211,82 @@ function crm_contact_install() {
     'deleted' => 0,
   );
   field_create_instance($instance);
+
+  // Create channel reference instance.
+  $instance = array(
+    'label' => $t('Channels'),
+    'widget' => array(
+      'weight' => -99,
+      'type' => 'entityreference_autocomplete',
+      'module' => 'entityreference',
+      'active' => 1,
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'size' => '60',
+        'path' => '',
+      ),
+    ),
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'entityreference_label',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'module' => 'entityreference',
+        'weight' => 4,
+      ),
+    ),
+    'required' => 0,
+    'description' => '',
+    'default_value' => NULL,
+    'field_name' => 'crm_channel',
+    'entity_type' => 'crm_contact',
+    'bundle' => 'crm_contact',
+    'deleted' => 0,
+  );
+  if (!field_info_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
+    field_create_instance($instance);
+  }
+
+  $field = array(
+    'settings' => array(
+      'target_type' => 'crm_contact',
+      'handler' => 'CRMReference_SelectionHandler',
+      'handler_settings' => array(
+        'behaviors' => array(
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+      ),
+    ),
+    'field_name' => 'crm_contact',
+    'type' => 'entityreference',
+    'module' => 'entityreference',
+    'active' => 1,
+    'locked' => 0,
+    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    'deleted' => 0,
+  );
+  if (!field_info_field($field['field_name'])) {
+    field_create_field($field);
+  }
+  $field['cardinality'] = 1;
+  $field['field_name'] = 'crm_contact_single';
+  if (!field_info_field($field['field_name'])) {
+    field_create_field($field);
+  }
 }
 
 /**
  * Implements hook_uninstall().
  */
 function crm_contact_uninstall() {
-
-  $instance = array(
-    'entity_type' => 'crm_contact',
-    'field_name' => 'crm_deprecated',
-    'bundle' => 'crm_contact',
-  );
-  field_delete_instance($instance);
+  field_delete_field('crm_deprecated');
+  field_delete_field('crm_contact');
+  field_delete_field('crm_contact_single');
 }

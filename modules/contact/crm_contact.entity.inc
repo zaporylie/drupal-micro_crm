@@ -100,6 +100,29 @@ function crm_contact_load_multiple($ids) {
 }
 
 /**
+ * @param $ids
+ * @return bool|mixed
+ */
+function crm_contact_load_by_channels($ids) {
+  // If it's not an array - make it an array.
+  if (!is_array($ids)) {
+    $ids = array($ids);
+  }
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'crm_contact')
+    ->fieldCondition('crm_channel', 'target_id', $ids, 'IN');
+  $result = $query->execute();
+
+  if (!empty($result['crm_contact']) && count($result['crm_contact']) > 1) {
+    return entity_load('crm_contact', array_keys($result['crm_contact']));
+  }
+  elseif (!empty($result['crm_contact']) && count($result['crm_contact']) == 1) {
+    return entity_load_single('crm_contact', array_keys($result['crm_contact']));
+  }
+  return entity_create('crm_contact', array());
+}
+
+/**
  * @param $contact
  * @return string
  */

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Holds Contact Entity Channel schema.
+ * Holds Channel schema.
  */
 
 /**
@@ -11,7 +11,7 @@
 function crm_channel_schema() {
 
   $schema['crm_channel'] = array(
-    'description' => 'Contact entity channel',
+    'description' => 'Channel entity',
     'fields' => array(
       'channel_id' => array(
         'description' => 'The primary identifier for a table.',
@@ -82,7 +82,7 @@ function crm_channel_schema() {
   );
   
   $schema['crm_channel_revision'] = array(
-    'description' => 'Contact channel entity revision',
+    'description' => 'Channel entity revision',
     'fields' => array(
       'revision_id' => array(
         'description' => 'The primary identifier for a table.',
@@ -91,7 +91,7 @@ function crm_channel_schema() {
         'not null' => TRUE,
       ),
       'channel_id' => array(
-        'description' => 'Parent {crm_channel}.channel_id contact channel identifier.',
+        'description' => 'Parent {crm_channel}.channel_id channel identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
@@ -143,18 +143,79 @@ function crm_channel_schema() {
 function crm_channel_install() {
 
   _field_info_collate_types(TRUE);
-  module_load_include('module', 'crm_channel', 'crm_channel');
 
   $t = get_t();
+//  $field = array(
+//    'settings' => array(
+//      'target_type' => 'crm_channel',
+//      'handler' => 'base',
+//      'handler_settings' => array(
+//        'target_bundles' => array(),
+//        'sort' => array(
+//          'type' => 'none',
+//        ),
+//        'behaviors' => array(
+//          'views-select-list' => array(
+//            'status' => 0,
+//          ),
+//        ),
+//      ),
+//    ),
+//    'field_name' => 'crm_channel',
+//    'type' => 'entityreference',
+//    'module' => 'entityreference',
+//    'active' => 1,
+//    'locked' => 0,
+//    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+//    'deleted' => 0,
+//  );
+//  field_create_field($field);
+//
+//  $instance = array(
+//    'label' => $t('Channel'),
+//    'widget' => array(
+//      'weight' => -99,
+//      'type' => 'inline_entity_form',
+//      'module' => 'inline_entity_form',
+//      'active' => 1,
+//      'settings' => array(
+//        'fields' => array(),
+//        'type_settings' => array(
+//          'allow_existing' => 0,
+//          'match_operator' => 'CONTAINS',
+//          'delete_references' => 1,
+//          'override_labels' => 0,
+//        ),
+//      ),
+//    ),
+//    'settings' => array(
+//      'user_register_form' => FALSE,
+//    ),
+//    'display' => array(
+//      'default' => array(
+//        'label' => 'above',
+//        'type' => 'entityreference_label',
+//        'settings' => array(
+//          'view_mode' => 'default',
+//          'link' => FALSE,
+//        ),
+//        'module' => 'entityreference',
+//        'weight' => 0,
+//      ),
+//    ),
+//    'required' => 0,
+//    'field_name' => 'crm_channel',
+//    'entity_type' => 'crm_contact',
+//    'bundle' => 'crm_contact',
+//    'deleted' => 0,
+//  );
+//  field_create_instance($instance);
+
   $field = array(
     'settings' => array(
       'target_type' => 'crm_channel',
-      'handler' => 'base',
+      'handler' => 'CRMReference_SelectionHandler',
       'handler_settings' => array(
-        'target_bundles' => array(),
-        'sort' => array(
-          'type' => 'none',
-        ),
         'behaviors' => array(
           'views-select-list' => array(
             'status' => 0,
@@ -170,60 +231,28 @@ function crm_channel_install() {
     'cardinality' => FIELD_CARDINALITY_UNLIMITED,
     'deleted' => 0,
   );
-  field_create_field($field);
-
-  $instance = array(
-    'label' => $t('Channel'),
-    'widget' => array(
-      'weight' => -99,
-      'type' => 'inline_entity_form',
-      'module' => 'inline_entity_form',
-      'active' => 1,
-      'settings' => array(
-        'fields' => array(),
-        'type_settings' => array(
-          'allow_existing' => 0,
-          'match_operator' => 'CONTAINS',
-          'delete_references' => 1,
-          'override_labels' => 0,
-        ),
-      ),
-    ),
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'type' => 'entityreference_label',
-        'settings' => array(
-          'view_mode' => 'default',
-          'link' => FALSE,
-        ),
-        'module' => 'entityreference',
-        'weight' => 0,
-      ),
-    ),
-    'required' => 0,
-    'field_name' => 'crm_channel',
-    'entity_type' => 'crm_contact',
-    'bundle' => 'crm_contact',
-    'deleted' => 0,
-  );
-  field_create_instance($instance);
+  if (!field_info_field($field['field_name'])) {
+    field_create_field($field);
+  }
+  $field['cardinality'] = 1;
+  $field['field_name'] = 'crm_channel_single';
+  if (!field_info_field($field['field_name'])) {
+    field_create_field($field);
+  }
 }
 
 /**
  * Implements hook_uninstall().
  */
 function crm_channel_uninstall() {
-
-  field_attach_delete_bundle('crm_contact', 'crm_contact');
-  $instance = array(
-    'entity_type' => 'crm_contact',
-    'field_name' => 'crm_channel',
-    'bundle' => 'crm_contact',
-  );
-  field_delete_instance($instance);
+  field_delete_field('crm_channel');
+  field_delete_field('crm_channel_single');
+//  field_attach_delete_bundle('crm_contact', 'crm_contact');
+//  $instance = array(
+//    'entity_type' => 'crm_contact',
+//    'field_name' => 'crm_channel',
+//    'bundle' => 'crm_contact',
+//  );
+//  field_delete_instance($instance);
 
 }

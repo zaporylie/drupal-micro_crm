@@ -118,7 +118,7 @@ function crm_channel_crm_channel_state_info() {
 }
 
 /**
- * Returns all statuses contact declared by modules.
+ * Returns all statuses declared by modules.
  *
  * @return array
  *   List of statuses
@@ -163,7 +163,7 @@ function crm_channel_crm_channel_status_info() {
 }
 
 /**
- * Returns all statuses contact declared by modules.
+ * Returns all statuses declared by modules.
  *
  * @return array
  *   List of statuses

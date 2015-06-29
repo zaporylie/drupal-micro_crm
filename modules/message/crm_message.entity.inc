@@ -106,5 +106,9 @@ function crm_message_uri($message) {
  *
  */
 function crm_message_label($message) {
-
+  $wrapper = entity_metadata_wrapper('crm_message', $message);
+  if ($wrapper->__isset('crm_channel_single') && $label = $wrapper->crm_channel_single->label()) {
+    return format_string('Message to: @channel', array('@channel' => $label));
+  }
+  return '';
 }

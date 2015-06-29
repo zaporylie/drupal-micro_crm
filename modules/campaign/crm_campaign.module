@@ -1,0 +1,431 @@
+<?php
+
+/**
+ * @file
+ */
+
+define('CRM_CAMPAIGN_STATUS_REGISTERED', 'registered');
+define('CRM_CAMPAIGN_STATUS_QUEUED', 'queued');
+define('CRM_CAMPAIGN_STATUS_SENT', 'sent');
+
+module_load_include('inc', 'crm_campaign', 'crm_campaign.entity');
+
+/**
+ * Implements hook_menu().
+ */
+function crm_campaign_menu() {
+  $items = array();
+
+  $items['admin/crm/campaign/%crm_campaign'] = array(
+    'title callback' => 'crm_campaign_label',
+    'title arguments' => array(3),
+    'page callback' => 'crm_campaign_view',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('view', 3),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/crm/campaign/%crm_campaign/view'] = array(
+    'title' => 'View',
+    'page callback' => 'crm_campaign_view',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('view', 3),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'weight' => -2,
+  );
+
+  $items['admin/crm/campaign/%crm_campaign/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'crm_campaign_edit_form_wrapper',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('update', 3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_campaign.form.inc',
+    'weight' => -1,
+  );
+
+  $items['admin/crm/campaign/%crm_campaign/send'] = array(
+    'title' => 'Send',
+    'page callback' => 'crm_campaign_send_form_wrapper',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('send', 3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_campaign.form.inc',
+    'weight' => 98,
+  );
+
+  $items['admin/crm/campaign/%crm_campaign/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'crm_campaign_delete_form_wrapper',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('delete', 3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_campaign.form.inc',
+    'weight' => 99,
+  );
+
+  $items['admin/crm/campaign/add'] = array(
+    'title' => 'Add campaign',
+    'page callback' => 'crm_campaign_add_form_wrapper',
+    'page arguments' => array(),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('create'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'includes/crm_campaign.form.inc',
+  );
+
+  $items['admin/crm/config/campaign'] = array(
+    'title' => 'Campaign',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_campaign_settings'),
+    'access arguments' => array('crm administer'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'crm_campaign.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function crm_campaign_permission() {
+  return array(
+    'crm campaign overview' => array(
+      'title' => t('Access to campaign list'),
+    ),
+    'crm campaign create' => array(
+      'title' => t('Create new campaign'),
+    ),
+    'crm campaign view' => array(
+      'title' => t('View campaign'),
+    ),
+    'crm campaign update' => array(
+      'title' => t('Update campaign'),
+    ),
+    'crm campaign delete' => array(
+      'title' => t('Delete campaign'),
+    ),
+    'crm campaign send' => array(
+      'title' => t('Send campaign'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_cron().
+ */
+function crm_campaign_cron() {
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'crm_campaign')
+    ->propertyCondition('status', CRM_CAMPAIGN_STATUS_QUEUED, '=');
+
+  $result = $query->execute();
+
+  if (isset($result['crm_campaign'])) {
+    foreach ($result['crm_campaign'] as $campaign_id => $campaign) {
+      if (_crm_campaign_is_sent($campaign_id)) {
+        try {
+          $campaign = entity_load_single('crm_campaign', $campaign_id);
+          $campaign->status = CRM_CAMPAIGN_STATUS_SENT;
+          $campaign->log = 'Campaign has been sent';
+          $campaign->revision = TRUE;
+          entity_save('crm_campaign', $campaign);
+        }
+        catch (Exception $e) {
+          watchdog_exception('crm_campaign', $e);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_action_info().
+ */
+function crm_campaign_action_info() {
+  return array(
+    'crm_campaign_add_to_campaign_action' => array(
+      'type' => 'crm_channel',
+      'label' => t('Add to Campaign'),
+      'configurable' => TRUE,
+      'permissions' => array('crm campaign update'),
+      'aggregate' => TRUE,
+    ),
+    'crm_campaign_remove_from_campaign_action' => array(
+      'type' => 'crm_channel',
+      'label' => t('Remove from Campaign'),
+      'configurable' => TRUE,
+      'permissions' => array('crm campaign update'),
+      'aggregate' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Action form callback.
+ */
+function crm_campaign_add_to_campaign_action_form($settings, &$form_state) {
+  $form = array();
+  $form['campaign'] = array(
+    '#type' => 'select',
+    '#title' => t('Choose campaign'),
+    '#options' => array(NULL => t('- Choose -')) + crm_campaign_get_option_list(CRM_CAMPAIGN_STATUS_REGISTERED),
+    '#required' => TRUE,
+    '#default_value' => isset($settings['view']->args[0]) ? $settings['view']->args[0] : NULL,
+  );
+  return $form;
+}
+
+/**
+ * Action form submit handler.
+ */
+function crm_campaign_add_to_campaign_action_submit($form, $form_state) {
+  $return = array();
+  $return['crm_campaign'] = entity_load_single('crm_campaign', $form_state['values']['campaign']);
+  return $return;
+}
+
+/**
+ * Action callback: crm_campaign_add_to_campaign_action.
+ */
+function crm_campaign_add_to_campaign_action(&$entities, &$context) {
+  $campaign = &$context['crm_campaign'];
+  try {
+    crm_campaign_add_channel_to_campaign($entities, $campaign);
+    $campaign->revision = TRUE;
+    $campaign->log = 'Campaign channels list has been updated';
+    entity_save('crm_campaign', $campaign);
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_campaign', $e);
+    drupal_set_message('Unable to add channels to campaign.', 'error');
+  }
+}
+
+/**
+ * Compares and adds missing channels to campaign tree.
+ *
+ * @param $channels
+ * @param $campaign
+ */
+function crm_campaign_add_channel_to_campaign($channels, &$campaign) {
+  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+  $values = $wrapper->crm_channel->raw();
+  $keys = array_keys($channels);
+  $diff = array_diff($keys, $values);
+  $values = array_merge($values, $diff);
+  asort($values);
+  $wrapper->crm_channel->set($values);
+}
+
+/**
+ * Action form callback.
+ */
+function crm_campaign_remove_from_campaign_action_form($settings, &$form_state) {
+  $form = array();
+  $form['campaign'] = array(
+    '#type' => 'select',
+    '#title' => t('Choose campaign'),
+    '#options' => array(NULL => t('- Choose -')) + crm_campaign_get_option_list(CRM_CAMPAIGN_STATUS_REGISTERED),
+    '#required' => TRUE,
+    '#default_value' => isset($settings['view']->args[0]) ? $settings['view']->args[0] : NULL,
+  );
+  return $form;
+}
+
+/**
+ * Action form submit handler.
+ */
+function crm_campaign_remove_from_campaign_action_submit($form, $form_state) {
+  $return = array();
+  $return['crm_campaign'] = entity_load_single('crm_campaign', $form_state['values']['campaign']);
+  return $return; //Note, return value here must be an array.
+}
+
+/**
+ * Action callback: crm_campaign_remove_from_campaign_action.
+ */
+function crm_campaign_remove_from_campaign_action(&$entities, &$context) {
+  $campaign = &$context['crm_campaign'];
+  crm_campaign_remove_channel_from_campaign($entities, $campaign);
+  $campaign->log = 'Campaign channels list has been updated.';
+  entity_save('crm_campaign', $campaign);
+}
+
+/**
+ * Compares and removes channels from campaign.
+ *
+ * @param $channels
+ * @param $campaign
+ */
+function crm_campaign_remove_channel_from_campaign($channels, &$campaign) {
+  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+  $values = $wrapper->crm_channel->raw();
+  $keys = array_keys($channels);
+  $values = array_diff($values, $keys);
+  asort($values);
+  $wrapper->crm_channel->set($values);
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function crm_campaign_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'crm_campaign') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_crm_campaign_status_info().
+ */
+function crm_campaign_crm_campaign_status_info() {
+  $status = array();
+
+  $status[CRM_CAMPAIGN_STATUS_REGISTERED] = array(
+    'title' => t('Registered'),
+    'description' => t('Registered, unprocessed campaign'),
+    'weight' => -99,
+  );
+
+  $status[CRM_CAMPAIGN_STATUS_QUEUED] = array(
+    'title' => t('Queued'),
+    'description' => t('Campaign queued to send.'),
+    'weight' => 0,
+  );
+
+  $status[CRM_CAMPAIGN_STATUS_SENT] = array(
+    'title' => t('Sent'),
+    'description' => t('Fully sent campaign.'),
+    'weight' => 99,
+  );
+
+  return $status;
+}
+
+/**
+ * Returns all statuses campaign declared by modules.
+ *
+ * @return array
+ *   List of statuses
+ */
+function crm_campaign_statuses() {
+  // First check the static cache for an order states array.
+  $statuses = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the statuses now.
+  if (empty($statuses)) {
+    $statuses = module_invoke_all('crm_campaign_status_info');
+
+    // Give other modules a chance to alter the order states.
+    drupal_alter('crm_campaign_status_info', $statuses);
+
+    uasort($statuses, 'drupal_sort_weight');
+  }
+
+  return $statuses;
+}
+
+/**
+ * Returns status label.
+ *
+ * @param $status
+ * @return null
+ */
+function crm_campaign_status_get_name($status) {
+  $statuses = crm_campaign_statuses();
+  if (isset($statuses[$status]['title'])) {
+    return $statuses[$status]['title'];
+  }
+  return NULL;
+}
+
+/**
+ * Returns list of available statuses.
+ */
+function crm_campaign_status_options_list() {
+
+  $options = array();
+
+  foreach (crm_campaign_statuses() as $key => $status) {
+    $options[$key] = $status['title'];
+  }
+
+  return $options;
+}
+
+/**
+ * @param null $status
+ * @return null
+ */
+function crm_campaign_campaigns($status = NULL) {
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'crm_campaign');
+  if ($status) {
+    $query->propertyCondition('status', $status);
+  }
+  $query->propertyOrderBy('title', 'ASC')
+    ->addTag('crm_campaign_get_option_list')
+    ->addMetaData('crm_campaign_status', $status);
+
+  $result = $query->execute();
+  if (!isset($result['crm_campaign'])) {
+    return NULL;
+  }
+  return entity_load('crm_campaign', array_keys($result['crm_campaign']));
+}
+
+/**
+ * @param null $status
+ */
+function crm_campaign_get_option_list($status = NULL) {
+  $array = array();
+  if (!($campaigns = crm_campaign_campaigns($status))) {
+    return $array;
+  }
+  foreach ($campaigns as $campaign) {
+    $array[$campaign->campaign_id] = $campaign->title;
+  }
+  return $array;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function crm_campaign_form_alter(&$form, &$form_state, $form_id) {
+  if (isset($form['crm_campaign_single']) && isset($form['#entity_type']) && $form['#entity_type'] == 'crm_message') {
+    // Hide all occurrences of crm_message_template field.
+    $form['crm_campaign_single']['#access'] = FALSE;
+  }
+}
+
+/**
+ * @param $campaign
+ * @return bool
+ */
+function _crm_campaign_is_sent($campaign_id) {
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'crm_message')
+    ->propertyCondition('status', CRM_CAMPAIGN_STATUS_SENT, '<>')
+    ->fieldCondition('crm_campaign_single', 'target_id', $campaign_id, '=');
+
+  $result = $query->execute();
+  if (!isset($result['crm_message']) || !count($result['crm_message'])) {
+    return TRUE;
+  }
+  return FALSE;
+}

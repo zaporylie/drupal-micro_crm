@@ -34,6 +34,11 @@ function crm_message_template_entity_info() {
         'custom settings' => FALSE,
       ),
     ),
+
+    // Inline entity controller support.
+    'inline entity form' => array(
+      'controller' => 'CRMMessageTemplateInlineFormController',
+    ),
 //    'translation' => array(
 //      'entity_translation' => array(
 //        'class' => 'EntityTranslationDefaultHandler',

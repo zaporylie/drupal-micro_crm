@@ -52,6 +52,11 @@ function crm_message_ui_form($form, &$form_state, $message) {
   );
 
   field_attach_form('crm_message', $message, $form, $form_state);
+//  $form_state['field']['field_test'][LANGUAGE_NONE]['field']['settings']['handler_settings']['view']['args'][] = $message->type;
+//dpm($form);
+//dpm($form_state);
+
+
 
   $form['settings'] = array(
     '#type' => 'vertical_tabs',
@@ -152,6 +157,15 @@ function crm_message_ui_send($form, &$form_state, $message) {
     '#type' => 'value',
     '#value' => $message,
   );
+  $form['method'] = array(
+    '#type' => 'radios',
+    '#required' => TRUE,
+    '#default_value' => CRM_CAMPAIGN_STATUS_SENT,
+    '#options' => array(
+      CRM_MESSAGE_STATUS_SENT => t('Send instantly'),
+      CRM_MESSAGE_STATUS_QUEUED => t('Queue, send with other queued messages'),
+    ),
+  );
   $uri = entity_uri('crm_message', $message);
   return confirm_form(
     $form,
@@ -164,14 +178,41 @@ function crm_message_ui_send($form, &$form_state, $message) {
  * Delete form submit handler.
  */
 function crm_message_ui_send_submit($form, &$form_state) {
-  $message_id = entity_id('crm_message', $form_state['values']['message']);
-  $uri = entity_uri('crm_message', $form_state['values']['message']);
-  if (crm_message_send($form_state['values']['message']) !== FALSE) {
-    drupal_set_message(t('Message (@message) has been sent', array('@message' => $message_id)));
+  $message = $form_state['values']['message'];
+  $message_id = entity_id('crm_message', $message);
+  switch ($form_state['values']['method']) {
+    case CRM_MESSAGE_STATUS_QUEUED:
+      try {
+        $message->status = CRM_MESSAGE_STATUS_QUEUED;
+        $message->revision = TRUE;
+        $message->log = format_string('Message (message_id: @message_id) added to queue.', array('@message_id' => $message_id));
+        entity_save('crm_message', $message);
+        $queue = DrupalQueue::get('crm_message_queue');
+        $queue->createQueue();
+        $queue->createItem($message_id);
+        drupal_set_message(t('Message (message_id: @message_id) has been queued', array('@message_id' => $message_id)));
+      }
+      catch (Exception $e) {
+        drupal_set_message(t('Unable to add message (message_id: @message_id) to queue.', array('@message_id' => $message_id)), 'error');
+      }
+      break;
+
+    case CRM_MESSAGE_STATUS_SENT:
+      try {
+        $result = crm_message_send($message);
+      }
+      catch (Exception $e) {
+        watchdog_exception('crm_message', $e);
+      }
+      if (isset($result) && $result) {
+        drupal_set_message(t('Message (message_id: @message_id) has been sent', array('@message_id' => $message_id)));
+      }
+      else {
+        drupal_set_message(t('Unable to send message (message_id: @message_id)', array('@message_id' => $message_id)), 'error');
+      }
+      break;
   }
-  else {
-    drupal_set_message(t('Unable to send message (@message)', array('@message' => $message_id)), 'error');
-  }
+  $uri = entity_uri('crm_message', $message);
   $form_state['redirect'] = $uri['path'];
 }
 

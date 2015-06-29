@@ -81,7 +81,7 @@ function crm_channel_tokens($type, $tokens, array $data = array(), array $option
       switch ($name) {
         // Simple key values on the node.
         case 'channel_id':
-          $replacements[$original] = $channel->nid;
+          $replacements[$original] = $channel->channel_id;
           break;
 
         case 'revision_id':
