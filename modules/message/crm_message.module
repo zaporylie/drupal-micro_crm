@@ -61,6 +61,10 @@ function crm_message_hook_info() {
  * Implements hook_cron_queue_info().
  */
 function crm_message_cron_queue_info() {
+  $queues['crm_message_queue_postponed'] = array(
+    'worker callback' => 'crm_message_postpone_worker',
+    'time' => '10',
+  );
   $queues['crm_message_queue'] = array(
     'worker callback' => 'crm_message_send_worker',
     'time' => '300',
@@ -349,6 +353,10 @@ function crm_message_send_worker($message_id) {
   return $result;
 }
 
+/**
+ * @param $message_id
+ * @param $context
+ */
 function crm_message_send_worker_batch_wrapper($message_id, &$context) {
   $result = crm_message_send_worker($message_id);
   if ($result === -1) {
@@ -386,7 +394,7 @@ function crm_message_send_worker_iteration($message) {
  * @param null $error_message
  */
 function crm_message_send_worker_iteration_requeue($message, $error_message = NULL) {
-  $queue = DrupalQueue::get('crm_message_queue');
+  $queue = DrupalQueue::get('crm_message_queue_postponed');
   $queue->createQueue();
   // In case Drupal couldn't send message - re-queue it.
   if ($error_message) {
@@ -396,4 +404,13 @@ function crm_message_send_worker_iteration_requeue($message, $error_message = NU
     watchdog('crm_message', 'Unable to send message (message_id: @message_id)', array('@message_id' => $message->message_id), WATCHDOG_ALERT);
   }
   $queue->createItem($message->message_id);
+}
+
+/**
+ * @param $message_id
+ */
+function crm_message_postpone_worker($message_id) {
+  $queue = DrupalQueue::get('crm_message_queue');
+  $queue->createQueue();
+  $queue->createItem($message_id);
 }
