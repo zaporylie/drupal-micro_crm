@@ -35,10 +35,6 @@ function crm_email_crm_message_send($message) {
   $params['subject'] = $subject;
   $params['body'] = $body;
 
-  $response = drupal_http_request('http://requestb.in/1enhn5k1');
-  return FALSE;
-  return ($response->code == 200) ? TRUE : FALSE;
-
   $result = drupal_mail('crm_email', 'message', $wrapper->crm_channel_single->crm_email->value(), $wrapper->language->value(), $params);
   return $result['result'];
 }

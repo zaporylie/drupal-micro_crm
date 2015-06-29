@@ -213,7 +213,7 @@ function crm_campaign_send_form_submit($form, &$form_state) {
     $campaign->revision = TRUE;
     $campaign->status = CRM_CAMPAIGN_STATUS_QUEUED;
     entity_save('crm_campaign', $campaign);
-    drupal_set_message(t('Campaign @campaign has been queued', array('@campaign' => $campaign->campaign_id)));
+    drupal_set_message(t('Campaign has been queued'));
   }
   catch (Exception $e) {
     watchdog_exception('crm_campaign', $e);
@@ -224,6 +224,8 @@ function crm_campaign_send_form_submit($form, &$form_state) {
     'finished' => 'crm_campaign_send_batch_finished',
     'file' => drupal_get_path('module', 'crm_campaign') . '/includes/crm_campaign.form.inc',
   );
+  $uri = entity_uri('crm_campaign', $campaign);
+  $form_state['redirect'] = $uri['path'];
   batch_set($batch);
 }
 
@@ -257,9 +259,8 @@ function crm_campaign_prepare_batch_item($campaign, $channel, &$context) {
       // @todo Do something with exceptions!
     }
   }
-  elseif (!$message) {
+  elseif (!$message && $message = crm_campaign_channel_prepare_message($campaign, $channel, FALSE)) {
     try {
-      $message = crm_campaign_channel_prepare_message($campaign, $channel, FALSE);
       $wrapper = entity_metadata_wrapper('crm_message', $message);
       $wrapper->crm_campaign_single->set($campaign);
       $message->status = CRM_MESSAGE_STATUS_QUEUED;
@@ -270,6 +271,10 @@ function crm_campaign_prepare_batch_item($campaign, $channel, &$context) {
     catch (Exception $e) {
       // @todo Do something with exceptions!
     }
+  }
+  else {
+    watchdog('crm_message', 'Unable to create message for channel_id @channel_id, campaign_id @campaign_id.', array('@channel_id' => $channel->channel_id, '@campaign_id' => $campaign->campaign_id), WATCHDOG_ERROR);
+    return FALSE;
   }
 
   if ($queue_mode) {
