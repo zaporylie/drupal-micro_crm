@@ -13,6 +13,7 @@ function crm_channel_ui_menu() {
 
   $items['admin/crm/config/channel'] = array(
     'title' => 'Channel',
+    'description' => 'Manage Channel configuration',
     'page callback' => 'crm_index',
     'page arguments' => array(),
     'access arguments' => array('crm administer'),

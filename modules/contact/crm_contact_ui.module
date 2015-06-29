@@ -11,15 +11,6 @@
 function crm_contact_ui_menu() {
   $items = array();
 
-  $items['admin/crm/contact'] = array(
-    'title' => 'Contact',
-    'page callback' => 'crm_contact_ui_list',
-    'page arguments' => array(),
-    'access arguments' => array('crm contact overview'),
-    'type' => MENU_NORMAL_ITEM,
-    'file' => 'includes/crm_contact_ui.list.inc',
-  );
-
   $items['admin/crm/contact/%crm_contact'] = array(
     'title callback' => 'crm_contact_label',
     'title arguments' => array(3),
@@ -79,6 +70,7 @@ function crm_contact_ui_menu() {
 
   $items['admin/crm/config/contact'] = array(
     'title' => 'Contact',
+    'description' => 'Manage Contact settings.',
     'page callback' => 'crm_index',
     'page arguments' => array(),
     'access arguments' => array('crm administer'),

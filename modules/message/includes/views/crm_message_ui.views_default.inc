@@ -12,8 +12,8 @@ function crm_message_ui_views_default_views() {
 
   $view = new view();
   $view->name = 'crm_message';
-  $view->description = '';
-  $view->tag = 'default';
+  $view->description = 'Message admin view';
+  $view->tag = 'crm';
   $view->base_table = 'crm_message';
   $view->human_name = 'CRM Message';
   $view->core = 7;
@@ -152,6 +152,7 @@ function crm_message_ui_views_default_views() {
   $handler->display->display_options['path'] = 'admin/crm/message';
   $handler->display->display_options['menu']['type'] = 'normal';
   $handler->display->display_options['menu']['title'] = 'Message';
+  $handler->display->display_options['menu']['description'] = 'List of all messages registered in CRM system.';
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['name'] = 'management';
   $handler->display->display_options['menu']['context'] = 0;

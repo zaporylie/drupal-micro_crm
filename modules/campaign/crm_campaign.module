@@ -85,6 +85,7 @@ function crm_campaign_menu() {
 
   $items['admin/crm/config/campaign'] = array(
     'title' => 'Campaign',
+    'description' => 'Manage Campaign configuration',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('crm_campaign_settings'),
     'access arguments' => array('crm administer'),

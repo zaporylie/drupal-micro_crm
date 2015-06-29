@@ -13,6 +13,7 @@ function crm_message_ui_menu() {
 
   $items['admin/crm/config/message'] = array(
     'title' => 'Message',
+    'description' => 'Manage Message configuration',
     'page callback' => 'crm_index',
     'page arguments' => array(),
     'access arguments' => array('crm administer'),
@@ -29,15 +30,6 @@ function crm_message_ui_menu() {
       'type' => MENU_NORMAL_ITEM,
     );
   }
-
-  $items['admin/crm/message'] = array(
-    'title' => 'Message',
-    'page callback' => 'crm_message_ui_list',
-    'page arguments' => array(),
-    'access arguments' => array('crm message overview'),
-    'type' => MENU_NORMAL_ITEM,
-    'file' => 'includes/crm_message_ui.list.inc',
-  );
 
   $items['admin/crm/message/%crm_message'] = array(
     'title callback' => 'crm_message_label',

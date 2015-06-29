@@ -13,6 +13,7 @@ function crm_message_template_ui_menu() {
 
   $items['admin/crm/config/message/template'] = array(
     'title' => 'Template',
+    'description' => 'Manage Message Template configuration',
     'page callback' => 'crm_index',
     'page arguments' => array(),
     'access arguments' => array('crm administer'),

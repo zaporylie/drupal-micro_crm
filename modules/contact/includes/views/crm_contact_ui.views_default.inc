@@ -13,7 +13,7 @@ function crm_contact_ui_views_default_views() {
   $view = new view();
   $view->name = 'crm_contact';
   $view->description = '';
-  $view->tag = 'default';
+  $view->tag = 'crm';
   $view->base_table = 'crm_contact';
   $view->human_name = 'CRM Contact';
   $view->core = 7;
@@ -62,6 +62,13 @@ function crm_contact_ui_views_default_views() {
       'empty_column' => 0,
     ),
   );
+  /* No results behavior: Global: Text area */
+  $handler->display->display_options['empty']['area']['id'] = 'area';
+  $handler->display->display_options['empty']['area']['table'] = 'views';
+  $handler->display->display_options['empty']['area']['field'] = 'area';
+  $handler->display->display_options['empty']['area']['empty'] = TRUE;
+  $handler->display->display_options['empty']['area']['content'] = 'No Contact found.';
+  $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   /* Field: Contact: Contact ID */
   $handler->display->display_options['fields']['contact_id']['id'] = 'contact_id';
   $handler->display->display_options['fields']['contact_id']['table'] = 'crm_contact';
@@ -118,6 +125,7 @@ function crm_contact_ui_views_default_views() {
   $handler->display->display_options['path'] = 'admin/crm/contact';
   $handler->display->display_options['menu']['type'] = 'normal';
   $handler->display->display_options['menu']['title'] = 'Contact';
+  $handler->display->display_options['menu']['description'] = 'List of all Contacts registered in CRM system.';
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['name'] = 'management';
   $handler->display->display_options['menu']['context'] = 0;

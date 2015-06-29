@@ -13,7 +13,7 @@ function crm_channel_ui_views_default_views() {
   $view = new view();
   $view->name = 'crm_channel';
   $view->description = '';
-  $view->tag = 'default';
+  $view->tag = 'crm';
   $view->base_table = 'crm_channel';
   $view->human_name = 'CRM Channel';
   $view->core = 7;
@@ -169,6 +169,7 @@ function crm_channel_ui_views_default_views() {
   $handler->display->display_options['path'] = 'admin/crm/channel';
   $handler->display->display_options['menu']['type'] = 'normal';
   $handler->display->display_options['menu']['title'] = 'Channel';
+  $handler->display->display_options['menu']['description'] = 'List of all Channels registered in CRM system.';
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['name'] = 'management';
   $handler->display->display_options['menu']['context'] = 0;

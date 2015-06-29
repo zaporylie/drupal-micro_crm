@@ -13,7 +13,7 @@ function crm_message_template_ui_views_default_views() {
   $view = new view();
   $view->name = 'crm_message_template';
   $view->description = '';
-  $view->tag = 'default';
+  $view->tag = 'crm';
   $view->base_table = 'crm_message_template';
   $view->human_name = 'CRM Message template';
   $view->core = 7;
@@ -150,6 +150,7 @@ function crm_message_template_ui_views_default_views() {
   $handler->display->display_options['path'] = 'admin/crm/message/template';
   $handler->display->display_options['menu']['type'] = 'normal';
   $handler->display->display_options['menu']['title'] = 'Template';
+  $handler->display->display_options['menu']['description'] = 'List of all Message Templates registered in CRM system.';
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['name'] = 'management';
   $handler->display->display_options['menu']['context'] = 0;
