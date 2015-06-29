@@ -160,7 +160,7 @@ function crm_message_ui_send($form, &$form_state, $message) {
   $form['method'] = array(
     '#type' => 'radios',
     '#required' => TRUE,
-    '#default_value' => CRM_CAMPAIGN_STATUS_SENT,
+    '#default_value' => CRM_MESSAGE_STATUS_SENT,
     '#options' => array(
       CRM_MESSAGE_STATUS_SENT => t('Send instantly'),
       CRM_MESSAGE_STATUS_QUEUED => t('Queue, send with other queued messages'),

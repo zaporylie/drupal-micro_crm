@@ -122,6 +122,53 @@ function crm_campaign_permission() {
 }
 
 /**
+ * Implements hook_crm_channel_fields_info().
+ */
+function crm_campaign_crm_channel_fields_info() {
+  $types = crm_channel_types(TRUE);
+  $array = array();
+  foreach ($types as $key => $bundle) {
+    $array['instances'][$key . '_crm_campaign_single'] = array(
+      'label' => t('Campaign'),
+      'widget' => array(
+        'weight' => '5',
+        'type' => 'entityreference_autocomplete',
+        'module' => 'entityreference',
+        'active' => 1,
+        'settings' => array(
+          'match_operator' => 'CONTAINS',
+          'size' => '60',
+          'path' => '',
+        ),
+      ),
+      'settings' => array(
+        'user_register_form' => FALSE,
+      ),
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'type' => 'entityreference_label',
+          'settings' => array(
+            'link' => FALSE,
+          ),
+          'module' => 'entityreference',
+          'weight' => 4,
+        ),
+      ),
+      'required' => 0,
+      'description' => '',
+      'default_value' => NULL,
+      'field_name' => 'crm_campaign_single',
+      'entity_type' => 'crm_message',
+      'bundle' => $key,
+      'deleted' => 0,
+    );
+  }
+  drupal_alter('crm_campaign_crm_channel_fields_info', $array);
+  return $array;
+}
+
+/**
  * Implements hook_cron().
  */
 function crm_campaign_cron() {

@@ -32,9 +32,13 @@ function crm_email_crm_message_send($message) {
   if (!$wrapper->__isset('crm_message_email_body') || !($body = $wrapper->crm_message_email_body->value())) {
     return FALSE;
   }
+  $key = 'crm_message';
+  if ($wrapper->__isset('crm_message_template_single') && $template = $wrapper->crm_message_template_single->label()) {
+    $key = $template;
+  }
   $params['subject'] = $subject;
   $params['body'] = $body;
 
-  $result = drupal_mail('crm_email', 'message', $wrapper->crm_channel_single->crm_email->value(), $wrapper->language->value(), $params);
+  $result = drupal_mail('crm_email', $key, $wrapper->crm_channel_single->crm_email->value(), $wrapper->language->value(), $params);
   return $result['result'];
 }

@@ -383,25 +383,19 @@ function _crm_channel_generate_token($channel) {
 }
 
 /**
+ *
+ */
+function crm_channel_fields_info() {
+  $fields = module_invoke_all('crm_channel_fields_info');
+  drupal_alter('crm_channel_fields_info', $fields);
+  return $fields;
+}
+
+/**
  * Implements hook_modules_installed().
  */
 function crm_channel_modules_installed($modules) {
-  $types = crm_channel_types(TRUE);
-  $list = module_list();
-  foreach ($types as $key => $bundle) {
-    foreach ($list as $module) {
-      if ($fields = module_invoke($bundle['module'], 'crm_channel_fields', $module)) {
-        crm_channel_install_fields($fields);
-      }
-    }
-  }
-//  foreach ($modules as $module) {
-//    foreach ($types as $key => $bundle) {
-//      if ($fields = module_invoke($bundle['module'], 'crm_channel_fields', $module)) {
-//        crm_channel_install_fields($fields);
-//      }
-//    }
-//  }
+  crm_channel_install_fields(crm_channel_fields_info());
 }
 
 /**
@@ -410,6 +404,14 @@ function crm_channel_modules_installed($modules) {
  * @throws \FieldException
  */
 function crm_channel_install_fields($array) {
+
+  entity_info_cache_clear();
+  field_cache_clear();
+
+  // Be sure that fields and instances elements are there.
+  $default['fields'] = array();
+  $default['instances'] = array();
+  $array += $default;
   foreach ($array['fields'] as $field) {
     if (!field_info_field($field['field_name'])) {
       field_create_field($field);
@@ -430,7 +432,7 @@ function crm_channel_modules_uninstalled($modules) {
   $list = module_list();
 
   // First remove support for all uninstalled modules (if channel is still
-  // there).drush
+  // there).
   // Get channel one by one.
   foreach ($types as $key => $bundle) {
     // Then get uninstalled modules - one by one.

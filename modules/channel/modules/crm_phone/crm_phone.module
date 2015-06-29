@@ -2,7 +2,10 @@
 
 /**
  * @file
+ * Phone channel.
  *
+ * Provides set of hook implementations for all submodules shipped with CRM
+ * module.
  */
 
 /**
@@ -120,6 +123,95 @@ function crm_phone_crm_channel_values_load($channel) {
 }
 
 /**
+ * Implements hook_crm_message_crm_channel_fields_info_alter().
+ */
+function crm_phone_crm_message_crm_channel_fields_info_alter(&$fields) {
+  // Prepare fields.
+  $fields['fields']['crm_message_phone_body'] = array(
+    'settings' => array(),
+    'field_name' => 'crm_message_phone_body',
+    'type' => 'text_long',
+    'module' => 'text',
+    'active' => 1,
+    'locked' => 0,
+    'cardinality' => 1,
+    'deleted' => 0,
+  );
+  // Prepare instances.
+  $fields['instances']['crm_message_phone_body'] = array(
+    'label' => t('Body'),
+    'widget' => array(
+      'weight' => '3',
+      'type' => 'text_textarea',
+      'module' => 'text',
+      'active' => 1,
+      'settings' => array(
+        'rows' => '5',
+      ),
+    ),
+    'settings' => array(
+      'text_processing' => '0',
+      'user_register_form' => FALSE,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'text_default',
+        'settings' => array(),
+        'module' => 'text',
+        'weight' => 2,
+      ),
+    ),
+    'required' => 1,
+    'description' => '',
+    'default_value' => NULL,
+    'field_name' => 'crm_message_phone_body',
+    'entity_type' => 'crm_message',
+    'bundle' => 'phone',
+    'deleted' => 0,
+  );
+}
+
+/**
+ * Implements hook_crm_message_template_crm_channel_fields_info_alter().
+ */
+function crm_phone_crm_message_template_crm_channel_fields_info_alter(&$fields) {
+  // Prepare instances.
+  $fields['instances']['crm_message_template_phone_body'] = array(
+    'label' => t('Body'),
+    'widget' => array(
+      'weight' => '3',
+      'type' => 'text_textarea',
+      'module' => 'text',
+      'active' => 1,
+      'settings' => array(
+        'rows' => '5',
+      ),
+    ),
+    'settings' => array(
+      'text_processing' => '0',
+      'user_register_form' => FALSE,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'text_default',
+        'settings' => array(),
+        'module' => 'text',
+        'weight' => 2,
+      ),
+    ),
+    'required' => 1,
+    'description' => '',
+    'default_value' => NULL,
+    'field_name' => 'crm_message_phone_body',
+    'entity_type' => 'crm_message_template',
+    'bundle' => 'phone',
+    'deleted' => 0,
+  );
+}
+
+/**
  * Implements hook_crm_channel_set_value().
  */
 function crm_phone_crm_channel_set_value(&$channel, $value) {
@@ -129,215 +221,6 @@ function crm_phone_crm_channel_set_value(&$channel, $value) {
   }
   $wrapper->crm_phone->set($value);
   return TRUE;
-}
-
-/**
- * Implements hook_crm_channel_fields().
- *
- * Do not assume that field or instance already exists - declare it from scratch
- * anyway.
- */
-function crm_phone_crm_channel_fields($type = NULL) {
-  // Be sure that fields and instances elements are there.
-  $array['fields'] = array();
-  $array['instances'] = array();
-  switch ($type) {
-    case 'crm_message':
-      // Prepare fields.
-      $array['fields']['crm_message_phone_body'] = array(
-        'settings' => array(),
-        'field_name' => 'crm_message_phone_body',
-        'type' => 'text_long',
-        'module' => 'text',
-        'active' => 1,
-        'locked' => 0,
-        'cardinality' => 1,
-        'deleted' => 0,
-      );
-      // Prepare instances.
-      $array['instances']['crm_message_phone_body'] = array(
-        'label' => t('Body'),
-        'widget' => array(
-          'weight' => '3',
-          'type' => 'text_textarea',
-          'module' => 'text',
-          'active' => 1,
-          'settings' => array(
-            'rows' => '5',
-          ),
-        ),
-        'settings' => array(
-          'text_processing' => '0',
-          'user_register_form' => FALSE,
-        ),
-        'display' => array(
-          'default' => array(
-            'label' => 'above',
-            'type' => 'text_default',
-            'settings' => array(),
-            'module' => 'text',
-            'weight' => 2,
-          ),
-        ),
-        'required' => 1,
-        'description' => '',
-        'default_value' => NULL,
-        'field_name' => 'crm_message_phone_body',
-        'entity_type' => 'crm_message',
-        'bundle' => 'phone',
-        'deleted' => 0,
-      );
-      $array['instances']['crm_channel_single'] = array(
-        'label' => t('Recipient (Channel)'),
-        'widget' => array(
-          'weight' => -99,
-          'type' => 'entityreference_autocomplete',
-          'module' => 'entityreference',
-          'active' => 1,
-          'settings' => array(
-            'match_operator' => 'CONTAINS',
-            'size' => '60',
-            'path' => '',
-          ),
-        ),
-        'settings' => array(
-          'user_register_form' => FALSE,
-        ),
-        'display' => array(
-          'default' => array(
-            'label' => 'above',
-            'type' => 'entityreference_label',
-            'settings' => array(
-              'link' => FALSE,
-            ),
-            'module' => 'entityreference',
-            'weight' => -99,
-          ),
-        ),
-        'required' => 1,
-        'description' => t('Recipient has to be registered and valid channel.'),
-        'default_value' => NULL,
-        'field_name' => 'crm_channel_single',
-        'entity_type' => 'crm_message',
-        'bundle' => 'phone',
-        'deleted' => 0,
-      );
-
-      break;
-
-    case 'crm_message_template':
-      // Prepare instances.
-      $array['instances']['crm_message_phone_body'] = array(
-        'label' => t('Body'),
-        'widget' => array(
-          'weight' => '3',
-          'type' => 'text_textarea',
-          'module' => 'text',
-          'active' => 1,
-          'settings' => array(
-            'rows' => '5',
-          ),
-        ),
-        'settings' => array(
-          'text_processing' => '0',
-          'user_register_form' => FALSE,
-        ),
-        'display' => array(
-          'default' => array(
-            'label' => 'above',
-            'type' => 'text_default',
-            'settings' => array(),
-            'module' => 'text',
-            'weight' => 2,
-          ),
-        ),
-        'required' => 1,
-        'description' => '',
-        'default_value' => NULL,
-        'field_name' => 'crm_message_phone_body',
-        'entity_type' => 'crm_message_template',
-        'bundle' => 'phone',
-        'deleted' => 0,
-      );
-      $array['instances']['crm_message_template_single'] = array(
-        'label' => t('Message Template'),
-        'widget' => array(
-          'weight' => '5',
-          'type' => 'entityreference_autocomplete',
-          'module' => 'entityreference',
-          'active' => 1,
-          'settings' => array(
-            'match_operator' => 'CONTAINS',
-            'size' => '60',
-            'path' => '',
-          ),
-        ),
-        'settings' => array(
-          'user_register_form' => FALSE,
-        ),
-        'display' => array(
-          'default' => array(
-            'label' => 'above',
-            'type' => 'entityreference_label',
-            'settings' => array(
-              'link' => FALSE,
-            ),
-            'module' => 'entityreference',
-            'weight' => 4,
-          ),
-        ),
-        'required' => 0,
-        'description' => '',
-        'default_value' => NULL,
-        'field_name' => 'crm_message_template_single',
-        'entity_type' => 'crm_message',
-        'bundle' => 'phone',
-        'deleted' => 0,
-      );
-      break;
-
-    case 'crm_campaign':
-      $array['instances']['crm_campaign_single'] = array(
-        'label' => t('Campaign'),
-        'widget' => array(
-          'weight' => '5',
-          'type' => 'entityreference_autocomplete',
-          'module' => 'entityreference',
-          'active' => 1,
-          'settings' => array(
-            'match_operator' => 'CONTAINS',
-            'size' => '60',
-            'path' => '',
-          ),
-        ),
-        'settings' => array(
-          'user_register_form' => FALSE,
-        ),
-        'display' => array(
-          'default' => array(
-            'label' => 'above',
-            'type' => 'entityreference_label',
-            'settings' => array(
-              'link' => FALSE,
-            ),
-            'module' => 'entityreference',
-            'weight' => 4,
-          ),
-        ),
-        'required' => 0,
-        'description' => '',
-        'default_value' => NULL,
-        'field_name' => 'crm_campaign_single',
-        'entity_type' => 'crm_message',
-        'bundle' => 'phone',
-        'deleted' => 0,
-      );
-      break;
-
-    default:
-      return FALSE;
-  }
-  return $array;
 }
 
 /**
