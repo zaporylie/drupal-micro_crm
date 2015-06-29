@@ -317,7 +317,7 @@ function crm_campaign_send_batch_finished($success, $results, $operations) {
       drupal_set_message(t('Nothing to send'));
     }
     $campaign = entity_load_single('crm_campaign', $results['campaign']);
-    if (_crm_campaign_is_sent($campaign)) {
+    if (_crm_campaign_is_sent($campaign->campaign_id)) {
       $campaign->log = 'Campaign has been sent';
       $campaign->revision = TRUE;
       $campaign->status = CRM_CAMPAIGN_STATUS_SENT;
@@ -388,24 +388,6 @@ function _crm_campaign_message_exists($campaign, $channel) {
   if (isset($result['crm_message'])) {
     $ids = array_keys($result['crm_message']);
     return entity_load_single('crm_message', reset($ids));
-  }
-  return FALSE;
-}
-
-/**
- * @param $campaign
- * @return bool
- */
-function _crm_campaign_is_sent($campaign) {
-  $query = new EntityFieldQuery();
-
-  $query->entityCondition('entity_type', 'crm_message')
-    ->propertyCondition('status', CRM_CAMPAIGN_STATUS_SENT, '<>')
-    ->fieldCondition('crm_campaign_single', 'target_id', $campaign->campaign_id, '=');
-
-  $result = $query->execute();
-  if (!isset($result['crm_message']) || !count($result['crm_message'])) {
-    return TRUE;
   }
   return FALSE;
 }

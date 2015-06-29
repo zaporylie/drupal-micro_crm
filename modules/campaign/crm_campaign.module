@@ -122,6 +122,35 @@ function crm_campaign_permission() {
 }
 
 /**
+ * Implements hook_cron().
+ */
+function crm_campaign_cron() {
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'crm_campaign')
+    ->propertyCondition('status', CRM_CAMPAIGN_STATUS_QUEUED, '=');
+
+  $result = $query->execute();
+
+  if (isset($result['crm_campaign'])) {
+    foreach ($result['crm_campaign'] as $campaign_id => $campaign) {
+      if (_crm_campaign_is_sent($campaign_id)) {
+        try {
+          $campaign = entity_load_single('crm_campaign', $campaign_id);
+          $campaign->status = CRM_CAMPAIGN_STATUS_SENT;
+          $campaign->log = 'Campaign has been sent';
+          $campaign->revision = TRUE;
+          entity_save('crm_campaign', $campaign);
+        }
+        catch (Exception $e) {
+          watchdog_exception('crm_campaign', $e);
+        }
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_action_info().
  */
 function crm_campaign_action_info() {
@@ -381,4 +410,22 @@ function crm_campaign_form_alter(&$form, &$form_state, $form_id) {
     // Hide all occurrences of crm_message_template field.
     $form['crm_campaign_single']['#access'] = FALSE;
   }
+}
+
+/**
+ * @param $campaign
+ * @return bool
+ */
+function _crm_campaign_is_sent($campaign_id) {
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'crm_message')
+    ->propertyCondition('status', CRM_CAMPAIGN_STATUS_SENT, '<>')
+    ->fieldCondition('crm_campaign_single', 'target_id', $campaign_id, '=');
+
+  $result = $query->execute();
+  if (!isset($result['crm_message']) || !count($result['crm_message'])) {
+    return TRUE;
+  }
+  return FALSE;
 }
