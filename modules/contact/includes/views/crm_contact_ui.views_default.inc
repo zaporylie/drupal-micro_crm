@@ -73,15 +73,14 @@ function crm_contact_ui_views_default_views() {
   $handler->display->display_options['fields']['contact_id']['id'] = 'contact_id';
   $handler->display->display_options['fields']['contact_id']['table'] = 'crm_contact';
   $handler->display->display_options['fields']['contact_id']['field'] = 'contact_id';
-  /* Field: Contact: Rendered Contact */
-  $handler->display->display_options['fields']['rendered_entity']['id'] = 'rendered_entity';
-  $handler->display->display_options['fields']['rendered_entity']['table'] = 'views_entity_crm_contact';
-  $handler->display->display_options['fields']['rendered_entity']['field'] = 'rendered_entity';
-  $handler->display->display_options['fields']['rendered_entity']['label'] = 'Details';
-  $handler->display->display_options['fields']['rendered_entity']['link_to_entity'] = 1;
-  $handler->display->display_options['fields']['rendered_entity']['display'] = 'view';
-  $handler->display->display_options['fields']['rendered_entity']['view_mode'] = 'administrator';
-  $handler->display->display_options['fields']['rendered_entity']['bypass_access'] = 0;
+  /* Field: Contact: Channels */
+  $handler->display->display_options['fields']['crm_channel']['id'] = 'crm_channel';
+  $handler->display->display_options['fields']['crm_channel']['table'] = 'field_data_crm_channel';
+  $handler->display->display_options['fields']['crm_channel']['field'] = 'crm_channel';
+  $handler->display->display_options['fields']['crm_channel']['settings'] = array(
+    'link' => 0,
+  );
+  $handler->display->display_options['fields']['crm_channel']['delta_offset'] = '0';
   /* Field: Contact: Status */
   $handler->display->display_options['fields']['status']['id'] = 'status';
   $handler->display->display_options['fields']['status']['table'] = 'crm_contact';
