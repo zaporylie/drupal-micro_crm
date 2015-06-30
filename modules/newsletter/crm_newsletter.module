@@ -233,6 +233,7 @@ function crm_newsletter_form_submit($form, &$form_state) {
     }
     // Save channel as a newsletter ready.
     $entity->status = CRM_NEWSLETTER_CHANNEL_STATUS;
+    $entity->revision = TRUE;
     try {
       entity_save('crm_channel', $entity);
     }
@@ -285,6 +286,7 @@ function crm_newsletter_form_submit($form, &$form_state) {
     }
 
     $entity->log = t('Contact modified by newsletter form.');
+    $entity->revision = TRUE;
     try {
       entity_save('crm_contact', $entity);
     }
@@ -460,9 +462,25 @@ function crm_newsletter_crm_channel_presave($channel) {
 }
 
 /**
+ * Implements hook_crm_channel_insert().
+ */
+function crm_newsletter_crm_channel_insert($channel) {
+  _crm_newsletter_set_and_send_message($channel);
+}
+
+/**
  * Implements hook_crm_channel_update().
  */
 function crm_newsletter_crm_channel_update($channel) {
+  _crm_newsletter_set_and_send_message($channel);
+}
+
+/**
+ * Set status message and/or send message via channel.
+ *
+ * @param $channel
+ */
+function _crm_newsletter_set_and_send_message($channel) {
   if (isset($channel->newsletter) && $channel->newsletter == FALSE) {
     $method = variable_get('crm_channel_ui_' . $channel->type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
     if ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT && function_exists('_crm_message_channel_supported') && _crm_message_channel_supported($channel->type)) {

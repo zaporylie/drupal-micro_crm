@@ -117,7 +117,7 @@ function crm_contact_load_by_channels($ids) {
     return entity_load('crm_contact', array_keys($result['crm_contact']));
   }
   elseif (!empty($result['crm_contact']) && count($result['crm_contact']) == 1) {
-    return entity_load_single('crm_contact', array_keys($result['crm_contact']));
+    return entity_load_single('crm_contact', key($result['crm_contact']));
   }
   return entity_create('crm_contact', array());
 }
