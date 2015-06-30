@@ -69,7 +69,7 @@ function crm_channel_ui_form($form, &$form_state, $channel) {
   );
 
   $form['actions'] = array('#type' => 'actions');
-  $form['actions']['save'] = array(
+  $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
   );

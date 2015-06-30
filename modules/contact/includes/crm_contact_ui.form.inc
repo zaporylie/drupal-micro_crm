@@ -74,7 +74,7 @@ function crm_contact_ui_form($form, &$form_state, $contact) {
   );
 
   $form['actions'] = array('#type' => 'actions');
-  $form['actions']['save'] = array(
+  $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
   );

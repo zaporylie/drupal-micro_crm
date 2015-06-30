@@ -194,7 +194,7 @@ function crm_contact_install() {
       'default' => array(
         'label' => 'above',
         'type' => 'entityreference_entity_view',
-        'weight' => '2',
+        'weight' => 99,
         'settings' => array(
           'view_mode' => 'administrator',
           'links' => 1,

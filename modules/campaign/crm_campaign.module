@@ -147,13 +147,13 @@ function crm_campaign_crm_channel_fields_info() {
       ),
       'display' => array(
         'default' => array(
-          'label' => 'above',
+          'label' => 'inline',
           'type' => 'entityreference_label',
+          'weight' => 98,
           'settings' => array(
-            'link' => FALSE,
+            'link' => 1,
           ),
           'module' => 'entityreference',
-          'weight' => 4,
         ),
       ),
       'required' => 0,

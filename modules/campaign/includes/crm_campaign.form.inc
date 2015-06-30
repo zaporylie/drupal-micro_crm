@@ -107,7 +107,7 @@ function crm_campaign_form($form, &$form_state, $campaign) {
     '#title' => t('Revision log'),
   );
   $form['actions'] = array('#type' => 'actions');
-  $form['actions']['save'] = array(
+  $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
   );

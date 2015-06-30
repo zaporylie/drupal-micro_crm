@@ -116,7 +116,7 @@ function crm_message_template_ui_form($form, &$form_state, $template) {
   );
 
   $form['actions'] = array('#type' => 'actions');
-  $form['actions']['save'] = array(
+  $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
   );

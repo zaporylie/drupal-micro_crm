@@ -96,13 +96,14 @@ function crm_message_ui_form($form, &$form_state, $message) {
   );
 
   $form['actions'] = array('#type' => 'actions');
-  $form['actions']['save'] = array(
+  $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save as Draft'),
   );
   $form['actions']['send'] = array(
     '#type' => 'submit',
     '#value' => t('Save & send'),
+    '#ief_submit_all' => TRUE,
   );
   return $form;
 }
