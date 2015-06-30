@@ -208,7 +208,7 @@ function crm_campaign_install() {
     'bundle' => 'crm_campaign',
     'deleted' => 0,
   );
-  if (!field_info_instance($instance['entity_type'], $instance['field_ name'], $instance['bundle'])) {
+  if (!field_info_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
     field_create_instance($instance);
   }
 
@@ -247,7 +247,7 @@ function crm_campaign_install() {
     'bundle' => 'crm_campaign',
     'deleted' => 0,
   );
-  if (!field_info_instance($instance['entity_type'], $instance['field_ name'], $instance['bundle'])) {
+  if (!field_info_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
     field_create_instance($instance);
   }
 }
