@@ -328,6 +328,23 @@ function crm_email_crm_message_create($values, $entity_type = 'crm_message') {
 }
 
 /**
+ * Implements hook_views_default_views_alter().
+ */
+function crm_email_views_default_views_alter(&$views) {
+  if (isset($views['crm_channel'])) {
+    $handler =& $views['crm_channel']->display['default']->handler;
+    /* Field: Channel: E-mail */
+    $handler->display->display_options['fields']['crm_email']['id'] = 'crm_email';
+    $handler->display->display_options['fields']['crm_email']['table'] = 'field_data_crm_email';
+    $handler->display->display_options['fields']['crm_email']['field'] = 'crm_email';
+    $handler->display->display_options['fields']['crm_email']['label'] = '';
+    $handler->display->display_options['fields']['crm_email']['exclude'] = TRUE;
+    $handler->display->display_options['fields']['crm_email']['element_label_colon'] = FALSE;
+    $handler->display->display_options['filters']['combine']['fields']['crm_email'] = 'crm_email';
+  }
+}
+
+/**
  * Implements hook_mail().
  */
 function crm_email_mail($key, &$message, $params) {

@@ -224,6 +224,23 @@ function crm_phone_crm_channel_set_value(&$channel, $value) {
 }
 
 /**
+ * Implements hook_views_default_views_alter().
+ */
+function crm_phone_views_default_views_alter(&$views) {
+  if (isset($views['crm_channel'])) {
+    $handler =& $views['crm_channel']->display['default']->handler;
+    /* Field: Channel: Phone */
+    $handler->display->display_options['fields']['crm_phone']['id'] = 'crm_phone';
+    $handler->display->display_options['fields']['crm_phone']['table'] = 'field_data_crm_phone';
+    $handler->display->display_options['fields']['crm_phone']['field'] = 'crm_phone';
+    $handler->display->display_options['fields']['crm_phone']['label'] = '';
+    $handler->display->display_options['fields']['crm_phone']['exclude'] = TRUE;
+    $handler->display->display_options['fields']['crm_phone']['element_label_colon'] = FALSE;
+    $handler->display->display_options['filters']['combine']['fields']['crm_phone'] = 'crm_phone';
+  }
+}
+
+/**
  * Implements hook_message_create().
  */
 function crm_phone_crm_message_create($values, $entity_type = 'crm_message') {
