@@ -280,6 +280,7 @@ function crm_campaign_views_default_views() {
   $handler->display->display_options['tab_options']['title'] = 'Campaign';
   $handler->display->display_options['tab_options']['description'] = 'List of all Campaigns registered in CRM system.';
   $handler->display->display_options['tab_options']['weight'] = '0';
+  $handler->display->display_options['tab_options']['name'] = 'management';
 
   $views[$view->name] = $view;
 
