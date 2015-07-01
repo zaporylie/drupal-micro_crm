@@ -109,6 +109,23 @@ function crm_campaignmonitor_crm_channel_update($channel) {
 }
 
 /**
+ * Implements hook_crm_channel_insert().
+ */
+function crm_campaignmonitor_crm_channel_insert($channel) {
+  if ($channel->type == 'email' && (isset($channel->newsletter) || isset($channel->skip_confirmation))) {
+    if (variable_get('crm_campaignmonitor_queue_outgoing', TRUE)) {
+      $queue = DrupalQueue::get('crm_campaignmonitor_outgoing');
+      $queue->createQueue();
+      $queue->createItem($channel);
+      watchdog('crm_campaignmonitor', 'Channel (@channel) has been added to Campaign Monitor sync queue.', array('@channel' => $channel->channel_id), WATCHDOG_NOTICE);
+    }
+    else {
+      crm_campaignmonitor_sync($channel);
+    }
+  }
+}
+
+/**
  * Implements hook_cron_queue_info().
  */
 function crm_campaignmonitor_cron_queue_info() {
