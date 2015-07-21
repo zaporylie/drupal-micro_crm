@@ -6,6 +6,7 @@
  */
 
 class CRMContactController extends EntityAPIController {
+
   /**
    * Overrides EntityAPIController::buildQuery().
    */
@@ -18,25 +19,16 @@ class CRMContactController extends EntityAPIController {
   }
 
   /**
-   * Overrides EntityAPIController::buildContent().
-   */
-  public function buildContent($entity, $view_mode = 'customer', $langcode = NULL) {
-    return parent::buildContent($entity, $view_mode, $langcode);
-  }
-  /**
    * Overrides EntityAPIController::attachLoad().
-   *
-   * @todo Check if it should be unserialized.
    */
   public function attachLoad(&$queried_entities, $revision_id = FALSE) {
+    foreach ($queried_entities as $id => &$entity) {
+      $entity->data = unserialize($entity->data);
+    }
+
     parent::attachLoad($queried_entities, $revision_id);
   }
-  /**
-   * Overrides EntityAPIController::load().
-   */
-  public function load($ids = array(), $conditions = array()) {
-    return parent::load($ids, $conditions);
-  }
+
   /**
    * Overrides EntityAPIController::access().
    */
@@ -60,12 +52,7 @@ class CRMContactController extends EntityAPIController {
     }
     return FALSE;
   }
-  /**
-   * Overrides EntityAPIController::view().
-   */
-  public function view($entities, $view_mode = 'administrator', $langcode = NULL, $page = NULL) {
-    return parent::view($entities, $view_mode, $langcode, $page);
-  }
+
   /**
    * Overrides EntityAPIController::create().
    */
@@ -76,6 +63,7 @@ class CRMContactController extends EntityAPIController {
     );
     return parent::create($values);
   }
+
   /**
    * Overrides EntityAPIController::save().
    */
@@ -98,6 +86,7 @@ class CRMContactController extends EntityAPIController {
     }
     return $return;
   }
+
   /**
    * Overrides DrupalDefaultEntityController::saveRevision().
    */
@@ -106,14 +95,5 @@ class CRMContactController extends EntityAPIController {
     $entity->revision_uid = $GLOBALS['user']->uid;
     return parent::saveRevision($entity);
   }
-  /**
-   * Overrides DrupalDefaultEntityController::delete().
-   */
-  public function delete($ids) {
-    return parent::delete($ids);
-  }
 
-  public function send($entity) {
-    dpm('test');
-  }
 }

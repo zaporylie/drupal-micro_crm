@@ -59,6 +59,13 @@ function crm_message_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of additional data.',
+      ),
     ),
     'primary key' => array('message_id'),
     'unique keys' => array(
@@ -123,6 +130,13 @@ function crm_message_schema() {
         'type' => 'text',
         'not null' => TRUE,
         'size' => 'big',
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of additional data.',
       ),
     ),
     'primary key' => array('revision_id'),

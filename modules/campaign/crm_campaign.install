@@ -51,6 +51,13 @@ function crm_campaign_schema() {
         'not null' => TRUE,
         'default' => CRM_CAMPAIGN_STATUS_REGISTERED,
       ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of additional data.',
+      ),
     ),
     'primary key' => array('campaign_id'),
     'unique keys' => array(
@@ -113,6 +120,13 @@ function crm_campaign_schema() {
         'type' => 'text',
         'not null' => TRUE,
         'size' => 'big',
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of additional data.',
       ),
     ),
     'primary key' => array('revision_id'),

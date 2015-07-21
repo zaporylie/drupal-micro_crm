@@ -62,6 +62,13 @@ function crm_message_template_schema() {
         'type' => 'int',
         'default' => 0,
       ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of additional data.',
+      ),
     ),
     'primary key' => array('template_id'),
     'unique keys' => array(
@@ -139,6 +146,13 @@ function crm_message_template_schema() {
         'description' => 'Defines if entity is locked so it cannot be deleted.',
         'type' => 'int',
         'default' => 0,
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of additional data.',
       ),
     ),
     'primary key' => array('revision_id'),

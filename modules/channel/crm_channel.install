@@ -63,6 +63,13 @@ function crm_channel_schema() {
         'unsigned' => TRUE,
         'default' => 0,
       ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of additional data.',
+      ),
     ),
     'primary key' => array('channel_id'),
     'unique keys' => array(
@@ -120,6 +127,13 @@ function crm_channel_schema() {
         'type' => 'text',
         'not null' => TRUE,
         'size' => 'big',
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of additional data.',
       ),
     ),
     'primary key' => array('revision_id'),
