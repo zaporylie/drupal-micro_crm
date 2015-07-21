@@ -114,8 +114,7 @@ function crm_email_crm_channel_values_load($channel) {
     return NULL;
   }
   else {
-    $entity = entity_load('crm_channel', array_keys($result['crm_channel']));
-    return reset($entity);
+    return entity_load_single('crm_channel', key($result['crm_channel']));
   }
 }
 

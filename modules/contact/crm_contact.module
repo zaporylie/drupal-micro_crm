@@ -143,20 +143,62 @@ function crm_contact_status_options_list() {
 
 /**
  * @param $contact
- * @return bool
+ * @return bool|array
  */
-function crm_contact_get_channels($contact) {
-  if (!module_exists('crm_channel')) {
-    return FALSE;
-  }
+function crm_contact_get_channel_ids($contact) {
   $wrapper = entity_metadata_wrapper('crm_contact', $contact);
   if (!$wrapper->__isset('crm_channel')) {
     return FALSE;
   }
+  return $wrapper->crm_channel->raw();
+}
 
-  $tmp = array();
-  foreach ($wrapper->crm_channel->getIterator() as $channel) {
-    $tmp[] = $channel->getIdentifier();
+/**
+ * @param $contact
+ * @param $channel_id
+ * @return bool
+ */
+function crm_contact_channel_exists($contact, $channel_id) {
+  if (!($channels = crm_contact_get_channel_ids($contact))) {
+   return FALSE;
   }
-  return $tmp;
+  return in_array($channel_id, $channels);
+}
+
+/**
+ * @param $contact
+ * @param $channel
+ * @return bool
+ */
+function crm_contact_channel_add(&$contact, $channel) {
+  try {
+    $wrapper = entity_metadata_wrapper('crm_contact', $contact);
+    $wrapper->crm_channel[] = $channel;
+    return TRUE;
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_contact', $e);
+    return FALSE;
+  }
+}
+
+/**
+ * @param $contact
+ * @param $channel_id
+ * @return bool
+ */
+function crm_contact_channel_remove(&$contact, $channel_id) {
+  try {
+    $wrapper = entity_metadata_wrapper('crm_contact', $contact);
+    foreach ($wrapper->crm_channel->raw() as $delta => $target_id) {
+      if ($target_id === $channel_id) {
+        unset($wrapper->crm_channel[$delta]);
+        return TRUE;
+      }
+    }
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_contact', $e);
+  }
+  return FALSE;
 }

@@ -68,7 +68,7 @@ class CRMContactController extends EntityAPIController {
    * Overrides EntityAPIController::save().
    */
   public function save($entity) {
-    if (isset($entity->is_new) && $entity->is_new == TRUE && !isset($entity->client_id)) {
+    if (isset($entity->is_new) && $entity->is_new == TRUE && !isset($entity->contact_id)) {
       $entity->created = REQUEST_TIME;
     }
     if (!isset($entity->language)) {

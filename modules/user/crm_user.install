@@ -1,0 +1,96 @@
+<?php
+
+/**
+ * @file
+ * Add user reference field to crm_contact entity.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function crm_user_install() {
+  $t = get_t();
+
+  $field = array(
+    'settings' => array(
+      'target_type' => 'user',
+      'handler' => 'base',
+      'handler_settings' => array(
+        'target_bundles' => array(),
+        'sort' => array(
+          'type' => 'none',
+        ),
+        'behaviors' => array(
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+      ),
+    ),
+    'field_name' => 'crm_user',
+    'type' => 'entityreference',
+    'module' => 'entityreference',
+    'active' => 1,
+    'locked' => 0,
+    'cardinality' => 1,
+    'deleted' => 0,
+  );
+  if (!field_info_field($field['field_name'])) {
+    field_create_field($field);
+  }
+
+  $instance = array(
+    'label' => $t('User'),
+    'widget' => array(
+      'weight' => '3',
+      'type' => 'entityreference_autocomplete',
+      'module' => 'entityreference',
+      'active' => 1,
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'size' => '60',
+        'path' => '',
+      ),
+    ),
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'type' => 'entityreference_label',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'module' => 'entityreference',
+        'weight' => 100,
+      ),
+    ),
+    'required' => 0,
+    'description' => '',
+    'default_value' => NULL,
+    'field_name' => 'crm_user',
+    'entity_type' => 'crm_contact',
+    'bundle' => 'crm_contact',
+    'deleted' => 0,
+  );
+  if (!field_info_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
+    field_create_instance($instance);
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function crm_user_uninstall() {
+  $instances = array(
+    array(
+      'field_name' => 'crm_user',
+      'entity_type' => 'crm_contact',
+      'bundle' => 'crm_contact',
+    ),
+  );
+  foreach ($instances as $instance) {
+    field_delete_instance($instance);
+  }
+}

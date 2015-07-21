@@ -1,0 +1,7 @@
+name = CRM User
+description = Helps track changes in user entity and applied those changes to channels and contacts.
+core = 7.x
+
+dependencies[] = crm_contact
+dependencies[] = user
+dependencies[] = entityreference
