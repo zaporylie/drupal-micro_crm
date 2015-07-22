@@ -18,6 +18,14 @@ function crm_user_menu() {
     'type' => MENU_NORMAL_ITEM,
     'file' => 'crm_user.admin.inc',
   );
+  $items['admin/config/people/crm/sync'] = array(
+    'title' => 'Synchronize all existing users',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_user_sync_all'),
+    'access arguments' => array('crm administer'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'crm_user.admin.inc',
+  );
   return $items;
 }
 
@@ -102,7 +110,7 @@ function _crm_user_account_process($account) {
         }
       }
       catch (Exception $e) {
-        watchdog_exception('crm_user', $e);
+        watchdog_exception('crm_user', $e, NULL, array(), WATCHDOG_NOTICE);
         continue;
       }
     }

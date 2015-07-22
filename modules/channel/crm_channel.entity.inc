@@ -120,8 +120,14 @@ function crm_channel_label($channel) {
 }
 
 /**
- * @param $channel
- * @return mixed|null
+ * Load channel for channel values (channel type independent).
+ *
+ * @param object $channel
+ *   Load channel object for structured channel.
+ *
+ * @return bool|null|object
+ *   FALSE if object cannot be loaded, NULL if object does not exist, object if
+ *   matching object was founded.
  */
 function crm_channel_values_load($channel) {
   if (!isset($channel->type)) {
@@ -135,7 +141,13 @@ function crm_channel_values_load($channel) {
   if (!function_exists($module . '_crm_channel_values_load')) {
     return FALSE;
   }
-  return module_invoke($module, 'crm_channel_values_load', $channel);
+  try {
+    return module_invoke($module, 'crm_channel_values_load', $channel);
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_channel', $e, NULL, array(), WATCHDOG_NOTICE);
+    return FALSE;
+  }
 }
 
 /**

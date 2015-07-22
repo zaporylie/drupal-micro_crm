@@ -99,12 +99,12 @@ function crm_channel_ui_form_submit($form, &$form_state) {
     entity_save('crm_channel', $channel);
     $uri = entity_uri('crm_channel', $channel);
     $form_state['redirect'] = $uri['path'];
-    drupal_set_message(t('Channel has been saved'));
+    drupal_set_message(t('Channel @label has been saved.', array('@label' => entity_label('crm_channel', $channel))));
   }
   catch (Exception $e) {
     watchdog_exception('crm_channel', $e);
     $form_state['rebuild'] = TRUE;
-    drupal_set_message(t('Unable to save channel'), 'error');
+    drupal_set_message(t('Unable to save channel @label.', array('@label' => entity_label('crm_channel', $channel))), 'error');
   }
 
 }
@@ -129,8 +129,14 @@ function crm_channel_ui_delete_form($form, &$form_state, $channel) {
  */
 function crm_channel_ui_delete_form_submit($form, &$form_state) {
   $channel_id = entity_id('crm_channel', $form_state['values']['channel']);
+  $label = entity_label('crm_channel', $form_state['values']['channel']);
   if (entity_delete('crm_channel', $channel_id) !== FALSE) {
-    drupal_set_message(t('Channel @channel has been deleted', array('@channel' => $channel_id)));
+    drupal_set_message(t('Channel @label has been deleted.', array('@label' => $label)));
+    $form_state['redirect'] = 'admin/crm/channel';
+  }
+  else {
+    drupal_set_message(t('Unable to delete chanel @label.', array('@label' => $label)), 'error');
+    $form_state['rebuild'] = TRUE;
   }
 }
 

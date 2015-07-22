@@ -17,6 +17,8 @@ function crm_user_settings_form($form, $form_state) {
     $form['map'][$key] = array(
       '#type' => 'fieldset',
       '#title' => $key,
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
     );
     foreach (_crm_user_get_properties('crm_channel', $key) as $property_key => $property_label) {
       $form['map'][$key][$property_key] = array(
@@ -42,6 +44,29 @@ function crm_user_settings_form($form, $form_state) {
  */
 function crm_user_settings_form_submit($form, $form_state) {
   variable_set('crm_user_map', $form_state['values']['map']);
+}
+
+/**
+ * Sync confirmation form.
+ */
+function crm_user_sync_all($form, &$form_state) {
+  return confirm_form($form, t('Are you sure you want to sync all users with CRM module?'), 'admin/crm/contact');
+}
+
+/**
+ * Sync confirmation form submit handler.
+ *
+ * @todo Do it with Batch API
+ */
+function crm_user_sync_all_submit($form, &$form_state) {
+  $users = entity_load('user');
+  foreach ($users as $user) {
+    if ($user->uid) {
+      _crm_user_account_process($user);
+    }
+  }
+  drupal_set_message(t('Action was performed. Check log for details.'));
+  $form_state['redirect'] = 'admin/crm/contact';
 }
 
 /**

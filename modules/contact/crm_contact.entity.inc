@@ -102,11 +102,17 @@ function crm_contact_load_multiple($ids) {
 /**
  * @param $ids
  * @return bool|mixed
+ *
+ * @todo This function should return NULL if there is nothing to show instead of
+ * creating new, empty contact.
  */
 function crm_contact_load_by_channels($ids) {
   // If it's not an array - make it an array.
   if (!is_array($ids)) {
     $ids = array($ids);
+  }
+  if (empty($ids)) {
+    return entity_create('crm_contact', array());
   }
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'crm_contact')

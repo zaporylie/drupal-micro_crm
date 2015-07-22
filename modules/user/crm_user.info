@@ -5,3 +5,5 @@ core = 7.x
 dependencies[] = crm_contact
 dependencies[] = user
 dependencies[] = entityreference
+
+files[] = tests/crm_user.test

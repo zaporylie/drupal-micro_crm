@@ -7,8 +7,8 @@ class CRMUserTestCase extends CRMBaseTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => 'CRM Email',
-      'description' => 'CRM Email interface accessibility.',
+      'name' => 'CRM User',
+      'description' => 'CRM <=> User entity integration.',
       'group' => 'crm',
     );
   }
@@ -19,19 +19,105 @@ class CRMUserTestCase extends CRMBaseTestCase {
       'crm channel view',
       'crm contact overview',
       'crm contact view',
+      'administer users',
     );
     $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
 
-    parent::setUp('crm_channel_ui', 'crm_contact_ui', 'crm_email', 'crm_phone', 'crm_user');
+    parent::setUp('crm_channel_ui', 'crm_contact_ui', 'crm_email', 'crm_user');
 
     $this->drupalLogin($this->admin);
   }
 
+  /**
+   * Tests integration with CRUD events on user account.
+   */
   function testCRUDUser() {
+    $edit = array();
+    $edit["map[email][crm_email]"] = 'mail';
+    $this->drupalPost('admin/config/people/crm', $edit, t('Submit'));
+
+    $account = $this->drupalCreateUser();
+    $this->drupalGet('admin/crm/channel');
+    $this->assertResponse(200);
+
+    $this->assertRaw($account->mail, t('New created account was found.'));
+
+    $this->drupalGet('admin/crm/contact');
+    $this->assertResponse(200);
+
+    $this->assertRaw($account->mail, t('New created account was found.'));
+
+    $edit = array();
+    $edit['mail'] = $this->randomName() . '@new.example.com';
+    $this->drupalPost("user/$account->uid/edit", $edit, t('Save'));
+    $this->assertRaw(t("The changes have been saved."));
+
+    $this->drupalGet('admin/crm/channel');
+    $this->assertResponse(200);
+
+    $this->assertRaw($account->mail, t('New e-mail address was found.'));
+
+    $this->drupalGet('admin/crm/contact');
+    $this->assertResponse(200);
+
+    $this->assertRaw($account->mail, t('New e-mail address was found.'));
 
   }
 
+  /**
+   * Test module configuration.
+   */
   function testAdminSettingsForm() {
+
+    $this->drupalLogin($this->admin);
+    $this->drupalGet('admin/config/people/crm');
+    $this->assertResponse(200, t('Admin has access to the settings page.'));
+
+    foreach (crm_channel_types() as $type => $bundle) {
+      $this->assertRaw($bundle['label'], t('Bundle @type found', array('@type' => $bundle['label'])));
+    }
+
+    $edit = array();
+    $edit["map[email][crm_email]"] = 'mail';
+    $this->drupalPost('admin/config/people/crm', $edit, t('Submit'));
+    $this->assertFieldByName("map[email][crm_email]", 'mail', t('Values match'));
+
+    $this->drupalLogin($this->user);
+    $this->drupalGet('admin/config/people/crm');
+    $this->assertResponse(403, t('Normal user is not able to access the settings page'));
+  }
+
+  /**
+   * Tests all users sync.
+   */
+  function testSyncAllUsers() {
+    $edit = array();
+    $edit["map[email][crm_email]"] = 'mail';
+    $this->drupalPost('admin/config/people/crm', $edit, t('Submit'));
+
+    $users = entity_load('user');
+    unset($users[0]);
+    unset($users[1]);
+
+    $this->drupalLogin($this->admin);
+
+    $this->drupalGet('admin/crm/contact');
+    $this->assertResponse(200);
+    foreach ($users as $user) {
+      $this->assertNoRaw($user->mail);
+    }
+
+    $this->drupalGet('admin/config/people/crm/sync');
+    $this->assertResponse(200, t('Admin has access to the sync page.'));
+
+    $this->drupalPost("admin/config/people/crm/sync", array(), t('Confirm'));
+    $this->assertRaw(t("Action was performed. Check log for details."));
+
+    $this->drupalGet('admin/crm/contact');
+    $this->assertResponse(200);
+    foreach ($users as $user) {
+      $this->assertRaw($user->mail);
+    }
 
   }
 
