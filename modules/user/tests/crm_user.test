@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * Tests basic CRM functions.
+ */
+class CRMUserTestCase extends CRMBaseTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'CRM Email',
+      'description' => 'CRM Email interface accessibility.',
+      'group' => 'crm',
+    );
+  }
+
+  function setUp() {
+    $admin_permissions = array(
+      'crm channel overview',
+      'crm channel view',
+      'crm contact overview',
+      'crm contact view',
+    );
+    $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
+
+    parent::setUp('crm_channel_ui', 'crm_contact_ui', 'crm_email', 'crm_phone', 'crm_user');
+
+    $this->drupalLogin($this->admin);
+  }
+
+  function testCRUDUser() {
+
+  }
+
+  function testAdminSettingsForm() {
+
+  }
+
+}

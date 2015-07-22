@@ -147,13 +147,13 @@ function crm_channel_crm_channel_status_info() {
   $status = array();
 
   $status[CRM_CHANNEL_STATUS_UNREGISTERED] = array(
-    'title' => t('Unregistered'),
+    'title' => t('Inactive'),
     'state' => CRM_CHANNEL_STATE_DISABLED,
     'weight' => -99,
   );
 
   $status[CRM_CHANNEL_STATUS_REGISTERED] = array(
-    'title' => t('Registered'),
+    'title' => t('Active'),
     'description' => t('Registered, unprocessed channel'),
     'state' => CRM_CHANNEL_STATE_ACTIVE,
     'weight' => -99,

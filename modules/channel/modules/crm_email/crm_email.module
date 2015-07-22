@@ -95,10 +95,10 @@ function crm_email_crm_channel_values_load($channel) {
   $wrapper = entity_metadata_wrapper('crm_channel', $channel);
 
   if (!$wrapper->__isset('crm_email')) {
-    return NULL;
+    return FALSE;
   }
   if (!($value = $wrapper->crm_email->value())) {
-    return NULL;
+    return FALSE;
   }
   $query = new EntityFieldQuery();
 
@@ -110,12 +110,10 @@ function crm_email_crm_channel_values_load($channel) {
   if (!isset($result['crm_channel'])) {
     return NULL;
   }
-  elseif (isset($result['crm_channel']) && count($result['crm_channel']) <> 1) {
-    return NULL;
-  }
-  else {
+  elseif (isset($result['crm_channel']) && !empty($result['crm_channel'])) {
     return entity_load_single('crm_channel', key($result['crm_channel']));
   }
+  return NULL;
 }
 
 /**

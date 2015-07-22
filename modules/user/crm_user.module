@@ -22,95 +22,132 @@ function crm_user_menu() {
 }
 
 /**
+ * Implements hook_user_delete().
+ *
+ * @todo Change status for all "registered" channels to unregistered.
+ */
+function crm_user_user_delete($account) {
+  $contact = crm_user_load_contact($account->uid);
+  if (isset($contact->contact_id)) {
+    crm_user_user_unset($contact, $account);
+    $contact->log = 'User has been deleted, crm_user field is empty now.';
+    $contact->revision = TRUE;
+    entity_save('crm_conact', $contact);
+  }
+}
+
+/**
  * Implements hook_user_insert().
  */
 function crm_user_user_insert(&$edit, $account, $category) {
-
+  _crm_user_account_process($account);
 }
 
 /**
  * Implements hook_user_update().
  */
 function crm_user_user_update(&$edit, $account, $category) {
-  if (module_exists('crm_email')) {
-    if ($account->original->mail !== $account->mail) {
-      // Assume that $account->original->mail was there already and deal with
-      // changed mail only.
-
-      // Load contact entity for user.
-      $contact = crm_user_load_contact($account->uid);
-
-      // Search for channel entity for mail address assigned to account.
-      $value = entity_create('crm_channel', array('type' => 'email'));
-      crm_channel_set_value($value, $account->mail);
-      $channel = crm_channel_values_load($value);
-
-      if (!isset($channel->channel_id)) {
-        // If channel does not exist yet, create one.
-        $value->log = 'Channel created by crm_user module';
-        $value->revision = TRUE;
-        entity_save('crm_channel', $value);
-        $channel = $value;
-      }
-      if ($channel->status == CRM_CHANNEL_STATUS_UNREGISTERED) {
-        $channel->status = CRM_CHANNEL_STATUS_REGISTERED;
-        $channel->log = 'Channel status changed to registered.';
-        $channel->revision = TRUE;
-        entity_save('crm_channel', $channel);
-      }
-
-      // Check if contact already exists.
-      if (!isset($contact->contact_id)) {
-        // If not - try another approach.
-        $contacts = crm_contact_load_by_channels($channel->channel_id);
-        if (is_array($contacts)) {
-          // Get only one.
-          $contact = reset($contacts);
-        }
-        else {
-          $contact = $contacts;
-        }
-        crm_user_user_add($contact, $account);
-        $contact->language = !empty($account->language) ? $account->language : LANGUAGE_NONE;
-      }
-
-      // Add channel to contact.
-      if (!crm_contact_channel_exists($contact, $channel->channel_id)) {
-        crm_contact_channel_add($contact, $channel);
-      }
-
-      // Search for channel entity for mail address assigned to account.
-      $value = entity_create('crm_channel', array('type' => 'email'));
-      crm_channel_set_value($value, $account->original->mail);
-      $channel = crm_channel_values_load($value);
-      if (!isset($channel->channel_id)) {
-        // If channel does not exist yet, create one.
-        $channel = $value;
-      }
-      if ($channel->status == CRM_CHANNEL_STATUS_REGISTERED) {
-        $channel->status = CRM_CHANNEL_STATUS_UNREGISTERED;
-        $channel->log = 'Channel status changed to unregistered.';
-        $channel->revision = TRUE;
-        entity_save('crm_channel', $channel);
-      }
-
-      // Add channel to contact.
-      if (!crm_contact_channel_exists($contact, $channel->channel_id)) {
-        crm_contact_channel_add($contact, $channel);
-      }
-
-      $contact->log = 'Contact save triggered by user save.';
-      $contact->revision = TRUE;
-      entity_save('crm_contact', $contact);
-    }
-  }
+  _crm_user_account_process($account);
 }
 
 /**
- * Implements hook_user_delete().
+ * Save channels and contact, add information about corresponding user account.
+ *
+ * @param $account
+ *   User account.
+ *
+ * @todo Do something with content of $account->original.
+ * @todo Change channel status to registered/unregistered.
  */
-function crm_user_user_delete($account) {
+function _crm_user_account_process($account) {
+  $settings = variable_get('crm_user_map', array());
+  $account_wrapper = entity_metadata_wrapper('user', $account);
+  $contact_channels = array();
 
+  foreach ($settings as $type => $properties) {
+    try {
+      $channel = entity_create('crm_channel', array('type' => $type));
+      $wrapper = entity_metadata_wrapper('crm_channel', $channel);
+    }
+    catch (Exception $e) {
+      watchdog_exception('crm_user', $e);
+      continue;
+    }
+
+    foreach ($properties as $channel_property => $user_property) {
+      // Continue only if $channel_property is not null.
+      if (!isset($user_property) || empty($user_property)) {
+        continue;
+      }
+
+      // Reset variables.
+      $user_subproperty = $channel_subproperty = NULL;
+
+      // Explode properties to subproperties.
+      list($user_property, $user_subproperty) = array_pad(explode('|', $user_property), 2, NULL);
+      list($channel_property, $channel_subproperty) = array_pad(explode('|', $channel_property), 2, NULL);
+
+      try {
+        if (isset($user_subproperty) && isset($channel_subproperty)) {
+          $wrapper->{$channel_property}->{$channel_subproperty}->set($account_wrapper->{$user_property}->{$user_subproperty}->value());
+        }
+        elseif (isset($user_subproperty)) {
+          $wrapper->{$channel_property}->set($account_wrapper->{$user_property}->{$user_subproperty}->value());
+        }
+        elseif (isset($channel_subproperty)) {
+          $wrapper->{$channel_property}->{$channel_subproperty}->set($account_wrapper->{$user_property}->value());
+        }
+        else {
+          $wrapper->{$channel_property}->set($account_wrapper->{$user_property}->value());
+        }
+      }
+      catch (Exception $e) {
+        watchdog_exception('crm_user', $e);
+        continue;
+      }
+    }
+    $channel_search = crm_channel_values_load($channel);
+    if (is_object($channel_search)) {
+      $channel = $channel_search;
+      if ($channel->status == CRM_CHANNEL_STATUS_UNREGISTERED) {
+        $channel->status = CRM_CHANNEL_STATUS_REGISTERED;
+        $channel->log = 'Channel status has been changed by crm_user module.';
+        $channel->revision = TRUE;
+        entity_save('crm_channel', $channel);
+      }
+      $contact_channels[$channel->channel_id] = $channel;
+    }
+    elseif ($channel_search === NULL) {
+      $channel->log = 'Channel has been created by crm_user module.';
+      $channel->revision = TRUE;
+      entity_save('crm_channel', $channel);
+      $contact_channels[$channel->channel_id] = $channel;
+    }
+    else {
+      continue;
+    }
+  }
+
+  $contact = crm_user_load_contact($account->uid);
+  if (!isset($contact->contact_id)) {
+    $contact = crm_contact_load_by_channels(array_keys($contact_channels));
+    if (is_array($contact)) {
+      $contact = reset($contact);
+    }
+    crm_user_user_set($contact, $account);
+    $contact->language = (isset($account->language) && $account->language) ? $account->language : LANGUAGE_NONE;
+  }
+
+  foreach ($contact_channels as $channel) {
+    // Add channel to contact.
+    if (!crm_contact_channel_exists($contact, $channel->channel_id)) {
+      crm_contact_channel_add($contact, $channel);
+    }
+  }
+
+  $contact->log = 'Contact has been updated by crm_user module.';
+  $contact->revision = TRUE;
+  entity_save('crm_contact', $contact);
 }
 
 /**
@@ -136,10 +173,27 @@ function crm_user_load_contact($uid) {
  * @param $user
  * @return bool
  */
-function crm_user_user_add(&$contact, $user) {
+function crm_user_user_set(&$contact, $user) {
   try {
     $wrapper = entity_metadata_wrapper('crm_contact', $contact);
     $wrapper->crm_user->set($user);
+    return TRUE;
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_contact', $e);
+    return FALSE;
+  }
+}
+
+/**
+ * @param $contact
+ * @param $user
+ * @return bool
+ */
+function crm_user_user_unset(&$contact, $user) {
+  try {
+    $wrapper = entity_metadata_wrapper('crm_contact', $contact);
+    $wrapper->crm_user->set(NULL);
     return TRUE;
   }
   catch (Exception $e) {

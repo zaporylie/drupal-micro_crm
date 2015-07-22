@@ -125,15 +125,15 @@ function crm_channel_label($channel) {
  */
 function crm_channel_values_load($channel) {
   if (!isset($channel->type)) {
-    return NULL;
+    return FALSE;
   }
   $entity = entity_get_info('crm_channel');
   if (!isset($entity['bundles'][$channel->type]['module'])) {
-    return NULL;
+    return FALSE;
   }
   $module = $entity['bundles'][$channel->type]['module'];
   if (!function_exists($module . '_crm_channel_values_load')) {
-    return NULL;
+    return FALSE;
   }
   return module_invoke($module, 'crm_channel_values_load', $channel);
 }
