@@ -66,11 +66,11 @@ before_script:
   - drush --yes pm-download smsframework entityreference entity inline_entity_form ctools views email telephone
   - drush --yes pm-enable simpletest
 
+script:
   # Start a web server on port 8080, run in the background; wait for
   # initialization.
   - drush runserver 127.0.0.1:8080 &
-  - until netstat -an 2>/dev/null | grep '8080.*LISTEN'; do true; done
+  - until netstat -an 2>/dev/null | grep '8080.*LISTEN'; sleep 1; curl -I http://127.0.0.1:8080 ; do true; done
 
-script:
   # Run the Simpletests for Rules.
   - drush test-run --uri=http://127.0.0.1:8080 "crm"
