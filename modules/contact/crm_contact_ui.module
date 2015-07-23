@@ -71,10 +71,11 @@ function crm_contact_ui_menu() {
   $items['admin/crm/config/contact'] = array(
     'title' => 'Contact',
     'description' => 'Manage Contact settings.',
-    'page callback' => 'crm_index',
-    'page arguments' => array(),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_contact_ui_settings_form'),
     'access arguments' => array('crm administer'),
     'type' => MENU_NORMAL_ITEM,
+    'file' => 'crm_contact_ui.admin.inc',
   );
 
   return $items;
