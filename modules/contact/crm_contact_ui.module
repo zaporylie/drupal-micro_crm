@@ -81,6 +81,40 @@ function crm_contact_ui_menu() {
 }
 
 /**
+ * Implements hook_menu_local_tasks_alter().
+ *
+ * Add links to all channels collected under contact.
+ */
+function crm_contact_ui_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+
+  if (!($root_path == 'admin/crm/contact/%')) {
+    return;
+  }
+  $contact = $router_item['page_arguments'][0];
+  $wrapper = entity_metadata_wrapper('crm_contact', $contact);
+  foreach ($wrapper->crm_channel->getIterator() as $channel) {
+    // Add a tabs linking to all channels to contact page.
+    $uri = entity_uri('crm_channel', $channel->value());
+    $data['tabs'][1]['output'][] = array(
+      '#theme' => 'menu_local_task',
+      '#link' => array(
+        'title' => $channel->label(),
+        'href' => $uri['path'],
+        'localized_options' => array(
+          'attributes' => array(
+            'title' => t('See channel'),
+          ),
+        ),
+      ),
+    );
+  }
+  if (isset($data['tabs'][1]['output']) && is_array($data['tabs'][1]['output'])) {
+    // Trick to display also if there is only one channel.
+    $data['tabs'][1]['count'] = count($data['tabs'][1]['output']) + 1;
+  }
+}
+
+/**
  * Implements hook_views_api().
  */
 function crm_contact_ui_views_api() {

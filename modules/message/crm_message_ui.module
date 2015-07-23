@@ -110,13 +110,13 @@ function crm_message_ui_menu() {
     'file' => 'includes/crm_message_ui.form.inc',
   );
 
-  $items['admin/crm/channel/%crm_channel/send'] = array(
+  $items['admin/crm/channel/%crm_channel/message/send'] = array(
     'title' => 'Send',
     'page callback' => 'crm_message_ui_send_channel_form_wrapper',
     'page arguments' => array(3),
     'access callback' => 'crm_message_ui_channel_access',
     'access arguments' => array('create', 3),
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_ACTION,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'file' => 'includes/crm_message_ui.form.inc',
   );
