@@ -168,7 +168,7 @@ function crm_channel_crm_channel_status_info() {
  * @return array
  *   List of statuses
  */
-function crm_channel_statuses() {
+function crm_channel_statuses($conditions = array()) {
   // First check the static cache for an order states array.
   $statuses = &drupal_static(__FUNCTION__);
 
@@ -180,6 +180,32 @@ function crm_channel_statuses() {
     drupal_alter('crm_channel_status_info', $statuses);
 
     uasort($statuses, 'drupal_sort_weight');
+  }
+
+  // Apply conditions to the returned statuses if specified.
+  if (!empty($conditions)) {
+    $matching_statuses = array();
+
+    foreach ($statuses as $name => $status) {
+      // Check the status against the conditions array to determine whether to
+      // add it to the return array or not.
+      $valid = TRUE;
+
+      foreach ($conditions as $property => $value) {
+        // If the current value for the specified property on the status does
+        // not match the filter value...
+        if ($status[$property] != $value) {
+          // Do not add it to the temporary array.
+          $valid = FALSE;
+        }
+      }
+
+      if ($valid) {
+        $matching_statuses[$name] = $status;
+      }
+    }
+
+    return $matching_statuses;
   }
 
   return $statuses;
@@ -477,4 +503,23 @@ function crm_channel_uninstall_fields($array) {
       field_delete_instance($instance);
     }
   }
+}
+
+/**
+ * Removes all inactive channels from array.
+ *
+ * @param $channels
+ *   Array of channels.
+ *
+ * @return array
+ *   Filtered array of channels.
+ */
+function crm_channel_filter_inactive($channels) {
+  $channels = array_filter($channels, function ($channel) {
+    if (in_array($channel->status, array_keys(crm_channel_statuses(array('state' => CRM_CHANNEL_STATE_DISABLED))))) {
+      return FALSE;
+    }
+    return TRUE;
+  });
+  return $channels;
 }

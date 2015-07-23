@@ -7,6 +7,11 @@
 
 define('CRM_CONTACT_STATUS_REGISTERED', 'registered');
 
+define('CRM_CONTACT_DEFAULT_CHANNEL_METHOD_LAST', 'last');
+define('CRM_CONTACT_DEFAULT_CHANNEL_METHOD_FIRST', 'first');
+define('CRM_CONTACT_DEFAULT_CHANNEL_METHOD_RANDOM', 'random');
+define('CRM_CONTACT_PREFERABLE_CHANNEL_TYPE', '');
+
 module_load_include('inc', 'crm_contact', 'crm_contact.entity');
 
 /**
@@ -201,4 +206,52 @@ function crm_contact_channel_remove(&$contact, $channel_id) {
     watchdog_exception('crm_contact', $e);
   }
   return FALSE;
+}
+
+/**
+ * @param $contact
+ *   Contact object.
+ * @param string|null $type
+ *   Channel type.
+ *
+ * @return bool|mixed
+ *   Default channel object or FALSE if does not exist.
+ */
+function crm_contact_channel_get_default($contact, $type = NULL) {
+  $wrapper = entity_metadata_wrapper('crm_contact', $contact);
+  $channels = $wrapper->crm_channel->value();
+
+  // Remove all inactive channels.
+  $channels = crm_channel_filter_inactive($channels);
+
+  $default_type = variable_get('crm_contact_preferable_channel_type', CRM_CONTACT_PREFERABLE_CHANNEL_TYPE);
+  if (!isset($type) && ($default_type !== CRM_CONTACT_PREFERABLE_CHANNEL_TYPE)) {
+    $type = $default_type;
+  }
+
+  if (isset($type)) {
+    $channels = array_filter($channels, function ($channel) use ($type) {
+      if ($channel->type !== $type) {
+        return FALSE;
+      }
+      return TRUE;
+    });
+  }
+
+  if (empty($channels)) {
+    return FALSE;
+  }
+
+  switch (variable_get('crm_contact_default_channel_method', CRM_CONTACT_DEFAULT_CHANNEL_METHOD_LAST)) {
+    case CRM_CONTACT_DEFAULT_CHANNEL_METHOD_FIRST:
+      return array_shift($channels);
+
+    case CRM_CONTACT_DEFAULT_CHANNEL_METHOD_RANDOM:
+      $key = array_rand($channels, 1);
+      return $channels[$key];
+
+    case CRM_CONTACT_DEFAULT_CHANNEL_METHOD_LAST:
+    default:
+      return array_pop($channels);
+  }
 }

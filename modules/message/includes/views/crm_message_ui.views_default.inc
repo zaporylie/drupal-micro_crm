@@ -147,8 +147,8 @@ function crm_message_ui_views_default_views() {
     3 => 0,
   );
 
-  /* Display: Page */
-  $handler = $view->new_display('page', 'Page', 'page');
+  /* Display: Messages */
+  $handler = $view->new_display('page', 'Messages', 'page');
   $handler->display->display_options['path'] = 'admin/crm/message/list';
   $handler->display->display_options['menu']['type'] = 'default tab';
   $handler->display->display_options['menu']['title'] = 'Message';
@@ -162,6 +162,28 @@ function crm_message_ui_views_default_views() {
   $handler->display->display_options['tab_options']['description'] = 'List of all messages registered in CRM system.';
   $handler->display->display_options['tab_options']['weight'] = '0';
   $handler->display->display_options['tab_options']['name'] = 'management';
+
+  /* Display: Channel messages */
+  $handler = $view->new_display('page', 'Channel messages', 'page_1');
+  $handler->display->display_options['defaults']['arguments'] = FALSE;
+  /* Contextual filter: Channel: Channel ID */
+  $handler->display->display_options['arguments']['channel_id']['id'] = 'channel_id';
+  $handler->display->display_options['arguments']['channel_id']['table'] = 'crm_channel';
+  $handler->display->display_options['arguments']['channel_id']['field'] = 'channel_id';
+  $handler->display->display_options['arguments']['channel_id']['relationship'] = 'crm_channel_single_target_id';
+  $handler->display->display_options['arguments']['channel_id']['default_action'] = 'default';
+  $handler->display->display_options['arguments']['channel_id']['default_argument_type'] = 'raw';
+  $handler->display->display_options['arguments']['channel_id']['default_argument_options']['index'] = '3';
+  $handler->display->display_options['arguments']['channel_id']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['channel_id']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['channel_id']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['path'] = 'admin/crm/channel/%/message';
+  $handler->display->display_options['menu']['type'] = 'tab';
+  $handler->display->display_options['menu']['title'] = 'Messages';
+  $handler->display->display_options['menu']['weight'] = '0';
+  $handler->display->display_options['menu']['name'] = 'management';
+  $handler->display->display_options['menu']['context'] = 1;
+  $handler->display->display_options['menu']['context_only_inline'] = 0;
 
   $views[$view->name] = $view;
 
