@@ -516,7 +516,7 @@ function _crm_campaign_is_sent($campaign_id) {
 /**
  * Implements hook_crm_campaign_presave().
  */
-function crm_campaign_crm_campign_presave($campaign) {
+function crm_campaign_crm_campaign_presave($campaign) {
   crm_campaign_pre_populate($campaign);
 }
 
