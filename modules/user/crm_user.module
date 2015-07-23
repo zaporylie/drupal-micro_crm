@@ -1,0 +1,211 @@
+<?php
+
+/**
+ * @file
+ * Mostly implementations of user hooks that helps you to track changes in user
+ * entity.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function crm_user_menu() {
+  $items['admin/config/people/crm'] = array(
+    'title' => 'CRM integration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_user_settings_form'),
+    'access arguments' => array('crm administer'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'crm_user.admin.inc',
+  );
+  $items['admin/config/people/crm/sync'] = array(
+    'title' => 'Synchronize all existing users',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_user_sync_all'),
+    'access arguments' => array('crm administer'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'crm_user.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_user_delete().
+ *
+ * @todo Change status for all "registered" channels to unregistered.
+ */
+function crm_user_user_delete($account) {
+  $contact = crm_user_load_contact($account->uid);
+  if (isset($contact->contact_id)) {
+    crm_user_user_unset($contact, $account);
+    $contact->log = 'User has been deleted, crm_user field is empty now.';
+    $contact->revision = TRUE;
+    entity_save('crm_conact', $contact);
+  }
+}
+
+/**
+ * Implements hook_user_insert().
+ */
+function crm_user_user_insert(&$edit, $account, $category) {
+  _crm_user_account_process($account);
+}
+
+/**
+ * Implements hook_user_update().
+ */
+function crm_user_user_update(&$edit, $account, $category) {
+  _crm_user_account_process($account);
+}
+
+/**
+ * Save channels and contact, add information about corresponding user account.
+ *
+ * @param $account
+ *   User account.
+ *
+ * @todo Do something with content of $account->original.
+ * @todo Change channel status to registered/unregistered.
+ */
+function _crm_user_account_process($account) {
+  $settings = variable_get('crm_user_map', array());
+  $account_wrapper = entity_metadata_wrapper('user', $account);
+  $contact_channels = array();
+
+  foreach ($settings as $type => $properties) {
+    try {
+      $channel = entity_create('crm_channel', array('type' => $type));
+      $wrapper = entity_metadata_wrapper('crm_channel', $channel);
+    }
+    catch (Exception $e) {
+      watchdog_exception('crm_user', $e);
+      continue;
+    }
+
+    foreach ($properties as $channel_property => $user_property) {
+      // Continue only if $channel_property is not null.
+      if (!isset($user_property) || empty($user_property)) {
+        continue;
+      }
+
+      // Reset variables.
+      $user_subproperty = $channel_subproperty = NULL;
+
+      // Explode properties to subproperties.
+      list($user_property, $user_subproperty) = array_pad(explode('|', $user_property), 2, NULL);
+      list($channel_property, $channel_subproperty) = array_pad(explode('|', $channel_property), 2, NULL);
+
+      try {
+        if (isset($user_subproperty) && isset($channel_subproperty)) {
+          $wrapper->{$channel_property}->{$channel_subproperty}->set($account_wrapper->{$user_property}->{$user_subproperty}->value());
+        }
+        elseif (isset($user_subproperty)) {
+          $wrapper->{$channel_property}->set($account_wrapper->{$user_property}->{$user_subproperty}->value());
+        }
+        elseif (isset($channel_subproperty)) {
+          $wrapper->{$channel_property}->{$channel_subproperty}->set($account_wrapper->{$user_property}->value());
+        }
+        else {
+          $wrapper->{$channel_property}->set($account_wrapper->{$user_property}->value());
+        }
+      }
+      catch (Exception $e) {
+        watchdog_exception('crm_user', $e, NULL, array(), WATCHDOG_NOTICE);
+        continue;
+      }
+    }
+    $channel_search = crm_channel_values_load($channel);
+    if (is_object($channel_search)) {
+      $channel = $channel_search;
+      if ($channel->status == CRM_CHANNEL_STATUS_UNREGISTERED) {
+        $channel->status = CRM_CHANNEL_STATUS_REGISTERED;
+        $channel->log = 'Channel status has been changed by crm_user module.';
+        $channel->revision = TRUE;
+        entity_save('crm_channel', $channel);
+      }
+      $contact_channels[$channel->channel_id] = $channel;
+    }
+    elseif ($channel_search === NULL) {
+      $channel->log = 'Channel has been created by crm_user module.';
+      $channel->revision = TRUE;
+      entity_save('crm_channel', $channel);
+      $contact_channels[$channel->channel_id] = $channel;
+    }
+    else {
+      continue;
+    }
+  }
+
+  $contact = crm_user_load_contact($account->uid);
+  if (!isset($contact->contact_id)) {
+    $contact = crm_contact_load_by_channels(array_keys($contact_channels));
+    if (is_array($contact)) {
+      $contact = reset($contact);
+    }
+    crm_user_user_set($contact, $account);
+    $contact->language = (isset($account->language) && $account->language) ? $account->language : LANGUAGE_NONE;
+  }
+
+  foreach ($contact_channels as $channel) {
+    // Add channel to contact.
+    if (!crm_contact_channel_exists($contact, $channel->channel_id)) {
+      crm_contact_channel_add($contact, $channel);
+    }
+  }
+
+  $contact->log = 'Contact has been updated by crm_user module.';
+  $contact->revision = TRUE;
+  entity_save('crm_contact', $contact);
+}
+
+/**
+ * @param $uid
+ * @return mixed|null
+ */
+function crm_user_load_contact($uid) {
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'crm_contact')
+    ->fieldCondition('crm_user', 'target_id', $uid, '=')
+    ->range(0, 1);
+
+  $result = $query->execute();
+  if (isset($result['crm_contact']) && !empty($result['crm_contact'])) {
+    return entity_load_single('crm_contact', key($result['crm_contact']));
+  }
+  return NULL;
+}
+
+/**
+ * @param $contact
+ * @param $user
+ * @return bool
+ */
+function crm_user_user_set(&$contact, $user) {
+  try {
+    $wrapper = entity_metadata_wrapper('crm_contact', $contact);
+    $wrapper->crm_user->set($user);
+    return TRUE;
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_contact', $e);
+    return FALSE;
+  }
+}
+
+/**
+ * @param $contact
+ * @param $user
+ * @return bool
+ */
+function crm_user_user_unset(&$contact, $user) {
+  try {
+    $wrapper = entity_metadata_wrapper('crm_contact', $contact);
+    $wrapper->crm_user->set(NULL);
+    return TRUE;
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_contact', $e);
+    return FALSE;
+  }
+}

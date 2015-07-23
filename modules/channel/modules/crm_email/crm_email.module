@@ -94,29 +94,27 @@ function crm_email_crm_reference_search_field_info() {
 function crm_email_crm_channel_values_load($channel) {
   $wrapper = entity_metadata_wrapper('crm_channel', $channel);
 
+  // Throw exception if there is no crm_email field or value for the field.
   if (!$wrapper->__isset('crm_email')) {
-    return NULL;
+    throw new Exception('Missing crm_email property.');
   }
   if (!($value = $wrapper->crm_email->value())) {
-    return NULL;
+    throw new Exception('Missing crm_email property value.');
   }
-  $query = new EntityFieldQuery();
 
+  // Search for channel.
+  $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'crm_channel')
     ->entityCondition('bundle', 'email')
     ->fieldCondition('crm_email', 'email', $value, '=');
-
   $result = $query->execute();
-  if (!isset($result['crm_channel'])) {
-    return NULL;
+
+  // Return only one channel at maximum.
+  if (isset($result['crm_channel']) && !empty($result['crm_channel'])) {
+    return entity_load_single('crm_channel', key($result['crm_channel']));
   }
-  elseif (isset($result['crm_channel']) && count($result['crm_channel']) <> 1) {
-    return NULL;
-  }
-  else {
-    $entity = entity_load('crm_channel', array_keys($result['crm_channel']));
-    return reset($entity);
-  }
+  // Otherwise return NULL.
+  return NULL;
 }
 
 /**

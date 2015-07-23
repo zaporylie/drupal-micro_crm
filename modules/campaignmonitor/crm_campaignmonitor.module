@@ -353,15 +353,14 @@ function crm_campaignmonitor_webhook($type) {
       }
     }
 
-    $tmp = crm_contact_get_channels($contact);
-    if (isset($new_entity) && $tmp) {
-      if (!in_array($new_entity->channel_id, $tmp)) {
-        $wrapper->crm_channel[] = $new_entity;
+    if (isset($new_entity)) {
+      if (!crm_contact_channel_exists($contact, $new_entity->channel_id)) {
+        crm_contact_channel_add($contact, $new_entity);
       }
     }
-    // Add channel to
-    if (!in_array($channel->channel_id, $tmp)) {
-      $wrapper->crm_channel[] = $channel;
+    // Add channel to wrapper.
+    if (!crm_contact_channel_exists($contact, $channel->channel_id)) {
+      crm_contact_channel_add($contact, $channel);
     }
 
     $contact->log = 'Contact updated via Campaign Monitor Webhook';

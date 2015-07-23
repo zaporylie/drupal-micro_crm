@@ -29,6 +29,8 @@ class CRMBaseTestCase extends DrupalWebTestCase {
     $args = func_get_args();
     call_user_func_array(array('parent', 'setUp'), $args);
 
+    field_cache_clear();
+
     $this->admin = $this->drupalCreateUser($this->admin_permissions);
     $this->user = $this->drupalCreateUser($this->user_permissions);
   }

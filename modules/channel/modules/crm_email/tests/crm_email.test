@@ -5,7 +5,9 @@
  */
 class CRMEmailTestCase extends CRMBaseTestCase {
 
-
+  /**
+   * Info about test case.
+   */
   public static function getInfo() {
     return array(
       'name' => 'CRM Email',
@@ -14,6 +16,9 @@ class CRMEmailTestCase extends CRMBaseTestCase {
     );
   }
 
+  /**
+   * Setup test case.
+   */
   function setUp() {
     $admin_permissions = array(
       'crm channel overview',
@@ -61,26 +66,11 @@ class CRMEmailTestCase extends CRMBaseTestCase {
 
     $this->drupalGet('admin/crm/channel/add/email');
     $this->assertResponse(200, t('Admin user is not able to access the email add page'));
-
-    // @todo move to separate test case.
-    $langcode = LANGUAGE_NONE;
-    $this->assertFieldByName("crm_email[$langcode][0][email]", NULL, t('%title field present in the add page', array('%title' => t('E-mail'))));
-
-    $this->drupalGet('admin/crm/channel');
-    $this->assertLinkByHref($uri['path'] . '/view');
-    $this->assertLinkByHref($uri['path'] . '/edit');
-    $this->assertLinkByHref($uri['path'] . '/delete');
-
-    $this->drupalGet($uri['path'] . '/view');
-    $this->assertResponse(200, t('Admin user is not able to access the channel view'));
-
-    $this->drupalGet($uri['path'] . '/edit');
-    $this->assertResponse(200, t('Admin user is not able to access the channel view'));
-
-    $this->drupalGet($uri['path'] . '/delete');
-    $this->assertResponse(200, t('Admin user is not able to access the channel view'));
   }
 
+  /**
+   * Tests new channel form.
+   */
   function testAddEmailChannel() {
     // Create a Email channel.
     $edit = array();
@@ -91,9 +81,25 @@ class CRMEmailTestCase extends CRMBaseTestCase {
     $this->drupalPost('admin/crm/channel/add/email', $edit, t('Save'));
 
     // Check that the Basic page has been created.
-    $this->assertRaw(t('Channel has been saved'));
+    $this->assertRaw(t('Channel @label has been saved', array('@label' => $edit["crm_email[$langcode][0][email]"])));
   }
 
+  /**
+   * Tests channel page.
+   */
+  function testViewEmailChannel() {
+    $channel = $this->createRandomEmailChannel();
+    $uri = entity_uri('crm_channel', $channel);
+
+    $this->drupalGet($uri['path'] . '/view');
+    $this->assertResponse(200);
+
+    $this->assertRaw(entity_label('crm_channel', $channel));
+  }
+
+  /**
+   * Tests edit form.
+   */
   function testEditEmailChannel() {
     $channel = $this->createRandomEmailChannel();
     $wrapper = entity_metadata_wrapper('crm_channel', $channel);
@@ -111,14 +117,34 @@ class CRMEmailTestCase extends CRMBaseTestCase {
     $this->drupalPost('admin/crm/channel/' . $channel->channel_id . '/edit', $edit, t('Save'));
 
     // Check that the Basic page has been created.
-    $this->assertRaw(t('Channel has been saved'));
+    $this->assertRaw(t('Channel @label has been saved.', array('@label' => $edit["crm_email[$langcode][0][email]"])));
 
   }
 
+  /**
+   * Tests delete form.
+   */
   function testDeleteEmailChannel() {
+    $channel = $this->createRandomEmailChannel();
+    $uri = entity_uri('crm_channel', $channel);
 
+    $this->drupalGet($uri['path'] . '/delete');
+    $this->assertResponse(200);
+
+    $this->drupalPost($uri['path'] . '/delete', array(), t('Confirm'));
+
+    $this->assertRaw(t('Channel @label has been deleted.', array('@label' => crm_channel_label($channel))));
   }
 
+  /**
+   * Creates new, random email channel.
+   *
+   * @param array $values
+   *   Values array, leave it empty if you want to use default values.
+   *
+   * @return object
+   *   Channel object.
+   */
   function createRandomEmailChannel($values = array()) {
     $values += array(
       'mail' => $this->randomEmail(),
@@ -127,19 +153,18 @@ class CRMEmailTestCase extends CRMBaseTestCase {
     $channel = entity_create('crm_channel', array(
       'type' => 'email',
     ));
-    try {
-      $wrapper = entity_metadata_wrapper('crm_channel', $channel);
-      $wrapper->crm_email->set($values['mail']);
-      $wrapper->log->set($values['log']);
-      $wrapper->save();
-    }
-    catch (Exception $e) {
-      print_r($e);
-    }
-
-    return $wrapper->value();
+    crm_channel_set_value($channel, $values['mail']);
+    $channel->log = $values['log'];
+    entity_save('crm_channel', $channel);
+    return $channel;
   }
 
+  /**
+   * Random email address.
+   *
+   * @return string
+   *   Random, valid email address.
+   */
   function randomEmail() {
     return $this->randomName() . '@' . $this->randomName() . '.' . $this->randomName(2);
   }
