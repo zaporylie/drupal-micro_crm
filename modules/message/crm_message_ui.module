@@ -121,6 +121,19 @@ function crm_message_ui_menu() {
     'file' => 'includes/crm_message_ui.form.inc',
   );
 
+  if (module_exists('crm_contact')) {
+    $items['admin/crm/contact/%crm_contact/send'] = array(
+      'title' => 'Send',
+      'page callback' => 'crm_message_ui_send_contact_form_wrapper',
+      'page arguments' => array(3),
+      'access callback' => 'crm_message_ui_contact_access',
+      'access arguments' => array('create', 3),
+      'type' => MENU_LOCAL_TASK,
+      'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+      'file' => 'includes/crm_message_ui.form.inc',
+    );
+  }
+
   return $items;
 }
 
@@ -165,4 +178,24 @@ function crm_message_ui_channel_access($op, $channel) {
     return FALSE;
   }
   return crm_message_access($op);
+}
+
+if (module_exists('crm_contact')) {
+  /**
+   * @param $contact
+   */
+  function crm_message_ui_contact_access($op, $contact) {
+    try {
+      $wrapper = entity_metadata_wrapper('crm_contact', $contact);
+      $channels = $wrapper->crm_channel->value();
+      $channels = crm_channel_filter_inactive($channels);
+      if (empty($channels)) {
+        return FALSE;
+      }
+      return crm_message_access($op);
+    }
+    catch (Exception $e) {
+      return FALSE;
+    }
+  }
 }

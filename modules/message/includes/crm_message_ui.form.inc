@@ -42,6 +42,22 @@ function crm_message_ui_send_channel_form_wrapper($channel) {
 }
 
 /**
+ * @param $contact
+ */
+function crm_message_ui_send_contact_form_wrapper($contact) {
+  if ($channel = crm_contact_channel_get_default($contact)) {
+    $message = crm_message_create(array(
+      'channel' => $channel,
+    ), 'crm_message');
+  }
+  if (!isset($message) || !$message) {
+    drupal_set_message(t('Unable to create a new message'), 'error');
+    drupal_goto();
+  }
+  return drupal_get_form('crm_message_ui_form', $message);
+}
+
+/**
  * Message form.
  */
 function crm_message_ui_form($form, &$form_state, $message) {
