@@ -221,6 +221,41 @@ function crm_campaign_action_info() {
 }
 
 /**
+ * @return array
+ */
+function crm_campaign_crm_campaign_manage_recipients_method_info() {
+  $methods['views'] = array(
+    'name' => t('VBO'),
+    'path' => 'admin/crm/campaign/%/channel',
+    'auto' => FALSE,
+  );
+  $methods['user_in_node'] = array(
+    'name' => t('USer in node'),
+    'auto' => TRUE,
+    'callback' => 'user_in_node',
+  );
+  return $methods;
+}
+
+/**
+ * @return array
+ */
+function crm_campaign_manage_recipients_method_info() {
+  // First check the static cache for an array.
+  $methods = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch it now.
+  if (empty($methods)) {
+    $methods = module_invoke_all('crm_campaign_manage_recipients_method_info');
+
+    // Give other modules a chance to alter the array.
+    drupal_alter('crm_campaign_manage_recipients_method_info', $methods);
+  }
+
+  return $methods;
+}
+
+/**
  * Action form callback.
  */
 function crm_campaign_add_to_campaign_action_form($settings, &$form_state) {
@@ -476,4 +511,43 @@ function _crm_campaign_is_sent($campaign_id) {
     return TRUE;
   }
   return FALSE;
+}
+
+/**
+ * Implements hook_crm_campaign_presave().
+ */
+function crm_campaign_crm_campign_presave($campaign) {
+  crm_campaign_pre_populate($campaign);
+}
+
+/**
+ * Manipulates object by populating crm_channel field value;
+ *
+ * @param $campaign
+ */
+function crm_campaign_pre_populate(&$campaign) {
+  $methods = crm_campaign_manage_recipients_method_info();
+  if (!isset($campaign->data['manage_recipients_methods'])) {
+    return;
+  }
+  if (empty($campaign->data['manage_recipients_methods'])) {
+    return;
+  }
+  if (!is_array($campaign->data['manage_recipients_methods'])) {
+    return;
+  }
+  uasort($campaign->data['manage_recipients_methods'], 'drupal_sort_weight');
+  foreach ($campaign->data['manage_recipients_methods'] as $method) {
+    if (!isset($methods[$method]['auto']) || !isset($methods[$method]['callback']) || !$methods[$method]['auto']) {
+      continue;
+    }
+    if (function_exists($methods[$method]['callback'])) {
+      $methods[$method]['callback']($campaign);
+    }
+  }
+}
+
+function user_in_node(&$campaign) {
+  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+  $wrapper->crm_channel[] = crm_channel_load(1);
 }
