@@ -182,8 +182,12 @@ function crm_message_template_install() {
   $field = array(
     'settings' => array(
       'target_type' => 'crm_message_template',
-      'handler' => 'CRMReference_SelectionHandler',
+      'handler' => 'base',
       'handler_settings' => array(
+        'target_bundles' => array(),
+        'sort' => array(
+          'type' => 'none',
+        ),
         'behaviors' => array(
           'views-select-list' => array(
             'status' => 0,

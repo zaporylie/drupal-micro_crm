@@ -23,6 +23,7 @@ function crm_message_template_entity_info() {
       'bundle' => 'type',
       'revision' => 'revision_id',
       'language' => 'language',
+      'label' => 'name',
     ),
     'bundle keys' => array(
       'bundle' => 'type',
