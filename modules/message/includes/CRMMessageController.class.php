@@ -22,17 +22,6 @@ class CRMMessageController extends EntityAPIController {
   }
 
   /**
-   * Overrides EntityAPIController::attachLoad().
-   */
-  public function attachLoad(&$queried_entities, $revision_id = FALSE) {
-    foreach ($queried_entities as $id => &$entity) {
-      $entity->data = unserialize($entity->data);
-    }
-
-    parent::attachLoad($queried_entities, $revision_id);
-  }
-
-  /**
    * Overrides EntityAPIController::access().
    */
   public function access($op, $entity = NULL, $account = NULL) {
