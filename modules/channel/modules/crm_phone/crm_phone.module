@@ -172,6 +172,46 @@ function crm_phone_crm_message_crm_channel_fields_info_alter(&$fields) {
 }
 
 /**
+ * Implements hook_libraries_info().
+ */
+function crm_phone_libraries_info() {
+  $libraries['sms-counter'] = array(
+    'name' => 'SMS Counter',
+    'vendor url' => 'https://github.com/danxexe/sms-counter',
+    'download url' => 'https://github.com/danxexe/sms-counter/archive/master.zip',
+    'version' => 'master',
+    'files' => array(
+      'js' => array('sms_counter.min.js'),
+    ),
+  );
+  return $libraries;
+}
+
+/**
+ * Implements hook_field_widget_WIDGET_TYPE_form_alter().
+ */
+function crm_phone_field_widget_text_textarea_form_alter(&$element, &$form_state, $context) {
+  if ($element['#field_name'] == 'crm_message_phone_body') {
+    $element['value']['#attributes']['class'][] = 'crm-phone-sms-message';
+
+    if (!isset($element['value']['#attached']['js'])) {
+      $element['value']['#attached']['js'] = array();
+    }
+    $element['value']['#attached']['js'][] = drupal_get_path('module', 'crm_phone') . '/crm_phone.js';
+
+    if (!isset($element['value']['#attached']['css'])) {
+      $element['value']['#attached']['css'] = array();
+    }
+    $element['value']['#attached']['css'][] = drupal_get_path('module', 'crm_phone') . '/crm_phone.css';
+
+    if (!isset($element['value']['#attached']['libraries_load'])) {
+      $element['value']['#attached']['libraries_load'] = array();
+    }
+    $element['value']['#attached']['libraries_load'][] = array('sms-counter');
+  }
+}
+
+/**
  * Implements hook_crm_message_template_crm_channel_fields_info_alter().
  */
 function crm_phone_crm_message_template_crm_channel_fields_info_alter(&$fields) {

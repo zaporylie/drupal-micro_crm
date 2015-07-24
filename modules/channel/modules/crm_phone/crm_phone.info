@@ -4,3 +4,4 @@ package = CRM
 
 dependencies[] = crm_channel
 dependencies[] = telephone_validation
+dependencies[] = libraries

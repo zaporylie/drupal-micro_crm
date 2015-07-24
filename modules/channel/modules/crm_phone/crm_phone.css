@@ -1,0 +1,15 @@
+.crm-phone-sms-message {
+
+}
+
+.crm-phone-sms-message-counter {
+
+}
+
+.crm-phone-sms-message-counter > div {
+  color: firebrick;
+}
+
+.crm-phone-sms-message-counter > div.messages-1 {
+  color: forestgreen;
+}
