@@ -97,6 +97,35 @@ function crm_campaign_menu() {
 }
 
 /**
+ * Implements hook_module_implements_alter().
+ */
+function crm_campaign_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'menu_alter') {
+    $group = $implementations['crm_campaign'];
+    unset($implementations['crm_campaign']);
+    $implementations['crm_campaign'] = $group;
+  }
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function crm_campaign_menu_alter(&$items) {
+  foreach (crm_campaign_manage_recipients_method_info() as $key => $method) {
+    if (!isset($method['path'])) {
+      continue;
+    }
+    $items[$method['path']]['access arguments'] = array(
+      $items[$method['path']]['access callback'],
+      $items[$method['path']]['access arguments'],
+      $method['path'],
+      $method['path argument position'],
+    );
+    $items[$method['path']]['access callback'] = 'crm_campaign_manage_recipients_access_callback';
+  }
+}
+
+/**
  * Implements hook_permission().
  */
 function crm_campaign_permission() {
@@ -218,6 +247,37 @@ function crm_campaign_action_info() {
       'aggregate' => TRUE,
     ),
   );
+}
+
+/**
+ * @return array
+ */
+function crm_campaign_crm_campaign_manage_recipients_method_info() {
+  $methods['crm_campaign_vbo'] = array(
+    'name' => t('VBO'),
+    'path' => 'admin/crm/campaign/%/channel',
+    'path argument position' => 3,
+    'auto' => FALSE,
+  );
+  return $methods;
+}
+
+/**
+ * @return array
+ */
+function crm_campaign_manage_recipients_method_info() {
+  // First check the static cache for an array.
+  $methods = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch it now.
+  if (empty($methods)) {
+    $methods = module_invoke_all('crm_campaign_manage_recipients_method_info');
+
+    // Give other modules a chance to alter the array.
+    drupal_alter('crm_campaign_manage_recipients_method_info', $methods);
+  }
+
+  return $methods;
 }
 
 /**
@@ -475,5 +535,73 @@ function _crm_campaign_is_sent($campaign_id) {
   if (!isset($result['crm_message']) || !count($result['crm_message'])) {
     return TRUE;
   }
+  return FALSE;
+}
+
+/**
+ * Implements hook_crm_campaign_presave().
+ */
+function crm_campaign_crm_campaign_presave($campaign) {
+  crm_campaign_pre_populate($campaign);
+}
+
+/**
+ * Manipulates object by populating crm_channel field value;
+ *
+ * @param $campaign
+ */
+function crm_campaign_pre_populate(&$campaign) {
+  if (!isset($campaign->data['manage_recipients_methods'])) {
+    return;
+  }
+  if (empty($campaign->data['manage_recipients_methods'])) {
+    return;
+  }
+  if (!is_array($campaign->data['manage_recipients_methods'])) {
+    return;
+  }
+  $methods = crm_campaign_manage_recipients_method_info();
+  uasort($campaign->data['manage_recipients_methods'], 'drupal_sort_weight');
+  foreach ($campaign->data['manage_recipients_methods'] as $method) {
+    if (!isset($methods[$method]['auto']) || !isset($methods[$method]['callback']) || !$methods[$method]['auto']) {
+      continue;
+    }
+    if (function_exists($methods[$method]['callback'])) {
+      $methods[$method]['callback']($campaign);
+    }
+  }
+}
+
+/**
+ *
+ *
+ * @param $callback
+ * @param $arguments
+ * @param $path
+ * @param $campaign
+ * @return bool|mixed
+ */
+function crm_campaign_manage_recipients_access_callback($callback, $arguments, $path, $campaign) {
+  if (is_numeric($campaign)) {
+    $campaign = entity_load_single('crm_campaign', $campaign);
+  }
+
+  if (!isset($campaign->data['manage_recipients_methods'])) {
+    return call_user_func_array($callback, $arguments);
+  }
+  if (empty($campaign->data['manage_recipients_methods'])) {
+    return call_user_func_array($callback, $arguments);
+  }
+  if (!is_array($campaign->data['manage_recipients_methods'])) {
+    return call_user_func_array($callback, $arguments);
+  }
+  $methods = crm_campaign_manage_recipients_method_info();
+  uasort($campaign->data['manage_recipients_methods'], 'drupal_sort_weight');
+  foreach ($campaign->data['manage_recipients_methods'] as $method) {
+    if (isset($methods[$method]['path']) && isset($methods[$method]['path']) == $path) {
+      return call_user_func_array($callback, $arguments);
+    }
+  }
+
   return FALSE;
 }

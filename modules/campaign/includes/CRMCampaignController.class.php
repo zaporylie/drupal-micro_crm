@@ -18,17 +18,6 @@ class CRMCampaignController extends EntityAPIController {
   }
 
   /**
-   * Overrides EntityAPIController::attachLoad().
-   */
-  public function attachLoad(&$queried_entities, $revision_id = FALSE) {
-    foreach ($queried_entities as $id => &$entity) {
-      $entity->data = unserialize($entity->data);
-    }
-
-    parent::attachLoad($queried_entities, $revision_id);
-  }
-
-  /**
    * Overrides EntityAPIController::access().
    */
   public function access($op, $entity = NULL, $account = NULL) {
@@ -63,6 +52,9 @@ class CRMCampaignController extends EntityAPIController {
   public function create(array $values = array()) {
     $values += array(
       'status' => CRM_CAMPAIGN_STATUS_REGISTERED,
+      'data' => array(
+        'manage_recipients_methods' => array('views'),
+      ),
     );
     return parent::create($values);
   }
