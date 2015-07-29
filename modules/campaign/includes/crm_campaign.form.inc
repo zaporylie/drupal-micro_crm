@@ -67,6 +67,7 @@ function crm_campaign_form_wrapper($campaign) {
  */
 function crm_campaign_form($form, &$form_state, $campaign) {
 
+  form_load_include($form_state, 'inc', 'crm_campaign', 'includes/crm_campaign.form');
   $form_state['crm_campaign'] = $campaign;
 
   $form['title'] = array(
@@ -106,10 +107,47 @@ function crm_campaign_form($form, &$form_state, $campaign) {
     '#type' => 'textarea',
     '#title' => t('Revision log'),
   );
+
+  if (!empty($campaign->data['manage_recipients']['methods'])) {
+    $form['settings']['manage_recipients'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Manage recipients'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#tree' => TRUE,
+    );
+    foreach ($campaign->data['manage_recipients']['methods'] as $method => $options) {
+      $form['settings']['manage_recipients']['methods'][$method] = crm_campaign_method_get_form($method, $options);
+    }
+
+    $form['settings']['manage_recipients']['rebuild'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Rebuild recipient list.'),
+      '#default_value' => isset($campaign->data['manage_recipients']['rebuild']) ? $campaign->data['manage_recipients']['rebuild'] : TRUE,
+      '#description' => t('If selected new channels will be added on form submit.'),
+    );
+
+    $form['settings']['manage_recipients']['remove'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Remove all existing channels and add it one more time.'),
+      '#default_value' => isset($campaign->data['manage_recipients']['remove']) ? $campaign->data['manage_recipients']['remove'] : FALSE,
+      '#description' => t('If selected all channels will be removed and added again. All channels added manually will disappear!'),
+      '#states' => array(
+        'invisible' => array(
+          ':input[name="manage_recipients[rebuild]"]' => array('checked' => FALSE),
+        ),
+      ),
+    );
+  }
+
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
+  );
+  $form['actions']['send'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save & send'),
   );
   return $form;
 }
@@ -128,6 +166,8 @@ function crm_campaign_form_submit($form, &$form_state) {
   $campaign = $form_state['crm_campaign'];
   $campaign->title = $form_state['values']['title'];
   $campaign->log = $form_state['values']['log'];
+  $campaign->data['manage_recipients'] = $form_state['values']['manage_recipients'];
+
   if (isset($form_state['values']['status'])) {
     $campaign->status = $form_state['values']['status'];
   }
@@ -135,10 +175,24 @@ function crm_campaign_form_submit($form, &$form_state) {
     $campaign->revision = TRUE;
   }
   try {
+    // Attach fields values to campaign object.
     field_attach_submit('crm_campaign', $campaign, $form, $form_state);
+    // Prepopulate channel field.
+    // Be really careful about that - this function can remove all channels from
+    // crm_channel field.
+    crm_campaign_prepopulate_channel($campaign);
+
     entity_save('crm_campaign', $campaign);
     $uri = entity_uri('crm_campaign', $campaign);
-    $form_state['redirect'] = $uri['path'];
+    if ($form_state['triggering_element']['#value'] == t('Save & send')) {
+      if (isset($_GET['destination'])) {
+        unset($_GET['destination']);
+      }
+      $form_state['redirect'] = $uri['path'] . '/send';
+    }
+    else {
+      $form_state['redirect'] = $uri['path'];
+    }
     drupal_set_message(t('Campaign has been saved'));
   }
   catch (Exception $e) {

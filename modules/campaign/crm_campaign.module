@@ -111,17 +111,17 @@ function crm_campaign_module_implements_alter(&$implementations, $hook) {
  * Implements hook_menu_alter().
  */
 function crm_campaign_menu_alter(&$items) {
-  foreach (crm_campaign_manage_recipients_method_info() as $key => $method) {
-    if (!isset($method['path'])) {
+  foreach (crm_campaign_method_info() as $key => $method) {
+    if (!isset($method['access path'])) {
       continue;
     }
-    $items[$method['path']]['access arguments'] = array(
-      $items[$method['path']]['access callback'],
-      $items[$method['path']]['access arguments'],
-      $method['path'],
-      $method['path argument position'],
+    $items[$method['access path']]['access arguments'] = array(
+      $items[$method['access path']]['access callback'],
+      $items[$method['access path']]['access arguments'],
+      $method['access path'],
+      $method['access path argument position'],
     );
-    $items[$method['path']]['access callback'] = 'crm_campaign_manage_recipients_access_callback';
+    $items[$method['access path']]['access callback'] = 'crm_campaign_method_access';
   }
 }
 
@@ -238,6 +238,8 @@ function crm_campaign_action_info() {
       'configurable' => TRUE,
       'permissions' => array('crm campaign update'),
       'aggregate' => TRUE,
+      // Add fake behaviour to prevent entity save.
+      'behavior' => array('null'),
     ),
     'crm_campaign_remove_from_campaign_action' => array(
       'type' => 'crm_channel',
@@ -245,6 +247,8 @@ function crm_campaign_action_info() {
       'configurable' => TRUE,
       'permissions' => array('crm campaign update'),
       'aggregate' => TRUE,
+      // Add fake behaviour to prevent entity save.
+      'behavior' => array('null'),
     ),
   );
 }
@@ -252,11 +256,11 @@ function crm_campaign_action_info() {
 /**
  * @return array
  */
-function crm_campaign_crm_campaign_manage_recipients_method_info() {
+function crm_campaign_crm_campaign_method_info() {
   $methods['crm_campaign_vbo'] = array(
     'name' => t('VBO'),
-    'path' => 'admin/crm/campaign/%/channel',
-    'path argument position' => 3,
+    'access path' => 'admin/crm/campaign/%/channel',
+    'access path argument position' => 3,
     'auto' => FALSE,
   );
   return $methods;
@@ -265,16 +269,20 @@ function crm_campaign_crm_campaign_manage_recipients_method_info() {
 /**
  * @return array
  */
-function crm_campaign_manage_recipients_method_info() {
+function crm_campaign_method_info($method = NULL) {
   // First check the static cache for an array.
   $methods = &drupal_static(__FUNCTION__);
 
   // If it did not exist, fetch it now.
   if (empty($methods)) {
-    $methods = module_invoke_all('crm_campaign_manage_recipients_method_info');
+    $methods = module_invoke_all('crm_campaign_method_info');
 
     // Give other modules a chance to alter the array.
-    drupal_alter('crm_campaign_manage_recipients_method_info', $methods);
+    drupal_alter('crm_campaign_method_info', $methods);
+  }
+
+  if (isset($method)) {
+    return isset($methods[$method]) ? $methods[$method] : NULL;
   }
 
   return $methods;
@@ -288,7 +296,7 @@ function crm_campaign_add_to_campaign_action_form($settings, &$form_state) {
   $form['campaign'] = array(
     '#type' => 'select',
     '#title' => t('Choose campaign'),
-    '#options' => array(NULL => t('- Choose -')) + crm_campaign_get_option_list(CRM_CAMPAIGN_STATUS_REGISTERED),
+    '#options' => array(NULL => t('- Choose -')) + crm_campaign_option_list(CRM_CAMPAIGN_STATUS_REGISTERED),
     '#required' => TRUE,
     '#default_value' => isset($settings['view']->args[0]) ? $settings['view']->args[0] : NULL,
   );
@@ -308,9 +316,9 @@ function crm_campaign_add_to_campaign_action_submit($form, $form_state) {
  * Action callback: crm_campaign_add_to_campaign_action.
  */
 function crm_campaign_add_to_campaign_action(&$entities, &$context) {
-  $campaign = &$context['crm_campaign'];
   try {
-    crm_campaign_add_channel_to_campaign($entities, $campaign);
+    $campaign = &$context['crm_campaign'];
+    crm_campaign_add_channel_to_campaign($campaign, $entities);
     $campaign->revision = TRUE;
     $campaign->log = 'Campaign channels list has been updated';
     entity_save('crm_campaign', $campaign);
@@ -322,12 +330,14 @@ function crm_campaign_add_to_campaign_action(&$entities, &$context) {
 }
 
 /**
- * Compares and adds missing channels to campaign tree.
+ * Compares lists and adds missing channels to campaign's crm_channel field.
  *
- * @param $channels
  * @param $campaign
+ *   Campaign object passed by reference.
+ * @param $channels
+ *   Array of channels.
  */
-function crm_campaign_add_channel_to_campaign($channels, &$campaign) {
+function crm_campaign_add_channel_to_campaign(&$campaign, $channels) {
   $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
   $values = $wrapper->crm_channel->raw();
   $keys = array_keys($channels);
@@ -345,7 +355,7 @@ function crm_campaign_remove_from_campaign_action_form($settings, &$form_state) 
   $form['campaign'] = array(
     '#type' => 'select',
     '#title' => t('Choose campaign'),
-    '#options' => array(NULL => t('- Choose -')) + crm_campaign_get_option_list(CRM_CAMPAIGN_STATUS_REGISTERED),
+    '#options' => array(NULL => t('- Choose -')) + crm_campaign_option_list(CRM_CAMPAIGN_STATUS_REGISTERED),
     '#required' => TRUE,
     '#default_value' => isset($settings['view']->args[0]) ? $settings['view']->args[0] : NULL,
   );
@@ -358,26 +368,35 @@ function crm_campaign_remove_from_campaign_action_form($settings, &$form_state) 
 function crm_campaign_remove_from_campaign_action_submit($form, $form_state) {
   $return = array();
   $return['crm_campaign'] = entity_load_single('crm_campaign', $form_state['values']['campaign']);
-  return $return; //Note, return value here must be an array.
+  return $return;
 }
 
 /**
  * Action callback: crm_campaign_remove_from_campaign_action.
  */
 function crm_campaign_remove_from_campaign_action(&$entities, &$context) {
-  $campaign = &$context['crm_campaign'];
-  crm_campaign_remove_channel_from_campaign($entities, $campaign);
-  $campaign->log = 'Campaign channels list has been updated.';
-  entity_save('crm_campaign', $campaign);
+  try {
+    $campaign = &$context['crm_campaign'];
+    crm_campaign_remove_channel_from_campaign($campaign, $entities);
+    $campaign->log = 'Campaign channels list has been updated.';
+    $campaign->revision = TRUE;
+    entity_save('crm_campaign', $campaign);
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_campaign', $e);
+    drupal_set_message('Unable to add channels to campaign.', 'error');
+  }
 }
 
 /**
  * Compares and removes channels from campaign.
  *
- * @param $channels
  * @param $campaign
+ *   Campaign object passed by reference.
+ * @param $channels
+ *   Array of channels.
  */
-function crm_campaign_remove_channel_from_campaign($channels, &$campaign) {
+function crm_campaign_remove_channel_from_campaign(&$campaign, $channels) {
   $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
   $values = $wrapper->crm_channel->raw();
   $keys = array_keys($channels);
@@ -475,19 +494,23 @@ function crm_campaign_status_options_list() {
 }
 
 /**
+ * Returns list of all campaigns.
+ *
  * @param null $status
- * @return null
+ *   Campaign status.
+ *
+ * @return null|array
+ *   List of campaign objects or NULL if nothing found.
  */
 function crm_campaign_campaigns($status = NULL) {
   $query = new EntityFieldQuery();
-
   $query->entityCondition('entity_type', 'crm_campaign');
   if ($status) {
     $query->propertyCondition('status', $status);
   }
   $query->propertyOrderBy('title', 'ASC')
-    ->addTag('crm_campaign_get_option_list')
-    ->addMetaData('crm_campaign_status', $status);
+    ->addTag('crm_campaign_campaigns')
+    ->addMetaData('status', $status);
 
   $result = $query->execute();
   if (!isset($result['crm_campaign'])) {
@@ -497,9 +520,15 @@ function crm_campaign_campaigns($status = NULL) {
 }
 
 /**
- * @param null $status
+ * Returns list of campaigns in a option list format (key => value pairs).
+ *
+ * @param string $status
+ *   Campaign status.
+ *
+ * @todo There is no need to load objects. Do simple query to load only titles
+ * and ids.
  */
-function crm_campaign_get_option_list($status = NULL) {
+function crm_campaign_option_list($status = NULL) {
   $array = array();
   if (!($campaigns = crm_campaign_campaigns($status))) {
     return $array;
@@ -521,6 +550,197 @@ function crm_campaign_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
+ * Manipulates object by populating crm_channel field value.
+ *
+ * @param $campaign
+ *   Campaign entity. Passed by reference.
+ */
+function crm_campaign_prepopulate_channel(&$campaign) {
+  if (!isset($campaign->data['manage_recipients']['methods'])) {
+    return;
+  }
+  if (empty($campaign->data['manage_recipients']['methods'])) {
+    return;
+  }
+  if (!is_array($campaign->data['manage_recipients']['methods'])) {
+    return;
+  }
+  if (isset($campaign->data['manage_recipients']['rebuild']) && !$campaign->data['manage_recipients']['rebuild']) {
+    return;
+  }
+  if (isset($campaign->data['manage_recipients']['rebuild']) && $campaign->data['manage_recipients']['rebuild'] && isset($campaign->data['manage_recipients']['remove']) && $campaign->data['manage_recipients']['remove']) {
+    try {
+      $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+      $wrapper->crm_channel->set(NULL);
+    }
+    catch (Exception $e) {
+      watchdog_exception('crm_campaign', $e);
+      return;
+    }
+  }
+  $methods = crm_campaign_method_info();
+  uasort($campaign->data['manage_recipients']['methods'], 'drupal_sort_weight');
+  foreach ($campaign->data['manage_recipients']['methods'] as $method => $options) {
+    if (!isset($methods[$method]['auto']) || !isset($methods[$method]['method callback']) || !isset($methods[$method]['method defaults']) || !$methods[$method]['auto']) {
+      continue;
+    }
+    if (function_exists($methods[$method]['method callback'])) {
+      $options += $methods[$method]['method defaults'];
+      $methods[$method]['method callback']($campaign, $options);
+    }
+  }
+}
+
+/**
+ * Gets form implemetation based on 'method form' property or forms namespace.
+ *
+ * If form does not exist or is not needed at all return dummy empty array.
+ *
+ * @param $method
+ *   Method key.
+ * @param array $options
+ *   Arrays with custom options. Default values will be added here.
+ *
+ * @return array
+ *   Form array. At least dummy element of type 'value' to preserve data
+ *   structure.
+ */
+function crm_campaign_method_get_form($method, $options = array()) {
+  $method_key = $method;
+  $method = crm_campaign_method_info($method);
+  if (isset($method['method defaults'])) {
+    $options += $method['method defaults'];
+  }
+  if (isset($method['method form']) && function_exists($method['method form'])) {
+   $form = $method['method form']($options);
+  }
+  elseif ($form = module_invoke_all('crm_campaign_method_' . $method_key . '_form', $options)) {
+    // If form is not empty skip else.
+  }
+  else {
+    $form = array(
+      '#type' => 'value',
+      '#value' => array(),
+    );
+    return $form;
+  }
+  return array(
+    '#type' => 'fieldset',
+    '#title' => $method['name'],
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  ) + $form;
+}
+
+/**
+ * Evaluate if user should have access to the page.
+ *
+ * @param $callback
+ *   Parent callback.
+ * @param $arguments
+ *   Parent arguments.
+ * @param $path
+ *   Path to page.
+ * @param $campaign
+ *   Campaign entity.
+ *
+ * @return bool|mixed
+ *   TRUE/FALSE.
+ */
+function crm_campaign_method_access($callback, $arguments, $path, $campaign) {
+  if (is_numeric($campaign)) {
+    $campaign = entity_load_single('crm_campaign', $campaign);
+  }
+
+  if (!isset($campaign->data['manage_recipients']['methods'])) {
+    return call_user_func_array($callback, $arguments);
+  }
+  if (empty($campaign->data['manage_recipients']['methods'])) {
+    return call_user_func_array($callback, $arguments);
+  }
+  if (!is_array($campaign->data['manage_recipients']['methods'])) {
+    return call_user_func_array($callback, $arguments);
+  }
+  $methods = crm_campaign_method_info();
+  uasort($campaign->data['manage_recipients']['methods'], 'drupal_sort_weight');
+  foreach ($campaign->data['manage_recipients']['methods'] as $method => $options) {
+    if (isset($methods[$method]['access path']) && $methods[$method]['access path'] == $path) {
+      return call_user_func_array($callback, $arguments);
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Returns boolean value which indicates if channel is on the campaign recipient
+ * list or not.
+ *
+ * @param $campaign
+ *   Campaign object.
+ * @param $channel_id
+ *   Channel ID.
+ *
+ * @return bool
+ *   TRUE or FALSE.
+ */
+function crm_campaign_channel_exists($campaign, $channel_id) {
+  try {
+    $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+    return in_array($channel_id, $wrapper->crm_channel->raw());
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_campaign', $e);
+    return FALSE;
+  }
+}
+
+/**
+ * Adds channel to campaign entity.
+ *
+ * @param $campaign
+ * @param $channel
+ * @return bool
+ */
+function crm_campaign_add_channel(&$campaign, $channel) {
+  if (crm_campaign_channel_exists($campaign, $channel->channel_id)) {
+    return TRUE;
+  }
+  try {
+    $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+    $wrapper->crm_channel[] = $channel;
+    return TRUE;
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_campaign', $e);
+    return FALSE;
+  }
+}
+
+/**
+ * Removes channel from campaign entity.
+ *
+ * @param $campaign
+ * @param $channel_id
+ * @return bool
+ */
+function crm_campaign_remove_channel(&$campaign, $channel_id) {
+  if (!crm_campaign_channel_exists($campaign, $channel_id)) {
+    return TRUE;
+  }
+  try {
+    $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+    $key = array_search($channel_id, $campaign->crm_channel->raw());
+    unset($wrapper->crm_channel[$key]);
+    return TRUE;
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_campaign', $e);
+    return FALSE;
+  }
+}
+
+/**
  * @param $campaign
  * @return bool
  */
@@ -535,73 +755,5 @@ function _crm_campaign_is_sent($campaign_id) {
   if (!isset($result['crm_message']) || !count($result['crm_message'])) {
     return TRUE;
   }
-  return FALSE;
-}
-
-/**
- * Implements hook_crm_campaign_presave().
- */
-function crm_campaign_crm_campaign_presave($campaign) {
-  crm_campaign_pre_populate($campaign);
-}
-
-/**
- * Manipulates object by populating crm_channel field value;
- *
- * @param $campaign
- */
-function crm_campaign_pre_populate(&$campaign) {
-  if (!isset($campaign->data['manage_recipients_methods'])) {
-    return;
-  }
-  if (empty($campaign->data['manage_recipients_methods'])) {
-    return;
-  }
-  if (!is_array($campaign->data['manage_recipients_methods'])) {
-    return;
-  }
-  $methods = crm_campaign_manage_recipients_method_info();
-  uasort($campaign->data['manage_recipients_methods'], 'drupal_sort_weight');
-  foreach ($campaign->data['manage_recipients_methods'] as $method) {
-    if (!isset($methods[$method]['auto']) || !isset($methods[$method]['callback']) || !$methods[$method]['auto']) {
-      continue;
-    }
-    if (function_exists($methods[$method]['callback'])) {
-      $methods[$method]['callback']($campaign);
-    }
-  }
-}
-
-/**
- *
- *
- * @param $callback
- * @param $arguments
- * @param $path
- * @param $campaign
- * @return bool|mixed
- */
-function crm_campaign_manage_recipients_access_callback($callback, $arguments, $path, $campaign) {
-  if (is_numeric($campaign)) {
-    $campaign = entity_load_single('crm_campaign', $campaign);
-  }
-
-  if (!isset($campaign->data['manage_recipients_methods'])) {
-    return call_user_func_array($callback, $arguments);
-  }
-  if (empty($campaign->data['manage_recipients_methods'])) {
-    return call_user_func_array($callback, $arguments);
-  }
-  if (!is_array($campaign->data['manage_recipients_methods'])) {
-    return call_user_func_array($callback, $arguments);
-  }
-  $methods = crm_campaign_manage_recipients_method_info();
-  uasort($campaign->data['manage_recipients_methods'], 'drupal_sort_weight');
-  foreach ($campaign->data['manage_recipients_methods'] as $method) {
-    if (isset($methods[$method]['path']) && isset($methods[$method]['path']) == $path) {
-      return call_user_func_array($callback, $arguments);
-    }
-  }
-
   return FALSE;
 }

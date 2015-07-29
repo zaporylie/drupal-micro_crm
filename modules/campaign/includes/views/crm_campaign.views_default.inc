@@ -426,6 +426,22 @@ function crm_campaign_views_default_views() {
     'page' => 'page',
     'default' => 0,
   );
+  /* Contextual filter: Campaign: Campaign ID */
+  $handler->display->display_options['arguments']['campaign_id']['id'] = 'campaign_id';
+  $handler->display->display_options['arguments']['campaign_id']['table'] = 'crm_campaign';
+  $handler->display->display_options['arguments']['campaign_id']['field'] = 'campaign_id';
+  $handler->display->display_options['arguments']['campaign_id']['relationship'] = 'reverse_crm_channel_crm_campaign';
+  $handler->display->display_options['arguments']['campaign_id']['exception']['title'] = 'Alle';
+  $handler->display->display_options['arguments']['campaign_id']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['campaign_id']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['campaign_id']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['campaign_id']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['defaults']['filter_groups'] = FALSE;
+  $handler->display->display_options['defaults']['filters'] = FALSE;
+  $handler->display->display_options['displays'] = array(
+    'page' => 'page',
+    'default' => 0,
+  );
 
   $views[$view->name] = $view;
 

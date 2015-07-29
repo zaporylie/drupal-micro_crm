@@ -253,7 +253,7 @@ function crm_campaign_install() {
         'weight' => -98,
       ),
     ),
-    'required' => 1,
+    'required' => 0,
     'description' => $t('Each recipient has to be registered and valid channel.'),
     'default_value' => NULL,
     'field_name' => 'crm_channel',

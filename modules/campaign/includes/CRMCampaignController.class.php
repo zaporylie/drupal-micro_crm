@@ -53,7 +53,11 @@ class CRMCampaignController extends EntityAPIController {
     $values += array(
       'status' => CRM_CAMPAIGN_STATUS_REGISTERED,
       'data' => array(
-        'manage_recipients_methods' => array('views'),
+        'manage_recipients' => array(
+          'methods' => array(
+            'crm_campaign_vbo' => array(),
+          ),
+        ),
       ),
     );
     return parent::create($values);
