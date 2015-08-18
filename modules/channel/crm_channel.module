@@ -516,6 +516,9 @@ function crm_channel_uninstall_fields($array) {
  */
 function crm_channel_filter_inactive($channels) {
   $channels = array_filter($channels, function ($channel) {
+    if (empty($channel)) {
+      return TRUE;
+    }
     if (in_array($channel->status, array_keys(crm_channel_statuses(array('state' => CRM_CHANNEL_STATE_DISABLED))))) {
       return FALSE;
     }
