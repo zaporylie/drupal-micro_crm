@@ -30,21 +30,6 @@ function crm_user_menu() {
 }
 
 /**
- * Implements hook_user_delete().
- *
- * @todo Change status for all "registered" channels to unregistered.
- */
-function crm_user_user_delete($account) {
-  $contact = crm_user_load_contact($account->uid);
-  if (isset($contact->contact_id)) {
-    crm_user_user_unset($contact, $account);
-    $contact->log = 'User has been deleted, crm_user field is empty now.';
-    $contact->revision = TRUE;
-    entity_save('crm_conact', $contact);
-  }
-}
-
-/**
  * Implements hook_user_insert().
  */
 function crm_user_user_insert(&$edit, $account, $category) {
@@ -68,6 +53,10 @@ function crm_user_user_update(&$edit, $account, $category) {
  * @todo Change channel status to registered/unregistered.
  */
 function _crm_user_account_process($account) {
+  // Skip this step if account is blocked.
+  if (!$account->status) {
+    return;
+  }
   $settings = variable_get('crm_user_map', array());
   $account_wrapper = entity_metadata_wrapper('user', $account);
   $contact_channels = array();
@@ -198,7 +187,7 @@ function crm_user_user_set(&$contact, $user) {
  * @param $user
  * @return bool
  */
-function crm_user_user_unset(&$contact, $user) {
+function crm_user_user_unset(&$contact, $user = NULL) {
   try {
     $wrapper = entity_metadata_wrapper('crm_contact', $contact);
     $wrapper->crm_user->set(NULL);
@@ -207,5 +196,44 @@ function crm_user_user_unset(&$contact, $user) {
   catch (Exception $e) {
     watchdog_exception('crm_contact', $e);
     return FALSE;
+  }
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+function crm_user_user_cancel($edit, $account, $method) {
+  switch ($method) {
+    case 'user_cancel_block_unpublish':
+    case 'user_cancel_reassign':
+      $contact = crm_user_load_contact($account->uid);
+      if (isset($contact->contact_id)) {
+        $wrapper = entity_metadata_wrapper('crm_contact', $contact);
+        crm_user_user_unset($contact);
+        foreach ($wrapper->crm_channel->getIterator() as $channel) {
+          $channel->status->set(CRM_CHANNEL_STATUS_UNREGISTERED);
+          $channel->log->set('Corresponding user account has been deleted.');
+          $channel->revision->set(TRUE);
+          $channel->save();
+        }
+        $contact->log = 'User has been deleted, crm_user field is empty now.';
+        $contact->revision = TRUE;
+        $wrapper->save();
+      }
+      break;
+  }
+}
+
+/**
+ * Implements hook_user_delete().
+ */
+function crm_user_user_delete($account) {
+  $contact = crm_user_load_contact($account->uid);
+  if (isset($contact->contact_id)) {
+    $wrapper = entity_metadata_wrapper('crm_contact', $contact);
+    foreach ($wrapper->crm_channel->getIterator() as $channel) {
+      $channel->delete();
+    }
+    $wrapper->delete();
   }
 }

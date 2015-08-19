@@ -25,10 +25,21 @@ function crm_channel_entity_property_info() {
     'description' => t('General value.'),
     'getter callback' => 'crm_channel_channel',
   );
+  $properties['status'] = array(
+    'setter callback' => 'entity_property_verbatim_set',
+    'options list' => 'crm_channel_status_option_list_flatten',
+    'required' => TRUE,
+  );
   $properties['log'] = array(
     'label' => t("Revision log message"),
     'type' => 'text',
     'description' => t("In case a new revision is to be saved, the log entry explaining the changes for this version."),
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+  $properties['revision'] = array(
+    'label' => t("Creates revision"),
+    'type' => 'boolean',
+    'description' => t("Whether saving this entity creates a new revision."),
     'setter callback' => 'entity_property_verbatim_set',
   );
 //  $properties['created'] = array(

@@ -245,6 +245,13 @@ function crm_channel_status_option_list() {
 }
 
 /**
+ * List of statuses flatten.
+ */
+function crm_channel_status_option_list_flatten() {
+  return options_array_flatten(crm_channel_status_option_list());
+}
+
+/**
  * Returns list of types (bundles) in key => title format.
  *
  * @return array
