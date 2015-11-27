@@ -284,3 +284,20 @@ function crm_campaign_uninstall() {
   );
   field_delete_instance($instance);
 }
+
+/**
+ * Rebuild schema.
+ */
+function crm_campaign_update_7001() {
+  $schema = drupal_get_complete_schema(TRUE);
+  foreach ($schema as $table_key => $table) {
+    if (!isset($table['fields']) || empty($table['fields'])) {
+      continue;
+    }
+    foreach ($table['fields'] as $field_key => $field) {
+      if (!db_field_exists($table_key, $field_key)) {
+        db_add_field($table_key, $field_key, $field);
+      }
+    }
+  }
+}
