@@ -426,7 +426,12 @@ function crm_campaign_channel_prepare_message($campaign, $channel, $send = FALSE
   if (!isset($template)) {
     return FALSE;
   }
-  return crm_message_template_apply($template, $channel, $send);
+
+  // Create message based on template.
+  $message = crm_message_template_apply($template, $channel);
+
+  //
+  return $send ? crm_message_send($message) : $message;
 }
 
 /**

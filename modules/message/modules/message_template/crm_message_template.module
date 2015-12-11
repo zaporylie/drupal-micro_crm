@@ -192,9 +192,11 @@ function crm_message_template_entity_translation_supported_type($type) {
  * @param $channel
  * @param bool $send
  *
+ * @return bool|mixed
+ *
  * @todo Add antiflood check?
  */
-function crm_message_template_apply($template, $channel, $send = FALSE) {
+function crm_message_template_apply($template, $channel) {
   $message = crm_message_create(array(
     'channel' => $channel,
   ), 'crm_message');
@@ -231,5 +233,5 @@ function crm_message_template_apply($template, $channel, $send = FALSE) {
   $message_wrapper->crm_message_template_single->set($template);
   $message->log = 'New message created from template ' . $template->template_id;
   entity_save('crm_message', $message);
-  return $send ? crm_message_send($message) : $message;
+  return $message;
 }
