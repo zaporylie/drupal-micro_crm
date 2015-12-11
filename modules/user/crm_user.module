@@ -127,10 +127,8 @@ function _crm_user_account_process($account) {
 
   $contact = crm_user_load_contact($account->uid);
   if (!isset($contact->contact_id)) {
-    $contact = crm_contact_load_by_channels(array_keys($contact_channels));
-    if (is_array($contact)) {
-      $contact = reset($contact);
-    }
+    // Create new contact.
+    $contact = entity_create('crm_contact', array());
     crm_user_user_set($contact, $account);
     $contact->language = (isset($account->language) && $account->language) ? $account->language : LANGUAGE_NONE;
   }
