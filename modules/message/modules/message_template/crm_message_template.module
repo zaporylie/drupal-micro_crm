@@ -188,28 +188,27 @@ function crm_message_template_entity_translation_supported_type($type) {
 }
 
 /**
- * @param $template
- * @param $channel
- * @param bool $send
+ * @param object $template
+ * @param object $channel
+ * @param array $context
  *
  * @return bool|mixed
  *
  * @todo Add antiflood check?
  */
-function crm_message_template_apply($template, $channel) {
+function crm_message_template_apply($template, $channel, $context = array()) {
   $message = crm_message_create(array(
     'channel' => $channel,
   ), 'crm_message');
   $template_wrapper = entity_metadata_wrapper('crm_message_template', $template);
   $message_wrapper = entity_metadata_wrapper('crm_message', $message);
   $fields = $template_wrapper->getPropertyInfo();
-  $context = array(
+
+  // If crm_channel is missing - provide default context.
+  $context += array(
     'crm_channel' => $channel,
   );
-  // If contact exists - load it as a context.
-  if (function_exists('crm_contact_load_by_channels')) {
-    $context['crm_contact'] = crm_contact_load_by_channels($channel->channel_id);
-  }
+
   foreach ($fields as $key => $field) {
     if (!isset($field['field']) || $field['field'] !== TRUE) {
       continue;
