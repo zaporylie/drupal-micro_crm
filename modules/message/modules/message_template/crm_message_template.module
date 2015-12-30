@@ -2,7 +2,6 @@
 
 /**
  * @file
- *
  */
 
 module_load_include('inc', 'crm_message_template', 'crm_message_template.entity');
@@ -118,6 +117,7 @@ function crm_message_template_crm_channel_fields_info() {
  * Returns boolean value if channel is supported by message module or not.
  *
  * @param $type
+ *
  * @return bool
  */
 function _crm_message_template_channel_supported($type) {
@@ -225,7 +225,7 @@ function crm_message_template_apply($template, $channel, $context = array()) {
       $message_wrapper->{$key}->set($value);
     }
     catch (Exception $e) {
-      // Meh, whatever ;)
+      // Meh, whatever ;).
     }
   }
 
