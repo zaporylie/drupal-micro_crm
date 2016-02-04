@@ -334,13 +334,16 @@ function crm_campaign_add_to_campaign_action(&$entities, &$context) {
  *
  * @param $campaign
  *   Campaign object passed by reference.
- * @param $channels
+ * @param object|array $channel
  *   Array of channels.
  */
-function crm_campaign_add_channel_to_campaign(&$campaign, $channels) {
+function crm_campaign_add_channel_to_campaign(&$campaign, $channel) {
   $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
   $values = $wrapper->crm_channel->raw();
-  $keys = array_keys($channels);
+  if (is_object($channel)) {
+    $channel = array($channel->channel_id => $channel);
+  }
+  $keys = array_keys($channel);
   $diff = array_diff($keys, $values);
   $values = array_merge($values, $diff);
   asort($values);
