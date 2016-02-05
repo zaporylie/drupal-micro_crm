@@ -1,0 +1,18 @@
+/* VBO Apply Form */
+.vbo-views-form #edit-select {
+  background: transparent url("../images/vbo-arrow.png") no-repeat 12px 1px;
+  border: 0;
+  padding: 0 0 0 28px;
+}
+.vbo-views-form select {
+  float: left;
+  min-height: 25px;
+  margin: 2px 10px 2px 0;
+  max-width: 250px;
+}
+.vbo-views-form input.form-submit {
+  position: relative;
+}
+.vbo-views-form #edit-select select {
+  min-height: 25px;
+}
