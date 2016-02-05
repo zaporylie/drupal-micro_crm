@@ -13,3 +13,4 @@ files[] = includes/views/handlers/crm_message_handler_filter_message_type.inc
 files[] = includes/views/handlers/crm_message_handler_filter_message_status.inc
 
 dependencies[] = crm_channel
+dependencies[] = system (>=7.28)

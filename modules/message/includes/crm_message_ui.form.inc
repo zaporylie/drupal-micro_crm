@@ -162,6 +162,32 @@ function crm_message_ui_form_submit($form, &$form_state) {
 }
 
 /**
+ * Cancel message confirmation form.
+ */
+function crm_message_ui_cancel($form, &$form_state, $message) {
+  $form['message'] = array(
+    '#type' => 'value',
+    '#value' => $message,
+  );
+  $uri = entity_uri('crm_message', $message);
+  return confirm_form(
+    $form,
+    t('Do you want to cancel this message?'),
+    $uri['path']
+  );
+}
+
+/**
+ * Cancel message submit handler.
+ */
+function crm_message_ui_cancel_submit($form, &$form_state) {
+  $message = $form_state['values']['message'];
+  crm_message_status_update($message, CRM_MESSAGE_STATUS_DRAFT);
+  $uri = entity_uri('crm_message', $message);
+  $form_state['redirect'] = $uri['path'];
+}
+
+/**
  * Send message confirmation form.
  */
 function crm_message_ui_send($form, &$form_state, $message) {
@@ -192,35 +218,26 @@ function crm_message_ui_send($form, &$form_state, $message) {
 function crm_message_ui_send_submit($form, &$form_state) {
   $message = $form_state['values']['message'];
   $message_id = entity_id('crm_message', $message);
+
+  $message->status = CRM_MESSAGE_STATUS_QUEUED;
+  $message->revision = TRUE;
+  $message->log = 'Message has been queued.';
+  entity_save('crm_message', $message);
+
   switch ($form_state['values']['method']) {
     case CRM_MESSAGE_STATUS_QUEUED:
-      try {
-        $message->status = CRM_MESSAGE_STATUS_QUEUED;
-        $message->revision = TRUE;
-        $message->log = format_string('Message (message_id: @message_id) added to queue.', array('@message_id' => $message_id));
-        entity_save('crm_message', $message);
-        $queue = DrupalQueue::get('crm_message_queue');
-        $queue->createQueue();
-        $queue->createItem($message_id);
-        drupal_set_message(t('Message (message_id: @message_id) has been queued', array('@message_id' => $message_id)));
-      }
-      catch (Exception $e) {
-        drupal_set_message(t('Unable to add message (message_id: @message_id) to queue.', array('@message_id' => $message_id)), 'error');
-      }
+      drupal_set_message(t('Message (message_id: @message_id) has been queued', array('@message_id' => $message_id)));
       break;
 
     case CRM_MESSAGE_STATUS_SENT:
-      try {
-        $result = crm_message_send($message);
-      }
-      catch (Exception $e) {
-        watchdog_exception('crm_message', $e);
-      }
-      if (isset($result) && $result) {
+      // Try to send message.
+      $result = crm_message_send($message);
+
+      if ($result === TRUE) {
         drupal_set_message(t('Message (message_id: @message_id) has been sent', array('@message_id' => $message_id)));
       }
       else {
-        drupal_set_message(t('Unable to send message (message_id: @message_id)', array('@message_id' => $message_id)), 'error');
+        drupal_set_message(t('Unable to send message. Message (message_id: @message_id) has been queued', array('@message_id' => $message_id)), 'error');
       }
       break;
   }
