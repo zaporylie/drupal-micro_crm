@@ -36,6 +36,7 @@ function crm_campaign_ui_views_default_views() {
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
     'campaign_id' => 'campaign_id',
+    'title' => 'title',
     'status' => 'status',
     'crm_channel' => 'crm_channel',
     'created' => 'created',
@@ -45,6 +46,13 @@ function crm_campaign_ui_views_default_views() {
   $handler->display->display_options['style_options']['default'] = 'changed';
   $handler->display->display_options['style_options']['info'] = array(
     'campaign_id' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'title' => array(
       'sortable' => 1,
       'default_sort_order' => 'asc',
       'align' => '',
@@ -101,13 +109,17 @@ function crm_campaign_ui_views_default_views() {
   $handler->display->display_options['fields']['campaign_id']['table'] = 'crm_campaign';
   $handler->display->display_options['fields']['campaign_id']['field'] = 'campaign_id';
   $handler->display->display_options['fields']['campaign_id']['label'] = 'ID';
+  /* Field: Campaign: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'crm_campaign';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
   /* Field: Campaign: Status */
   $handler->display->display_options['fields']['status']['id'] = 'status';
   $handler->display->display_options['fields']['status']['table'] = 'crm_campaign';
   $handler->display->display_options['fields']['status']['field'] = 'status';
   $handler->display->display_options['fields']['status']['link_to_campaign'] = 0;
   $handler->display->display_options['fields']['status']['use_raw_value'] = 0;
-  /* Field: COUNT(Field: Recipients (Channels)) */
+  /* Field: COUNT(Campaign: Recipients (Channels)) */
   $handler->display->display_options['fields']['crm_channel']['id'] = 'crm_channel';
   $handler->display->display_options['fields']['crm_channel']['table'] = 'field_data_crm_channel';
   $handler->display->display_options['fields']['crm_channel']['field'] = 'crm_channel';

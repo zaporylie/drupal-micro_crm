@@ -47,6 +47,25 @@ function crm_campaign_views_data() {
     ),
   );
 
+  // Expose the message type.
+  $data['crm_campaign']['title'] = array(
+    'title' => t('Title'),
+    'help' => t('Title.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
   $data['crm_campaign']['created'] = array(
     'title' => t('Created date'),
     'help' => t('The date the campaign was created.'),

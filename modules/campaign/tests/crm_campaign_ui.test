@@ -81,7 +81,16 @@ class CRMCampaignUITestCase extends CRMCampaignTestCase {
   }
 
   function testAddCampaign() {
+    $text = $this->randomString(10);
+    $data = array(
+      'title' => $text,
+//      'crm_message_template[und][form][title]' =>
+    );
+    $this->drupalPost('admin/crm/campaign/add', $data, 'Save');
 
+    $this->drupalGet('admin/crm/campaign');
+    $this->assertResponse(200);
+    $this->assertText($text);
   }
 
   function testEditCampaign() {
