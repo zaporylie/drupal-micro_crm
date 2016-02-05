@@ -1,0 +1,5 @@
+name = Campaign UI
+description = UI for Campaign module.
+core = 7.x
+
+dependencies[] = crm_campaign

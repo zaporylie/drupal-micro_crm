@@ -1,0 +1,221 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function crm_campaign_ui_menu() {
+  $items = array();
+
+  $items['admin/crm/campaign/%crm_campaign/view'] = array(
+    'title' => 'View',
+    'page callback' => 'crm_campaign_view',
+    'page arguments' => array(3, 'administrator', NULL, TRUE),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('view', 3),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'weight' => -2,
+  );
+
+  $items['admin/crm/campaign/%crm_campaign/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'crm_campaign_ui_edit_form_wrapper',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('update', 3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_campaign_ui.form.inc',
+    'weight' => -1,
+  );
+
+  $items['admin/crm/campaign/%crm_campaign/recipients'] = array(
+    'title' => 'Manage recipients',
+    'page callback' => 'crm_campaign_ui_manage_recipients',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_ui_manage_recipients_access_callback',
+    'access arguments' => array(3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_campaign_ui.form.inc',
+    'weight' => 50,
+  );
+
+  $items['admin/crm/campaign/%crm_campaign/send'] = array(
+    'title' => 'Send',
+    'page callback' => 'crm_campaign_ui_send_form_wrapper',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('send', 3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_campaign_ui.form.inc',
+    'weight' => 98,
+  );
+
+  $items['admin/crm/campaign/%crm_campaign/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'crm_campaign_ui_delete_form_wrapper',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('delete', 3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_campaign_ui.form.inc',
+    'weight' => 99,
+  );
+
+  $items['admin/crm/campaign/add'] = array(
+    'title' => 'Add campaign',
+    'page callback' => 'crm_campaign_ui_add_form_wrapper',
+    'page arguments' => array(),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('create'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'includes/crm_campaign_ui.form.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function crm_campaign_ui_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'crm_campaign') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_action_info().
+ */
+function crm_campaign_ui_action_info() {
+  $info['crm_campaign_ui_add_to_campaign_action'] = array(
+    'type' => 'crm_channel',
+    'label' => t('Add to Campaign'),
+    'configurable' => FALSE,
+    'permissions' => array('crm campaign update'),
+    'aggregate' => TRUE,
+    // Add fake behaviour to prevent entity save.
+    'behavior' => array('null'),
+  );
+  $info['crm_campaign_ui_remove_from_campaign_action'] = array(
+    'type' => 'crm_channel',
+    'label' => t('Remove from Campaign'),
+    'configurable' => FALSE,
+    'permissions' => array('crm campaign update'),
+    'aggregate' => TRUE,
+    // Add fake behaviour to prevent entity save.
+    'behavior' => array('null'),
+  );
+  return $info;
+}
+
+/**
+ * @return array
+ */
+function crm_campaign_ui_crm_campaign_method_info() {
+  $methods['crm_campaign_vbo'] = array(
+    'name' => t('VBO'),
+    'access path' => 'admin/crm/campaign/%/channel',
+    'access path argument position' => 3,
+    'auto' => FALSE,
+  );
+  return $methods;
+}
+
+/**
+ * Action callback: crm_campaign_add_to_campaign_action.
+ */
+function crm_campaign_ui_add_to_campaign_action(&$entities, &$context) {
+  try {
+    $campaign = entity_load_single('crm_campaign', $context['view_info']['arguments'][0]);
+    crm_campaign_add_channel_to_campaign($campaign, $entities);
+    $campaign->revision = TRUE;
+    $campaign->log = 'Campaign channels list has been updated';
+    entity_save('crm_campaign', $campaign);
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_campaign', $e);
+    drupal_set_message('Unable to add channels to campaign.', 'error');
+    return FALSE;
+  }
+}
+
+/**
+ * Action callback: crm_campaign_ui_remove_from_campaign_action.
+ */
+function crm_campaign_ui_remove_from_campaign_action(&$entities, &$context) {
+  try {
+    $campaign = entity_load_single('crm_campaign', $context['view_info']['arguments'][0]);
+    crm_campaign_remove_channel_from_campaign($campaign, $entities);
+    $campaign->log = 'Campaign channels list has been updated.';
+    $campaign->revision = TRUE;
+    entity_save('crm_campaign', $campaign);
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_campaign', $e);
+    drupal_set_message('Unable to add channels to campaign.', 'error');
+    return FALSE;
+  }
+}
+
+/**
+ * Menage recipients: page callback.
+ *
+ * @param $campaign
+ *   Campaign object.
+ *
+ * @return array
+ *   Build array.
+ */
+function crm_campaign_ui_manage_recipients($campaign) {
+  $build = array();
+
+  $view = views_get_view('crm_campaign_channel');
+  $view->override_url = current_path();
+
+  $build['view'] = array(
+    '#markup' => $view->preview('default', array($campaign->campaign_id)),
+  );
+
+  return $build;
+}
+
+/**
+ * Manage recipients: access callback.
+ *
+ * @param $campaign
+ *   Campaign object.
+ *
+ * @return bool
+ *   Accessible or not.
+ */
+function crm_campaign_ui_manage_recipients_access_callback($campaign, $account = NULL) {
+  if ($campaign->status !== CRM_CAMPAIGN_STATUS_REGISTERED) {
+    return FALSE;
+  }
+  if (!isset($campaign->data['manage_recipients']['methods']['crm_campaign_vbo'])) {
+    return FALSE;
+  }
+  return user_access('crm campaign update', $account);
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function crm_campaign_ui_entity_info_alter(&$entity_info) {
+
+  // Expose the order UI for order fields.
+  $entity_info['crm_campaign']['bundles']['crm_campaign']['admin'] = array(
+    'path' => 'admin/crm/config/campaign',
+    'real path' => 'admin/crm/config/campaign',
+    'access arguments' => array('crm administer'),
+  );
+}

@@ -20,67 +20,10 @@ function crm_campaign_menu() {
     'title callback' => 'crm_campaign_label',
     'title arguments' => array(3),
     'page callback' => 'crm_campaign_view',
-    'page arguments' => array(3),
+    'page arguments' => array(3, 'administrator', NULL, TRUE),
     'access callback' => 'crm_campaign_access',
     'access arguments' => array('view', 3),
     'type' => MENU_CALLBACK,
-  );
-
-  $items['admin/crm/campaign/%crm_campaign/view'] = array(
-    'title' => 'View',
-    'page callback' => 'crm_campaign_view',
-    'page arguments' => array(3),
-    'access callback' => 'crm_campaign_access',
-    'access arguments' => array('view', 3),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'weight' => -2,
-  );
-
-  $items['admin/crm/campaign/%crm_campaign/edit'] = array(
-    'title' => 'Edit',
-    'page callback' => 'crm_campaign_edit_form_wrapper',
-    'page arguments' => array(3),
-    'access callback' => 'crm_campaign_access',
-    'access arguments' => array('update', 3),
-    'type' => MENU_LOCAL_TASK,
-    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'file' => 'includes/crm_campaign.form.inc',
-    'weight' => -1,
-  );
-
-  $items['admin/crm/campaign/%crm_campaign/send'] = array(
-    'title' => 'Send',
-    'page callback' => 'crm_campaign_send_form_wrapper',
-    'page arguments' => array(3),
-    'access callback' => 'crm_campaign_access',
-    'access arguments' => array('send', 3),
-    'type' => MENU_LOCAL_TASK,
-    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'file' => 'includes/crm_campaign.form.inc',
-    'weight' => 98,
-  );
-
-  $items['admin/crm/campaign/%crm_campaign/delete'] = array(
-    'title' => 'Delete',
-    'page callback' => 'crm_campaign_delete_form_wrapper',
-    'page arguments' => array(3),
-    'access callback' => 'crm_campaign_access',
-    'access arguments' => array('delete', 3),
-    'type' => MENU_LOCAL_TASK,
-    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'file' => 'includes/crm_campaign.form.inc',
-    'weight' => 99,
-  );
-
-  $items['admin/crm/campaign/add'] = array(
-    'title' => 'Add campaign',
-    'page callback' => 'crm_campaign_add_form_wrapper',
-    'page arguments' => array(),
-    'access callback' => 'crm_campaign_access',
-    'access arguments' => array('create'),
-    'type' => MENU_LOCAL_ACTION,
-    'file' => 'includes/crm_campaign.form.inc',
   );
 
   $items['admin/crm/config/campaign'] = array(
@@ -97,32 +40,16 @@ function crm_campaign_menu() {
 }
 
 /**
- * Implements hook_module_implements_alter().
+ * Implements hook_hook_info().
  */
-function crm_campaign_module_implements_alter(&$implementations, $hook) {
-  if ($hook == 'menu_alter') {
-    $group = $implementations['crm_campaign'];
-    unset($implementations['crm_campaign']);
-    $implementations['crm_campaign'] = $group;
-  }
-}
-
-/**
- * Implements hook_menu_alter().
- */
-function crm_campaign_menu_alter(&$items) {
-  foreach (crm_campaign_method_info() as $key => $method) {
-    if (!isset($method['access path'])) {
-      continue;
-    }
-    $items[$method['access path']]['access arguments'] = array(
-      $items[$method['access path']]['access callback'],
-      $items[$method['access path']]['access arguments'],
-      $method['access path'],
-      $method['access path argument position'],
-    );
-    $items[$method['access path']]['access callback'] = 'crm_campaign_method_access';
-  }
+function crm_campaign_hook_info() {
+  $info['crm_campaign_method_info'] = array(
+    'group' => 'crm',
+  );
+  $info['crm_campaign_status_info'] = array(
+    'group' => 'crm',
+  );
+  return $info;
 }
 
 /**
@@ -153,6 +80,8 @@ function crm_campaign_permission() {
 
 /**
  * Implements hook_crm_channel_fields_info().
+ *
+ * @todo: move to crm.inc
  */
 function crm_campaign_crm_channel_fields_info() {
   $types = crm_channel_types(TRUE);
@@ -231,39 +160,13 @@ function crm_campaign_cron() {
  * Implements hook_action_info().
  */
 function crm_campaign_action_info() {
-  return array(
-    'crm_campaign_add_to_campaign_action' => array(
-      'type' => 'crm_channel',
-      'label' => t('Add to Campaign'),
-      'configurable' => TRUE,
-      'permissions' => array('crm campaign update'),
-      'aggregate' => TRUE,
-      // Add fake behaviour to prevent entity save.
-      'behavior' => array('null'),
-    ),
-    'crm_campaign_remove_from_campaign_action' => array(
-      'type' => 'crm_channel',
-      'label' => t('Remove from Campaign'),
-      'configurable' => TRUE,
-      'permissions' => array('crm campaign update'),
-      'aggregate' => TRUE,
-      // Add fake behaviour to prevent entity save.
-      'behavior' => array('null'),
-    ),
+  $info['crm_campaign_channel_send_message'] = array(
+    'type' => 'crm_channel',
+    'label' => t('Send message'),
+    'configurable' => TRUE,
   );
-}
 
-/**
- * @return array
- */
-function crm_campaign_crm_campaign_method_info() {
-  $methods['crm_campaign_vbo'] = array(
-    'name' => t('VBO'),
-    'access path' => 'admin/crm/campaign/%/channel',
-    'access path argument position' => 3,
-    'auto' => FALSE,
-  );
-  return $methods;
+  return $info;
 }
 
 /**
@@ -286,126 +189,6 @@ function crm_campaign_method_info($method = NULL) {
   }
 
   return $methods;
-}
-
-/**
- * Action form callback.
- */
-function crm_campaign_add_to_campaign_action_form($settings, &$form_state) {
-  $form = array();
-  $form['campaign'] = array(
-    '#type' => 'select',
-    '#title' => t('Choose campaign'),
-    '#options' => array(NULL => t('- Choose -')) + crm_campaign_option_list(CRM_CAMPAIGN_STATUS_REGISTERED),
-    '#required' => TRUE,
-    '#default_value' => isset($settings['view']->args[0]) ? $settings['view']->args[0] : NULL,
-  );
-  return $form;
-}
-
-/**
- * Action form submit handler.
- */
-function crm_campaign_add_to_campaign_action_submit($form, $form_state) {
-  $return = array();
-  $return['crm_campaign'] = entity_load_single('crm_campaign', $form_state['values']['campaign']);
-  return $return;
-}
-
-/**
- * Action callback: crm_campaign_add_to_campaign_action.
- */
-function crm_campaign_add_to_campaign_action(&$entities, &$context) {
-  try {
-    $campaign = &$context['crm_campaign'];
-    crm_campaign_add_channel_to_campaign($campaign, $entities);
-    $campaign->revision = TRUE;
-    $campaign->log = 'Campaign channels list has been updated';
-    entity_save('crm_campaign', $campaign);
-  }
-  catch (Exception $e) {
-    watchdog_exception('crm_campaign', $e);
-    drupal_set_message('Unable to add channels to campaign.', 'error');
-  }
-}
-
-/**
- * Compares lists and adds missing channels to campaign's crm_channel field.
- *
- * @param $campaign
- *   Campaign object passed by reference.
- * @param object|array $channel
- *   Array of channels.
- */
-function crm_campaign_add_channel_to_campaign(&$campaign, $channel) {
-  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
-  $values = $wrapper->crm_channel->raw();
-  if (is_object($channel)) {
-    $channel = array($channel->channel_id => $channel);
-  }
-  $keys = array_keys($channel);
-  $diff = array_diff($keys, $values);
-  $values = array_merge($values, $diff);
-  asort($values);
-  $wrapper->crm_channel->set($values);
-}
-
-/**
- * Action form callback.
- */
-function crm_campaign_remove_from_campaign_action_form($settings, &$form_state) {
-  $form = array();
-  $form['campaign'] = array(
-    '#type' => 'select',
-    '#title' => t('Choose campaign'),
-    '#options' => array(NULL => t('- Choose -')) + crm_campaign_option_list(CRM_CAMPAIGN_STATUS_REGISTERED),
-    '#required' => TRUE,
-    '#default_value' => isset($settings['view']->args[0]) ? $settings['view']->args[0] : NULL,
-  );
-  return $form;
-}
-
-/**
- * Action form submit handler.
- */
-function crm_campaign_remove_from_campaign_action_submit($form, $form_state) {
-  $return = array();
-  $return['crm_campaign'] = entity_load_single('crm_campaign', $form_state['values']['campaign']);
-  return $return;
-}
-
-/**
- * Action callback: crm_campaign_remove_from_campaign_action.
- */
-function crm_campaign_remove_from_campaign_action(&$entities, &$context) {
-  try {
-    $campaign = &$context['crm_campaign'];
-    crm_campaign_remove_channel_from_campaign($campaign, $entities);
-    $campaign->log = 'Campaign channels list has been updated.';
-    $campaign->revision = TRUE;
-    entity_save('crm_campaign', $campaign);
-  }
-  catch (Exception $e) {
-    watchdog_exception('crm_campaign', $e);
-    drupal_set_message('Unable to add channels to campaign.', 'error');
-  }
-}
-
-/**
- * Compares and removes channels from campaign.
- *
- * @param $campaign
- *   Campaign object passed by reference.
- * @param $channels
- *   Array of channels.
- */
-function crm_campaign_remove_channel_from_campaign(&$campaign, $channels) {
-  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
-  $values = $wrapper->crm_channel->raw();
-  $keys = array_keys($channels);
-  $values = array_diff($values, $keys);
-  asort($values);
-  $wrapper->crm_channel->set($values);
 }
 
 /**
@@ -595,7 +378,7 @@ function crm_campaign_prepopulate_channel(&$campaign) {
 }
 
 /**
- * Gets form implemetation based on 'method form' property or forms namespace.
+ * Gets form implementation based on 'method form' property or forms namespace.
  *
  * If form does not exist or is not needed at all return dummy empty array.
  *
@@ -699,11 +482,60 @@ function crm_campaign_channel_exists($campaign, $channel_id) {
 }
 
 /**
+ * Compares lists and adds missing channels to campaign's crm_channel field.
+ *
+ * @param $campaign
+ *   Campaign object passed by reference.
+ * @param object|array $channel
+ *   Array of channels or single object.
+ *
+ * @deprecated
+ *   Use crm_campaign_add_channel instead.
+ */
+function crm_campaign_add_channel_to_campaign(&$campaign, $channel) {
+  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+  $values = $wrapper->crm_channel->raw();
+  if (is_object($channel)) {
+    $channel = array($channel->channel_id => $channel);
+  }
+  $keys = array_keys($channel);
+  $diff = array_diff($keys, $values);
+  $values = array_merge($values, $diff);
+  asort($values);
+  $wrapper->crm_channel->set($values);
+}
+
+/**
+ * Compares and removes channels from campaign.
+ *
+ * @param $campaign
+ *   Campaign object passed by reference.
+ * @param object| array $channel
+ *   Array of channels or single object.
+ *
+ * @deprecated
+ *   Use crm_campaign_remove_channel instead.
+ */
+function crm_campaign_remove_channel_from_campaign(&$campaign, $channel) {
+  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+  $values = $wrapper->crm_channel->raw();
+  if (is_object($channel)) {
+    $channel = array($channel->channel_id => $channel);
+  }
+  $keys = array_keys($channel);
+  $values = array_diff($values, $keys);
+  asort($values);
+  $wrapper->crm_channel->set($values);
+}
+
+/**
  * Adds channel to campaign entity.
  *
  * @param $campaign
  * @param $channel
  * @return bool
+ *
+ * @todo: Use syntax from crm_campaign_add_channel_to_campaign
  */
 function crm_campaign_add_channel(&$campaign, $channel) {
   if (crm_campaign_channel_exists($campaign, $channel->channel_id)) {
@@ -726,6 +558,8 @@ function crm_campaign_add_channel(&$campaign, $channel) {
  * @param $campaign
  * @param $channel_id
  * @return bool
+ *
+ * @todo: Use syntax from crm_campaign_remove_channel_from_campaign
  */
 function crm_campaign_remove_channel(&$campaign, $channel_id) {
   if (!crm_campaign_channel_exists($campaign, $channel_id)) {
@@ -744,7 +578,7 @@ function crm_campaign_remove_channel(&$campaign, $channel_id) {
 }
 
 /**
- * @param $campaign
+ * @param $campaign_id
  * @return bool
  */
 function _crm_campaign_is_sent($campaign_id) {
@@ -759,4 +593,189 @@ function _crm_campaign_is_sent($campaign_id) {
     return TRUE;
   }
   return FALSE;
+}
+
+/**
+ * @param $campaign
+ * @param $channel
+ * @return bool|mixed
+ */
+function _crm_campaign_message_exists($campaign, $channel) {
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'crm_message')
+    ->fieldCondition('crm_campaign_single', 'target_id', $campaign->campaign_id, '=')
+    ->fieldCondition('crm_channel_single', 'target_id', $channel->channel_id, '=')
+    ->range(0, 1);
+
+  $result = $query->execute();
+
+  if (isset($result['crm_message'])) {
+    $ids = array_keys($result['crm_message']);
+    return entity_load_single('crm_message', reset($ids));
+  }
+  return FALSE;
+}
+
+/**
+ *
+ *
+ * @param $campaign
+ * @param $channel
+ * @param bool $send
+ *
+ * @return bool|mixed
+ */
+function crm_campaign_channel_create_message($campaign, $channel) {
+  $type = $channel->type;
+  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+  $templates = $wrapper->crm_message_template->raw();
+
+  if (!is_array($templates) && is_numeric($templates)) {
+    if ($wrapper->crm_message_template->getBundle() == $type) {
+      $template = $wrapper->crm_message_template->value();
+    }
+  }
+  elseif (is_array($templates)) {
+    foreach ($wrapper->crm_message_template as $template_wrapper) {
+      if ($template_wrapper->getBundle() == $type) {
+        $template = $template_wrapper->value();
+        break;
+      }
+    }
+  }
+  if (!isset($template)) {
+    return FALSE;
+  }
+
+  // Create message based on template.
+  $message = crm_message_template_apply($template, $channel, array(), FALSE);
+  $message->status = CRM_MESSAGE_STATUS_QUEUED;
+  $message->revision = TRUE;
+  $message->log = t('Message has been queued.');
+  $message_wrapper = entity_metadata_wrapper('crm_message', $message);
+  $message_wrapper->crm_campaign_single->set($campaign);
+  $message_wrapper->save();
+
+  // Return message.
+  return $message;
+}
+
+/**
+ * @param $entity
+ * @param array $context
+ */
+function crm_campaign_channel_send_message($entity, &$context = array()) {
+
+  // Add channel to campaign.
+  crm_campaign_add_channel($context['crm_campaign'], $entity);
+  $context['crm_campaign']->revision = FALSE;
+  entity_save('crm_campaign', $context['crm_campaign']);
+
+  // Generate message for channel.
+  $message = crm_campaign_channel_create_message($context['crm_campaign'], $entity);
+
+  // Send message.
+  crm_message_send($message);
+
+  // If that's last one and all messages have been sent - save status.
+  if ($context['progress']['total'] == $context['progress']['current']) {
+    if (_crm_campaign_is_sent($context['crm_campaign']->campaign_id)) {
+      $context['crm_campaign']->status = CRM_CAMPAIGN_STATUS_SENT;
+      $context['crm_campaign']->log = t('Campaign has been sent.');
+      entity_save('crm_campaign', $context['crm_campaign']);
+    }
+  }
+}
+
+/**
+ * Form callback.
+ */
+function crm_campaign_channel_send_message_form($context, &$form_state) {
+  $form['message_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Choose message type'),
+    '#required' => TRUE,
+    '#options' => crm_message_template_types(),
+    '#ajax' => array(
+      'wrapper' => 'crm_campaign_message_template',
+      'callback' => 'crm_campaign_channel_send_message_form_ajax_callback',
+    ),
+  );
+
+
+  $form['message'] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'id' => 'crm_campaign_message_template',
+    ),
+  );
+  if (isset($form_state['values']['message_type'])) {
+
+    $form['message']['title'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Title'),
+      '#required' => TRUE,
+      '#description' => t("This value won't be exposed to end user."),
+    );
+
+    $form['message']['machine_name'] = array(
+      '#type' => 'machine_name',
+      '#machine_name' => array(
+        'exists' => 'crm_message_template_menu_name_exists',
+        'source' => array('message', 'title'),
+      ),
+    );
+
+    $template = entity_create('crm_message_template', array('type' => $form_state['values']['message_type']));
+
+    $form['message']['template'] = array(
+      '#type' => 'value',
+      '#value' => $template,
+    );
+
+    field_attach_form('crm_message_template', $template, $form['message'], $form_state);
+  }
+
+  return $form;
+}
+
+/**
+ * Inject message template form.
+ */
+function crm_campaign_channel_send_message_form_ajax_callback($form, $form_state) {
+  return $form['message'];
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ * @return array
+ * @throws \Exception
+ */
+function crm_campaign_channel_send_message_submit($form, &$form_state) {
+  $transaction = db_transaction();
+  try {
+    $campaign = entity_create('crm_campaign', array(
+      'title' => $form_state['values']['title'],
+      'status' => CRM_CAMPAIGN_STATUS_QUEUED,
+      'log' => t('Campaign created from Action (VBO)'),
+    ));
+    $campaign_wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+
+    $template = $form_state['values']['template'];
+    $template->name = $form_state['values']['machine_name'];
+    field_attach_submit('crm_message_template', $template, $form['message'], $form_state);
+    $template->log = t('Message template created by crm_campaign (VBO)');
+    entity_save('crm_message_template', $template);
+
+    $campaign_wrapper->crm_message_template->set(array($template));
+    $campaign_wrapper->save();
+  }
+  catch (Exception $e) {
+    $transaction->rollback();
+    throw $e;
+  }
+
+  return array('crm_campaign' => $campaign);
 }

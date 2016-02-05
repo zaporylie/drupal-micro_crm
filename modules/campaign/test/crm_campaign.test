@@ -1,0 +1,67 @@
+<?php
+
+/**
+ * @file
+ */
+
+class CRMCampaignTestCase extends CRMBaseTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'CRM Campaign',
+      'description' => 'CRM Campaign tests.',
+      'group' => 'crm',
+    );
+  }
+
+  function setUp() {
+    $args = func_get_args();
+    $args[] = 'crm_campaign';
+
+    $admin_permissions = array(
+      'crm campaign overview',
+      'crm campaign create',
+      'crm campaign view',
+      'crm campaign update',
+      'crm campaign delete',
+      'crm campaign send',
+    );
+    $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
+
+    $args = func_get_args();
+    call_user_func_array(array('parent', 'setUp'), $args);
+  }
+
+  /**
+   * Tests the admin links accessibility.
+   */
+  function testAdminAccessibility() {
+    // Login with normal user.
+    $this->drupalLogin($this->user);
+
+    $this->drupalGet('admin/crm/config/campaign');
+    $this->assertResponse(403, t('Normal user can access admin page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->admin);
+
+    $this->drupalGet('admin/crm/config/campaign');
+    $this->assertResponse(200, t('Admin user is not able to access the admin page'));
+    $this->assertText(t('Campaign'), t('%title title present in the admin list page', array('%title' => t('Campaign'))));
+  }
+
+  /**
+   * @param array $values
+   * @return bool
+   */
+  function helperCreateCampaign($values = array()) {
+    $campaign = entity_create('crm_campaign', $values + array(
+      'title' => $this->randomString(8),
+      'status' => CRM_CAMPAIGN_STATUS_REGISTERED,
+      'log' => 'New campaign created',
+    ));
+    entity_save('crm_campaign', $campaign);
+    return $campaign;
+  }
+
+}
