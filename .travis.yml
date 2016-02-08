@@ -64,7 +64,7 @@ before_script:
   # Reference and enable rules in build site.
   - drush --yes pm-download smsframework entityreference entity inline_entity_form ctools views email telephone views_bulk_operations libraries
   - ln -s $TESTDIR sites/all/modules/crm
-  - drush --yes pm-enable simpletest sms entityreference entity inline_entity_form ctools views email telephone views_bulk_operations libraries
+  - drush --yes pm-enable simpletest sms entityreference entity inline_entity_form ctools views email telephone views_bulk_operations libraries crm crm_reference crm_channel crm_contact crm_message crm_message_template crm_campaign crm_user crm_email
 
 script:
   # Start a web server on port 8080, run in the background; wait for
