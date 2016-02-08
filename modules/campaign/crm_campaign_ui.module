@@ -181,6 +181,8 @@ function crm_campaign_ui_manage_recipients($campaign) {
   $view = views_get_view('crm_campaign_channel');
   $view->override_url = current_path();
 
+  $build['statistics'] = _crm_campaign_ui_statistics($campaign);
+
   $build['view'] = array(
     '#markup' => $view->preview('default', array($campaign->campaign_id)),
   );
@@ -218,4 +220,92 @@ function crm_campaign_ui_entity_info_alter(&$entity_info) {
     'real path' => 'admin/crm/config/campaign',
     'access arguments' => array('crm administer'),
   );
+}
+
+/**
+ * Statistic renderable block.
+ *
+ * @param $campaign
+ *   Campaign object.
+ *
+ * @return array
+ *   Build array.
+ */
+function _crm_campaign_ui_statistics($campaign) {
+  $build = array();
+
+  $build['#attached']['css'] = array(
+    drupal_get_path('module', 'crm_campaign_ui') . '/assets/crm_campaign_ui.statistics.css' => array(),
+  );
+
+  $all = $all_selected = 0;
+  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+
+  foreach (crm_channel_types() as $name => $type) {
+    if (!_crm_message_template_channel_supported($name)) {
+      continue;
+    }
+
+    // Query.
+    $query = db_select('crm_channel', 'c');
+    $query->leftJoin('field_data_crm_channel', 'cc', 'c.channel_id = cc.crm_channel_target_id AND cc.entity_type = :entity_type AND cc.entity_id = :entity_id', array(':entity_type' => 'crm_campaign', ':entity_id' => $campaign->campaign_id));
+    $query->condition('c.type', $name);
+    $query->addExpression('COUNT(c.channel_id)', 'max');
+    $query->addExpression('COUNT(cc.entity_id)', 'value');
+    $results = $query->execute()->fetchAssoc();
+
+
+    // Check if template exists.
+    $exists = FALSE;
+    foreach ($wrapper->crm_message_template->getIterator() as $template_wrapper) {
+      if ($template_wrapper->getBundle() === $name) {
+        $exists = TRUE;
+        break;
+      }
+    }
+
+    // Container
+    $build[$name] = array(
+      '#type' => 'container',
+      '#attributes' => array(
+        'class' => array(
+          'crm-campaign-ui__statistics__type',
+          !$exists && $results['value'] ? 'non-existing' : NULL,
+        ),
+      ),
+    );
+
+    // Add knob.
+    $build[$name]['knob'] = array(
+      '#theme' => 'crm_ui_knob',
+      '#label' => crm_channel_type_get_name($name),
+      '#value' => $results['value'],
+      '#min' => 0,
+      '#max' => $results['max'],
+      '#settings' => array(
+        'fgColor' => $exists ? '#009900' : '#eeeeee',
+      ),
+    );
+
+    // Summarize data.
+    $all_selected += $results['value'];
+    $all += $results['max'];
+  }
+
+  $build['all'] = array(
+    '#theme' => 'crm_ui_knob',
+    '#weight' => -99,
+    '#label' => t('Total'),
+    '#value' => $all_selected,
+    '#min' => 0,
+    '#max' => $all,
+    '#settings' => array(
+      'fgColor' => NULL,
+      'width' => 200,
+      'height' => 200,
+    ),
+  );
+
+
+  return $build;
 }
