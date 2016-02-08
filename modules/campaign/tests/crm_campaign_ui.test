@@ -101,7 +101,7 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
 
     $this->drupalGet('admin/crm/campaign');
     $this->assertResponse(200);
-    $this->assertText($text);
+    $this->assertRaw($text);
   }
 
   function testEditCampaign() {
@@ -126,7 +126,7 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
 
     $this->drupalGet('admin/crm/campaign');
     $this->assertResponse(200);
-    $this->assertText($text);
+    $this->assertRaw($text);
   }
 
   function testDeleteCampaign() {
