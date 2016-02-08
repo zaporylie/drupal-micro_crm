@@ -45,6 +45,18 @@ function crm_campaign_ui_menu() {
     'weight' => 50,
   );
 
+  $items['admin/crm/campaign/%crm_campaign/clone'] = array(
+    'title' => 'Clone',
+    'page callback' => 'crm_campaign_ui_clone',
+    'page arguments' => array(3),
+    'access callback' => 'crm_campaign_access',
+    'access arguments' => array('create'),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_campaign_ui.form.inc',
+    'weight' => 50,
+  );
+
   $items['admin/crm/campaign/%crm_campaign/send'] = array(
     'title' => 'Send',
     'page callback' => 'crm_campaign_ui_send_form_wrapper',

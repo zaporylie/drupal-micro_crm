@@ -28,6 +28,80 @@ function crm_campaign_ui_add_form_wrapper() {
 }
 
 /**
+ * Form wrapper for entity clone.
+ *
+ * @param object $campaign
+ *   Original campaign.
+ *
+ * @return array
+ *   Form.
+ */
+function crm_campaign_ui_clone($campaign) {
+  return drupal_get_form('crm_campaign_ui_clone_form', $campaign);
+}
+
+/**
+ * Clone confirmation form.
+ */
+function crm_campaign_ui_clone_form($form, $form_state, $campaign) {
+
+  $form['campaign'] = array(
+    '#type' => 'value',
+    '#value' => $campaign,
+  );
+
+  return confirm_form($form, t('Do you really want to clone campaign %title?', array('%title' => $campaign->title)), 'admin/crm/campaign');
+}
+
+/**
+ * Clone confirmation form: submit handler.
+ */
+function crm_campaign_ui_clone_form_submit($form, &$form_state) {
+  $campaign = $form_state['values']['campaign'];
+  $transaction = db_transaction();
+  try {
+    $campaign_wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+    $templates = array();
+    foreach ($campaign_wrapper->crm_message_template->getIterator() as $delta => $template_wrapper) {
+      $template = $template_wrapper->value();
+      unset($template->template_id);
+      unset($template->revision_id);
+      unset($template->revision_uid);
+      unset($template->revision_timestamp);
+      $template->created = REQUEST_TIME;
+      unset($template->current_revision_id);
+      unset($template->default_revision);
+
+      do {
+        $template->name = $template->name . '_clone';
+      } while(crm_message_template_menu_name_exists($template->name));
+      $template->log = 'Template cloned along with campaign';
+
+      $template_wrapper->save();
+      $templates[] = $template;
+    }
+    $campaign_wrapper->crm_message_template->set($templates);
+
+    $campaign = entity_create('crm_campaign', array(
+      'title' => $campaign->title,
+      'crm_channel' => $campaign->crm_channel,
+      'crm_message_template' => $campaign->crm_message_template,
+      'data' => $campaign->data,
+      'log' => 'Campaign cloned',
+    ));
+    entity_save('crm_campaign', $campaign);
+    $uri = crm_campaign_uri($campaign);
+    $form_state['redirect'] = $uri['path'];
+  }
+  catch (Exception $e) {
+    $transaction->rollback();
+    watchdog_exception('crm_campaign_ui', $e);
+    drupal_set_message(t('Unable to clone campaign. Check admin log.'), 'error');
+    $form_state['rebuild'] = TRUE;
+  }
+}
+
+/**
  * Form wrapper for entity deletion.
  *
  * @param null $type
