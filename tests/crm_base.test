@@ -65,18 +65,18 @@ abstract class CRMBaseTestCase extends DrupalWebTestCase {
 
     $dependencies = array(
       // API
+      'ctools',
       'entity',
 //      'entity_token',
-      'sms',
+//      'sms',
       'email',
 //      'telephone_validation',
-      'libraries',
-      'inline_entity_form',
-      'views_bulk_operations',
+//      'libraries',
       'entityreference',
+      'inline_entity_form',
       // UI
-      'ctools',
       'views',
+      'views_bulk_operations',
       //'views_ui',
       'field',
       'field_ui',
@@ -91,6 +91,7 @@ abstract class CRMBaseTestCase extends DrupalWebTestCase {
       'crm_message_template',
       'crm_campaign',
       'crm_user',
+      'crm_email',
     );
     $ui = array(
       'crm_channel_ui',
