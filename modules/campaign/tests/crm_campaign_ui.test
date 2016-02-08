@@ -15,7 +15,7 @@ class CRMCampaignUITestCase extends CRMCampaignTestCase {
   }
 
   function setUp() {
-    parent::setUp('crm_campaign_ui');
+    parent::setUp(array('crm_campaign_ui'));
   }
 
   /**

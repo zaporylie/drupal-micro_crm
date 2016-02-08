@@ -14,9 +14,12 @@ class CRMCampaignTestCase extends CRMBaseTestCase {
     );
   }
 
-  function setUp() {
-    $args = func_get_args();
-    $args[] = 'crm_campaign';
+  public function setUp() {
+
+    $modules = func_get_args();
+    if (isset($modules[0]) && is_array($modules[0])) {
+      $modules = $modules[0];
+    }
 
     $admin_permissions = array(
       'crm campaign overview',
@@ -28,8 +31,7 @@ class CRMCampaignTestCase extends CRMBaseTestCase {
     );
     $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
 
-    $args = func_get_args();
-    call_user_func_array(array('parent', 'setUp'), $args);
+    parent::setUp($modules + array('crm_campaign'));
   }
 
   /**

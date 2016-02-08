@@ -26,8 +26,12 @@ class CRMBaseTestCase extends DrupalWebTestCase {
   }
 
   function setUp() {
-    $args = func_get_args();
-    call_user_func_array(array('parent', 'setUp'), $args);
+
+    $modules = func_get_args();
+    if (isset($modules[0]) && is_array($modules[0])) {
+      $modules = $modules[0];
+    }
+    parent::setUp($modules + array('crm'));
 
     field_cache_clear();
 
@@ -35,7 +39,7 @@ class CRMBaseTestCase extends DrupalWebTestCase {
     $this->user = $this->drupalCreateUser($this->user_permissions);
   }
 
-  function mergePermissions() {
+  protected function mergePermissions() {
     $args = func_get_args();
     $permission = array();
     foreach ($args as $arg) {
