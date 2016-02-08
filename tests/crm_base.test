@@ -254,4 +254,19 @@ abstract class CRMBaseTestCase extends DrupalWebTestCase {
     return $this->randomName() . '@' . $this->randomName() . '.' . $type;
   }
 
+  /**
+   * @param array $values
+   * @return bool
+   */
+  function createCampaign($values = array()) {
+    $values += array(
+      'title' => $this->randomString(8),
+      'status' => CRM_CAMPAIGN_STATUS_REGISTERED,
+      'log' => 'New campaign created',
+    );
+    $campaign = entity_create('crm_campaign', $values);
+    entity_save('crm_campaign', $campaign);
+    return $campaign;
+  }
+
 }

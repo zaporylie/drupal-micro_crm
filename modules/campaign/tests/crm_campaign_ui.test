@@ -102,7 +102,7 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
     // Login with admin.
     $this->drupalLogin($this->admin);
 
-    $campaign = $this->helperCreateCampaign();
+    $campaign = $this->createCampaign();
 
     $this->drupalGet('admin/crm/campaign/' . $campaign->campaign_id . '/edit');
     $this->assertResponse(200);
@@ -143,20 +143,6 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
 
   function testDeleteCampaign() {
 
-  }
-
-  /**
-   * @param array $values
-   * @return bool
-   */
-  function helperCreateCampaign($values = array()) {
-    $campaign = entity_create('crm_campaign', $values + array(
-        'title' => $this->randomString(8),
-        'status' => CRM_CAMPAIGN_STATUS_REGISTERED,
-        'log' => 'New campaign created',
-      ));
-    entity_save('crm_campaign', $campaign);
-    return $campaign;
   }
 
 }

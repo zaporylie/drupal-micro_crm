@@ -63,7 +63,7 @@ before_script:
 
   # Reference and enable rules in build site.
   - ln -s $TESTDIR modules/crm
-  - drush --yes pm-download smsframework entityreference entity inline_entity_form ctools views email telephone
+  - drush --yes pm-download smsframework entityreference entity inline_entity_form ctools views email telephone views_bulk_operations
   - drush --yes pm-enable simpletest
 
 script:
