@@ -31,7 +31,7 @@ class CRMBaseTestCase extends DrupalWebTestCase {
     if (isset($modules[0]) && is_array($modules[0])) {
       $modules = $modules[0];
     }
-    parent::setUp(array('crm') + $modules);
+    parent::setUp($modules);
 
     field_cache_clear();
 

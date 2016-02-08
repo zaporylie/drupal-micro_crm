@@ -14,12 +14,7 @@ class CRMCampaignTestCase extends CRMBaseTestCase {
     );
   }
 
-  public function setUp() {
-
-    $modules = func_get_args();
-    if (isset($modules[0]) && is_array($modules[0])) {
-      $modules = $modules[0];
-    }
+  function setUp() {
 
     $admin_permissions = array(
       'crm campaign overview',
@@ -31,7 +26,7 @@ class CRMCampaignTestCase extends CRMBaseTestCase {
     );
     $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
 
-    parent::setUp(array('crm_campaign') + $modules);
+    parent::setUp(array('crm_campaign'));
   }
 
   /**
@@ -50,20 +45,6 @@ class CRMCampaignTestCase extends CRMBaseTestCase {
     $this->drupalGet('admin/crm/config/campaign');
     $this->assertResponse(200, t('Admin user is not able to access the admin page'));
     $this->assertText(t('Campaign'), t('%title title present in the admin list page', array('%title' => t('Campaign'))));
-  }
-
-  /**
-   * @param array $values
-   * @return bool
-   */
-  function helperCreateCampaign($values = array()) {
-    $campaign = entity_create('crm_campaign', $values + array(
-      'title' => $this->randomString(8),
-      'status' => CRM_CAMPAIGN_STATUS_REGISTERED,
-      'log' => 'New campaign created',
-    ));
-    entity_save('crm_campaign', $campaign);
-    return $campaign;
   }
 
 }

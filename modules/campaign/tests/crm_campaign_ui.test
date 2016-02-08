@@ -3,7 +3,7 @@
 /**
  * Tests basic CRM functions.
  */
-class CRMCampaignUITestCase extends CRMCampaignTestCase {
+class CRMCampaignUITestCase extends CRMBaseTestCase {
 
 
   public static function getInfo() {
@@ -15,6 +15,16 @@ class CRMCampaignUITestCase extends CRMCampaignTestCase {
   }
 
   function setUp() {
+
+    $admin_permissions = array(
+      'crm campaign overview',
+      'crm campaign create',
+      'crm campaign view',
+      'crm campaign update',
+      'crm campaign delete',
+      'crm campaign send',
+    );
+    $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
     parent::setUp(array('crm_campaign_ui'));
   }
 
@@ -116,6 +126,20 @@ class CRMCampaignUITestCase extends CRMCampaignTestCase {
 
   function testDeleteCampaign() {
 
+  }
+
+  /**
+   * @param array $values
+   * @return bool
+   */
+  function helperCreateCampaign($values = array()) {
+    $campaign = entity_create('crm_campaign', $values + array(
+        'title' => $this->randomString(8),
+        'status' => CRM_CAMPAIGN_STATUS_REGISTERED,
+        'log' => 'New campaign created',
+      ));
+    entity_save('crm_campaign', $campaign);
+    return $campaign;
   }
 
 }
