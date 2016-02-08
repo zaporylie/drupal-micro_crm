@@ -31,7 +31,7 @@ class CRMCampaignTestCase extends CRMBaseTestCase {
     );
     $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
 
-    parent::setUp($modules + array('crm_campaign'));
+    parent::setUp(array('crm_campaign') + $modules);
   }
 
   /**
