@@ -3,60 +3,26 @@
 /**
  * Tests basic CRM functions.
  */
-class CRMBaseTestCase extends DrupalWebTestCase {
+class CRMTestCase extends CRMBaseTestCase {
 
-  protected $user;
-  protected $admin;
-  protected $admin_permissions = array(
-    'access administration pages',
-    'crm manage',
-    'crm administer',
-    'access content',
-  );
-  protected $user_permissions = array(
-    'access content',
-  );
 
   public static function getInfo() {
     return array(
       'name' => 'CRM',
-      'description' => 'Tests basic CRM functions.',
+      'description' => 'CRM test.',
       'group' => 'crm',
     );
   }
 
   function setUp() {
-
-    $modules = func_get_args();
-    if (isset($modules[0]) && is_array($modules[0])) {
-      $modules = $modules[0];
-    }
+    $other_modules = array();
+    $other_modules[] = 'crm';
+    $modules = parent::setUpHelper('dependencies', $other_modules);
     parent::setUp($modules);
 
-    field_cache_clear();
-
-    $this->admin = $this->drupalCreateUser($this->admin_permissions);
-    $this->user = $this->drupalCreateUser($this->user_permissions);
-  }
-
-  protected function mergePermissions() {
-    $args = func_get_args();
-    $permission = array();
-    foreach ($args as $arg) {
-      if (is_array($arg)) {
-        foreach ($arg as $perm) {
-          if (!in_array($perm, $permission)) {
-            $permission[] = $perm;
-          }
-        }
-      }
-      else {
-        if (!in_array($arg, $permission)) {
-          $permission[] = $arg;
-        }
-      }
-    }
-    return $permission;
+    $this->admin = $this->createAdmin();
+    $this->user = $this->createUser();
+    cache_clear_all(); // Just in case
   }
 
 }

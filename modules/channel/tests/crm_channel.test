@@ -1,1 +1,26 @@
 <?php
+
+/**
+ * Tests basic CRM functions.
+ */
+class CRMChannelTestCase extends CRMBaseTestCase {
+
+
+  public static function getInfo() {
+    return array(
+      'name' => 'CRM Channel',
+      'description' => 'CRM Channel.',
+      'group' => 'crm',
+    );
+  }
+
+  function setUp() {
+    $modules = parent::setUpHelper('api');
+    parent::setUp($modules);
+
+    $this->admin = $this->createAdmin();
+    $this->user = $this->createUser();
+    cache_clear_all(); // Just in case
+  }
+
+}

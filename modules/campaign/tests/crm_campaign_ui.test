@@ -15,17 +15,12 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
   }
 
   function setUp() {
+    $modules = parent::setUpHelper('ui');
+    parent::setUp($modules);
 
-    $admin_permissions = array(
-      'crm campaign overview',
-      'crm campaign create',
-      'crm campaign view',
-      'crm campaign update',
-      'crm campaign delete',
-      'crm campaign send',
-    );
-    $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
-    parent::setUp(array('crm_campaign_ui'));
+    $this->admin = $this->createAdmin();
+    $this->user = $this->createUser();
+    cache_clear_all(); // Just in case
   }
 
   /**
@@ -116,6 +111,28 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
 
     $data = array(
       'title' => $text,
+      'crm_message_template' => array(
+        LANGUAGE_NONE => array(
+          'form' => array(
+            'name' => $this->randomString(10),
+            'crm_message_email_subject' => array(
+              LANGUAGE_NONE => array(
+                array(
+                  'value' => $this->randomString(10),
+                ),
+              ),
+            ),
+            'crm_message_email_body' => array(
+              LANGUAGE_NONE => array(
+                array(
+                  'value' => $this->randomString(100),
+                  'format' => 'plain_text',
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
     $this->drupalPost('admin/crm/campaign/' . $campaign->campaign_id . '/edit', $data, 'Save');
 

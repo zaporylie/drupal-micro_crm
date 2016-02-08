@@ -20,16 +20,12 @@ class CRMEmailTestCase extends CRMBaseTestCase {
    * Setup test case.
    */
   function setUp() {
-    $admin_permissions = array(
-      'crm channel overview',
-      'crm channel create',
-      'crm channel update',
-      'crm channel delete',
-      'crm channel view',
-    );
-    $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
+    $modules = parent::setUpHelper('ui');
+    parent::setUp($modules);
 
-    parent::setUp('crm_channel_ui', 'crm_email');
+    $this->admin = $this->createAdmin();
+    $this->user = $this->createUser();
+    cache_clear_all(); // Just in case
 
     $this->drupalLogin($this->admin);
   }
@@ -75,7 +71,7 @@ class CRMEmailTestCase extends CRMBaseTestCase {
     // Create a Email channel.
     $edit = array();
     $langcode = LANGUAGE_NONE;
-    $edit["crm_email[$langcode][0][email]"] = $this->randomEmail();
+    $edit["crm_email[$langcode][0][email]"] = $this->generateEmail();
     $edit["status"] = CRM_CHANNEL_STATUS_UNREGISTERED;
     $edit["log"] = $this->randomString(32);
     $this->drupalPost('admin/crm/channel/add/email', $edit, t('Save'));
@@ -111,7 +107,7 @@ class CRMEmailTestCase extends CRMBaseTestCase {
     $this->assertFieldByName("crm_email[$langcode][0][email]", $wrapper->crm_email->value(), t('Email address match'));
 
     $edit = array();
-    $edit["crm_email[$langcode][0][email]"] = $this->randomEmail();
+    $edit["crm_email[$langcode][0][email]"] = $this->generateEmail();
     $edit["status"] = CRM_CHANNEL_STATUS_UNREGISTERED;
     $edit["log"] = $this->randomString(32);
     $this->drupalPost('admin/crm/channel/' . $channel->channel_id . '/edit', $edit, t('Save'));
@@ -147,7 +143,7 @@ class CRMEmailTestCase extends CRMBaseTestCase {
    */
   function createRandomEmailChannel($values = array()) {
     $values += array(
-      'mail' => $this->randomEmail(),
+      'mail' => $this->generateEmail(),
       'log' => $this->randomString(),
     );
     $channel = entity_create('crm_channel', array(
@@ -157,16 +153,6 @@ class CRMEmailTestCase extends CRMBaseTestCase {
     $channel->log = $values['log'];
     entity_save('crm_channel', $channel);
     return $channel;
-  }
-
-  /**
-   * Random email address.
-   *
-   * @return string
-   *   Random, valid email address.
-   */
-  function randomEmail() {
-    return $this->randomName() . '@' . $this->randomName() . '.' . $this->randomName(2);
   }
 
 }

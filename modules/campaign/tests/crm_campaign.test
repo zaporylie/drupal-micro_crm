@@ -15,18 +15,12 @@ class CRMCampaignTestCase extends CRMBaseTestCase {
   }
 
   function setUp() {
+    $modules = parent::setUpHelper('api');
+    parent::setUp($modules);
 
-    $admin_permissions = array(
-      'crm campaign overview',
-      'crm campaign create',
-      'crm campaign view',
-      'crm campaign update',
-      'crm campaign delete',
-      'crm campaign send',
-    );
-    $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
-
-    parent::setUp(array('crm_campaign'));
+    $this->admin = $this->createAdmin();
+    $this->user = $this->createUser();
+    cache_clear_all(); // Just in case
   }
 
   /**

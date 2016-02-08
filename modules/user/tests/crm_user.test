@@ -14,16 +14,12 @@ class CRMUserTestCase extends CRMBaseTestCase {
   }
 
   function setUp() {
-    $admin_permissions = array(
-      'crm channel overview',
-      'crm channel view',
-      'crm contact overview',
-      'crm contact view',
-      'administer users',
-    );
-    $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
+    $modules = parent::setUpHelper('ui');
+    parent::setUp($modules);
 
-    parent::setUp('crm_channel_ui', 'crm_contact_ui', 'crm_email', 'crm_user');
+    $this->admin = $this->createAdmin();
+    $this->user = $this->createUser();
+    cache_clear_all(); // Just in case
 
     $this->drupalLogin($this->admin);
   }
