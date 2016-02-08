@@ -82,10 +82,16 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
 
     $this->drupalGet('admin/crm/campaign/add');
     $this->assertResponse(200, t('Admin user is not able to access the add page'));
+    $this->assertText(t('Campaign'), t('%title title present in the add page', array('%title' => t('Campaign'))));
+
+    $this->drupalGet('admin/crm/campaign');
     $this->assertText(t('Add campaign'), t('%title title present in the add page', array('%title' => t('Add campaign'))));
   }
 
   function testAddCampaign() {
+
+    $this->drupalLogin($this->admin);
+
     $text = $this->randomString(10);
     $data = array(
       'title' => $text,
@@ -111,28 +117,10 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
 
     $data = array(
       'title' => $text,
-      'crm_message_template' => array(
-        LANGUAGE_NONE => array(
-          'form' => array(
-            'name' => $this->randomString(10),
-            'crm_message_email_subject' => array(
-              LANGUAGE_NONE => array(
-                array(
-                  'value' => $this->randomString(10),
-                ),
-              ),
-            ),
-            'crm_message_email_body' => array(
-              LANGUAGE_NONE => array(
-                array(
-                  'value' => $this->randomString(100),
-                  'format' => 'plain_text',
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+      'crm_message_template[und][form][name]' => $this->randomString(10),
+      'crm_message_template[und][form][name][crm_message_email_subject][und][0][value]' => $this->randomString(10),
+      'crm_message_template[und][form][name][crm_message_email_body][und][0][value]' => $this->randomString(100),
+      'crm_message_template[und][form][name][crm_message_email_body][und][0][format]' => 'plain_text',
     );
     $this->drupalPost('admin/crm/campaign/' . $campaign->campaign_id . '/edit', $data, 'Save');
 

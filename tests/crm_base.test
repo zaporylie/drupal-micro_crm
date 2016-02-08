@@ -67,6 +67,7 @@ abstract class CRMBaseTestCase extends DrupalWebTestCase {
       // API
       'ctools',
       'entity',
+      'token',
 //      'entity_token',
 //      'sms',
       'email',
