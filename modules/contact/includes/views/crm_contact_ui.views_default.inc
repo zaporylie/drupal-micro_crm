@@ -47,6 +47,13 @@ function crm_contact_ui_views_default_views() {
       'separator' => '',
       'empty_column' => 0,
     ),
+    'status' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
     'created' => array(
       'sortable' => 1,
       'default_sort_order' => 'asc',
@@ -69,10 +76,20 @@ function crm_contact_ui_views_default_views() {
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
   $handler->display->display_options['empty']['area']['content'] = 'No Contact found.';
   $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
+  /* Field: Bulk operations: Contact */
+  $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
+  $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'crm_contact';
+  $handler->display->display_options['fields']['views_bulk_operations']['field'] = 'views_bulk_operations';
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['display_type'] = '0';
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['enable_select_all_pages'] = 1;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['force_single'] = 0;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['entity_load_capacity'] = '10';
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array();
   /* Field: Contact: Contact ID */
   $handler->display->display_options['fields']['contact_id']['id'] = 'contact_id';
   $handler->display->display_options['fields']['contact_id']['table'] = 'crm_contact';
   $handler->display->display_options['fields']['contact_id']['field'] = 'contact_id';
+  $handler->display->display_options['fields']['contact_id']['label'] = 'ID';
   /* Field: Field: Recipients (Channels) */
   $handler->display->display_options['fields']['crm_channel']['id'] = 'crm_channel';
   $handler->display->display_options['fields']['crm_channel']['table'] = 'field_data_crm_channel';

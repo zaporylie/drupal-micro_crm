@@ -100,7 +100,7 @@ function crm_campaign_ui_menu() {
 function crm_campaign_ui_views_api() {
   return array(
     'api' => 3,
-    'path' => drupal_get_path('module', 'crm_campaign') . '/includes/views',
+    'path' => drupal_get_path('module', 'crm_campaign_ui') . '/includes/views',
   );
 }
 
