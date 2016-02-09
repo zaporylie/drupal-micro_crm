@@ -666,7 +666,7 @@ function crm_campaign_action_send_message_form($context, &$form_state) {
     $form['message']['machine_name'] = array(
       '#type' => 'machine_name',
       '#machine_name' => array(
-        'exists' => 'crm_message_template_menu_name_exists',
+        'exists' => 'crm_message_template_exists_by_name',
         'source' => array('message', 'title'),
       ),
     );

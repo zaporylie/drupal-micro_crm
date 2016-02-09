@@ -602,7 +602,7 @@ function _crm_newsletter_create_messages() {
   $types = crm_channel_types(TRUE);
   foreach ($types as $key => $type) {
     // @todo Check if message exists or not.
-    if (!crm_message_template_menu_name_exists('subscribe_' . $key)) {
+    if (!crm_message_template_exists_by_name('subscribe_' . $key)) {
       $subscribe = array(
         'subject' => t('Confirm your subscription'),
         'body' => t('Click link to confirm [crm_channel:subscribe-url]'),
@@ -615,7 +615,7 @@ function _crm_newsletter_create_messages() {
         entity_save('crm_message_template', $message);
       }
     }
-    if (!crm_message_template_menu_name_exists('unsubscribe_' . $key)) {
+    if (!crm_message_template_exists_by_name('unsubscribe_' . $key)) {
       $subscribe = array(
         'subject' => t('Cancel your newsletter subscription'),
         'body' => t('Thank you for being with us. Click to confirm [crm_channel:unsubscribe-url]'),
