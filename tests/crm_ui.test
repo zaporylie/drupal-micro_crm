@@ -15,7 +15,7 @@ class CRMUITestCase extends CRMBaseTestCase {
   }
 
   function setUp() {
-    $modules = parent::setUpHelper('api');
+    $modules = parent::setUpHelper('ui');
     parent::setUp($modules);
 
     $this->admin = $this->createAdmin();
