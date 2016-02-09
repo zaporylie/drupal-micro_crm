@@ -167,7 +167,7 @@ function crm_message_template_type_get_name($type) {
 }
 
 /**
- *
+ * @todo Needs to be renamed.
  */
 function crm_message_template_menu_name_exists($value) {
   return db_query_range('SELECT 1 FROM {crm_message_template} WHERE name = :name', 0, 1, array(':name' => $value))->fetchField();

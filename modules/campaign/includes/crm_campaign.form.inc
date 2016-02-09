@@ -100,10 +100,12 @@ function crm_campaign_form($form, &$form_state, $campaign) {
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
+    '#weight' => -1,
   );
   $form['actions']['send'] = array(
     '#type' => 'submit',
     '#value' => t('Save & send'),
+    '#weight' => 99,
   );
   return $form;
 }
@@ -136,7 +138,7 @@ function crm_campaign_form_submit($form, &$form_state) {
     // Prepopulate channel field.
     // Be really careful about that - this function can remove all channels from
     // crm_channel field.
-    crm_campaign_prepopulate_channel($campaign);
+    _crm_campaign_method_prepopulate($campaign);
 
     entity_save('crm_campaign', $campaign);
     $uri = entity_uri('crm_campaign', $campaign);

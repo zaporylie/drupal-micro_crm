@@ -330,7 +330,7 @@ function crm_campaign_option_list($status = NULL) {
  */
 function crm_campaign_form_alter(&$form, &$form_state, $form_id) {
   if (isset($form['crm_campaign_single']) && isset($form['#entity_type']) && $form['#entity_type'] == 'crm_message') {
-    // Hide all occurrences of crm_message_template field.
+    // Hide all occurrences of crm_campaign_single field.
     $form['crm_campaign_single']['#access'] = FALSE;
   }
 }
@@ -341,7 +341,7 @@ function crm_campaign_form_alter(&$form, &$form_state, $form_id) {
  * @param $campaign
  *   Campaign entity. Passed by reference.
  */
-function crm_campaign_prepopulate_channel(&$campaign) {
+function _crm_campaign_method_prepopulate(&$campaign) {
   if (!isset($campaign->data['manage_recipients']['methods'])) {
     return;
   }
@@ -416,46 +416,6 @@ function crm_campaign_method_get_form($method, $options = array()) {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   ) + $form;
-}
-
-/**
- * Evaluate if user should have access to the page.
- *
- * @param $callback
- *   Parent callback.
- * @param $arguments
- *   Parent arguments.
- * @param $path
- *   Path to page.
- * @param $campaign
- *   Campaign entity.
- *
- * @return bool|mixed
- *   TRUE/FALSE.
- */
-function crm_campaign_method_access($callback, $arguments, $path, $campaign) {
-  if (is_numeric($campaign)) {
-    $campaign = entity_load_single('crm_campaign', $campaign);
-  }
-
-  if (!isset($campaign->data['manage_recipients']['methods'])) {
-    return call_user_func_array($callback, $arguments);
-  }
-  if (empty($campaign->data['manage_recipients']['methods'])) {
-    return call_user_func_array($callback, $arguments);
-  }
-  if (!is_array($campaign->data['manage_recipients']['methods'])) {
-    return call_user_func_array($callback, $arguments);
-  }
-  $methods = crm_campaign_method_info();
-  uasort($campaign->data['manage_recipients']['methods'], 'drupal_sort_weight');
-  foreach ($campaign->data['manage_recipients']['methods'] as $method => $options) {
-    if (isset($methods[$method]['access path']) && $methods[$method]['access path'] == $path) {
-      return call_user_func_array($callback, $arguments);
-    }
-  }
-
-  return FALSE;
 }
 
 /**
@@ -662,6 +622,8 @@ function crm_campaign_channel_create_message($campaign, $channel) {
 }
 
 /**
+ * Send message to channel: action callback.
+ *
  * @param $entity
  * @param array $context
  */
@@ -689,7 +651,7 @@ function crm_campaign_channel_send_message($entity, &$context = array()) {
 }
 
 /**
- * Form callback.
+ * Send message to channel: action form callback.
  */
 function crm_campaign_channel_send_message_form($context, &$form_state) {
   $form['message_type'] = array(
@@ -741,6 +703,8 @@ function crm_campaign_channel_send_message_form($context, &$form_state) {
 }
 
 /**
+ * Send message to channel: action form ajax callback.
+ *
  * Inject message template form.
  */
 function crm_campaign_channel_send_message_form_ajax_callback($form, $form_state) {
@@ -748,10 +712,7 @@ function crm_campaign_channel_send_message_form_ajax_callback($form, $form_state
 }
 
 /**
- * @param $form
- * @param $form_state
- * @return array
- * @throws \Exception
+ * Send message to channel: action form submit handler.
  */
 function crm_campaign_channel_send_message_submit($form, &$form_state) {
   $transaction = db_transaction();

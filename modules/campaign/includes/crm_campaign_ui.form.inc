@@ -9,9 +9,8 @@
 /**
  * Form wrapper for entity addition.
  *
- * @param null $type
- *
- * @return array|mixed
+ * @return array
+ *   Form.
  */
 function crm_campaign_ui_add_form_wrapper() {
   $campaign = entity_create('crm_campaign', array(
