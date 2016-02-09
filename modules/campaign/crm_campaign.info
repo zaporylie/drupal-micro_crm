@@ -3,8 +3,7 @@ description = Allows you to send campaign messages using Message Template system
 core = 7.x
 package = CRM
 
-dependencies[] = crm_message_template_ui
-dependencies[] = views_bulk_operations
+dependencies[] = crm_message_template
 dependencies[] = inline_entity_form
 
 files[] = includes/CRMCampaignController.class.php
