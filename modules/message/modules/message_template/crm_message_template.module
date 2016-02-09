@@ -115,6 +115,16 @@ function crm_message_template_crm_channel_fields_info() {
 }
 
 /**
+ * Implements hook_form_alter().
+ */
+function crm_message_template_form_alter(&$form, &$form_state, $form_id) {
+  if (isset($form['crm_message_template_single']) && isset($form['#entity_type']) && $form['#entity_type'] == 'crm_message') {
+    // Hide all occurrences of crm_message_template field.
+    $form['crm_message_template_single']['#access'] = FALSE;
+  }
+}
+
+/**
  * Returns boolean value if channel is supported by message module or not.
  *
  * @param $type
