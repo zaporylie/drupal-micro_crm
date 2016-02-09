@@ -50,7 +50,7 @@ class CRMChannelUITestCase extends CRMBaseTestCase {
 
     $this->drupalGet('admin/crm/channel/add');
     $this->assertResponse(200, t('Admin user is not able to access the add page'));
-    $this->assertText(t('Add channel'), t('%title title present in the add page', array('%title' => t('Add channel'))));
+    $this->assertText(t('Channel'), t('%title title present in the add page', array('%title' => t('Channel'))));
   }
 
 }

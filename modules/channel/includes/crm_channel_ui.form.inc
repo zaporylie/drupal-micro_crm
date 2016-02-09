@@ -151,12 +151,21 @@ function crm_channel_ui_add() {
     $type_arg = strtr($type, '_', '-');
     $items[] = array(
       'data' => l($name, 'admin/crm/channel/add/' . $type_arg),
+      'class' => array('crm-channel', $type_arg),
     );
   }
 
   $build['list'] = array(
     '#theme' => 'item_list',
     '#items' => $items,
+    '#attributes' => array(
+      'class' => array(
+        'crm-channel-ui-type-list',
+      ),
+    ),
   );
+
+  $build['#attached']['css'][] = drupal_get_path('module', 'crm_channel_ui') . '/assets/crm_channel_ui.types.css';
+
   return $build;
 }
