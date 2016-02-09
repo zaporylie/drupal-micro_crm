@@ -172,6 +172,12 @@ function crm_campaign_action_info() {
     'configurable' => TRUE,
   );
 
+  $info['crm_campaign_user_send_message'] = array(
+    'type' => 'user',
+    'label' => t('Send campaign'),
+    'configurable' => TRUE,
+  );
+
   return $info;
 }
 
@@ -718,23 +724,49 @@ function crm_campaign_action_send_message_form_submit($form, &$form_state) {
 }
 
 /**
+ * Campaign actions: send single message helper.
+ *
+ * @param $channel
+ *   Channel object.
+ * @param $context
+ *   Context array - passed by reference.
+ *
+ * @return bool
+ */
+function _crm_campaign_message_send($channel, &$context) {
+  try {
+    // Add channel to campaign.
+    crm_campaign_add_channel($context['crm_campaign'], $channel);
+    $context['crm_campaign']->revision = FALSE;
+    entity_save('crm_campaign', $context['crm_campaign']);
+
+    // Generate message for channel.
+    $message = crm_campaign_channel_create_message($context['crm_campaign'], $channel);
+
+    // Send message.
+    crm_message_send($message);
+    return TRUE;
+  }
+  catch (Exception $e) {
+    watchdog_exception('crm_campaign', $e);
+    return FALSE;
+  }
+}
+
+/**
  * Send message to channel: action callback.
  *
- * @param $entity
+ * @param $channel
  * @param array $context
  */
-function crm_campaign_channel_send_message($entity, &$context = array()) {
+function crm_campaign_channel_send_message($channel, &$context = array()) {
 
-  // Add channel to campaign.
-  crm_campaign_add_channel($context['crm_campaign'], $entity);
-  $context['crm_campaign']->revision = FALSE;
-  entity_save('crm_campaign', $context['crm_campaign']);
-
-  // Generate message for channel.
-  $message = crm_campaign_channel_create_message($context['crm_campaign'], $entity);
-
-  // Send message.
-  crm_message_send($message);
+  if (isset($channel->channel_id)) {
+    $return = _crm_campaign_message_send($channel, $context);
+  }
+  else {
+    $return = FALSE;
+  }
 
   // If that's last one and all messages have been sent - save status.
   if ($context['progress']['total'] == $context['progress']['current']) {
@@ -744,6 +776,8 @@ function crm_campaign_channel_send_message($entity, &$context = array()) {
       entity_save('crm_campaign', $context['crm_campaign']);
     }
   }
+
+  return $return;
 }
 
 /**
@@ -768,13 +802,16 @@ function crm_campaign_channel_send_message_submit($form, &$form_state) {
  */
 function crm_campaign_contact_send_message($contact, &$context = array()) {
 
-  // Add channel to campaign.
-  $entity = crm_contact_channel_get_default($contact, $context['type']);
-  if (!$entity) {
-    return FALSE;
+  if (isset($contact->contact_id)) {
+    // Add channel to campaign.
+    $channel = crm_contact_channel_get_default($contact, $context['type']);
   }
+  else {
+    $channel = NULL;
+  }
+
   // We are gonna send message to only default channel for contact.
-  crm_campaign_channel_send_message($entity, $context);
+  return crm_campaign_channel_send_message($channel, $context);
 }
 
 /**
@@ -788,5 +825,34 @@ function crm_campaign_contact_send_message_form($context, &$form_state) {
  * Send message to contact: action form submit handler.
  */
 function crm_campaign_contact_send_message_submit($form, &$form_state) {
+  return crm_campaign_action_send_message_form_submit($form, $form_state);
+}
+
+/**
+ * Send message to channel: action callback.
+ *
+ * @param $contact
+ * @param array $context
+ */
+function crm_campaign_user_send_message($user, &$context = array()) {
+
+  // Get contact for user.
+  $contact = crm_user_load_contact($user->uid);
+
+  // We are gonna send message to only default channel for contact.
+  return crm_campaign_contact_send_message($contact, $context);
+}
+
+/**
+ * Send message to contact: action form callback.
+ */
+function crm_campaign_user_send_message_form($context, &$form_state) {
+  return crm_campaign_action_send_message_form($context, $form_state);
+}
+
+/**
+ * Send message to contact: action form submit handler.
+ */
+function crm_campaign_user_send_message_submit($form, &$form_state) {
   return crm_campaign_action_send_message_form_submit($form, $form_state);
 }
