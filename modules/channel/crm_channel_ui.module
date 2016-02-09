@@ -11,44 +11,6 @@
 function crm_channel_ui_menu() {
   $items = array();
 
-  $items['admin/crm/config/channel'] = array(
-    'title' => 'Channel',
-    'description' => 'Manage Channel configuration',
-    'page callback' => 'crm_index',
-    'page arguments' => array(),
-    'access arguments' => array('crm administer'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
-  $items['admin/crm/channel'] = array(
-    'title' => 'Channel',
-    'page callback' => 'crm_index',
-    'page arguments' => array(),
-    'access arguments' => array('crm channel overview'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
-  foreach (crm_channel_type_option_list() as $type => $name) {
-    $type_arg = strtr($type, '_', '-');
-    $items['admin/crm/config/channel/' . $type_arg] = array(
-      'title' => $name,
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('crm_channel_ui_settings', $type),
-      'access arguments' => array('crm administer'),
-      'type' => MENU_NORMAL_ITEM,
-    );
-  }
-
-  $items['admin/crm/channel/%crm_channel'] = array(
-    'title callback' => 'crm_channel_label',
-    'title arguments' => array(3),
-    'page callback' => 'crm_channel_view',
-    'page arguments' => array(3),
-    'access callback' => 'crm_channel_access',
-    'access arguments' => array('view', 3),
-    'type' => MENU_CALLBACK,
-  );
-
   $items['admin/crm/channel/%crm_channel/view'] = array(
     'title' => 'View',
     'page callback' => 'crm_channel_view',
@@ -85,12 +47,12 @@ function crm_channel_ui_menu() {
   );
 
   $items['admin/crm/channel/add'] = array(
-    'title' => 'Add new channel',
+    'title' => 'Add channel',
     'page callback' => 'crm_channel_ui_add',
     'page arguments' => array(),
     'access callback' => 'crm_channel_access',
     'access arguments' => array('create'),
-    'type' => MENU_CALLBACK,
+    'type' => MENU_LOCAL_ACTION,
     'file' => 'includes/crm_channel_ui.form.inc',
   );
 
@@ -105,22 +67,6 @@ function crm_channel_ui_menu() {
   );
 
   return $items;
-}
-
-/**
- * Implements hook_menu_local_tasks_alter().
- */
-function crm_channel_ui_menu_local_tasks_alter(&$data, $router_item, $root_path) {
-  // Add action link to 'admin/crm/channel/add' on 'admin/crm/channel' page.
-  if ($root_path == 'admin/crm/channel') {
-    $item = menu_get_item('admin/crm/channel/add');
-    if ($item['access']) {
-      $data['actions']['output'][] = array(
-        '#theme' => 'menu_local_action',
-        '#link' => $item,
-      );
-    }
-  }
 }
 
 /**
