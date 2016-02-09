@@ -222,6 +222,7 @@ function crm_campaign_ui_form_crm_campaign_form_alter(&$form, &$form_state, $for
   $form['actions']['manage'] = array(
     '#type' => 'submit',
     '#value' => t('Save & add recipients'),
+    '#ief_submit_all' => TRUE,
   );
   $form['#submit'][] = 'crm_campaign_ui_manage_recipients_redirect_form_submit';
 }
@@ -236,9 +237,6 @@ function crm_campaign_ui_manage_recipients_redirect_form_submit(&$form, &$form_s
       unset($_GET['destination']);
     }
     $form_state['redirect'] = $uri['path'] . '/recipients';
-  }
-  else {
-    $form_state['redirect'] = $uri['path'];
   }
 }
 
