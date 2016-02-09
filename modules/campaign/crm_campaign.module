@@ -166,6 +166,12 @@ function crm_campaign_action_info() {
     'configurable' => TRUE,
   );
 
+  $info['crm_campaign_contact_send_message'] = array(
+    'type' => 'crm_contact',
+    'label' => t('Send campaign'),
+    'configurable' => TRUE,
+  );
+
   return $info;
 }
 
@@ -708,7 +714,7 @@ function crm_campaign_action_send_message_form_submit($form, &$form_state) {
     throw $e;
   }
 
-  return array('crm_campaign' => $campaign);
+  return array('crm_campaign' => $campaign, 'type' => $template->type);
 }
 
 /**
@@ -751,5 +757,36 @@ function crm_campaign_channel_send_message_form($context, &$form_state) {
  * Send message to channel: action form submit handler.
  */
 function crm_campaign_channel_send_message_submit($form, &$form_state) {
+  return crm_campaign_action_send_message_form_submit($form, $form_state);
+}
+
+/**
+ * Send message to channel: action callback.
+ *
+ * @param $contact
+ * @param array $context
+ */
+function crm_campaign_contact_send_message($contact, &$context = array()) {
+
+  // Add channel to campaign.
+  $entity = crm_contact_channel_get_default($contact, $context['type']);
+  if (!$entity) {
+    return FALSE;
+  }
+  // We are gonna send message to only default channel for contact.
+  crm_campaign_channel_send_message($entity, $context);
+}
+
+/**
+ * Send message to contact: action form callback.
+ */
+function crm_campaign_contact_send_message_form($context, &$form_state) {
+  return crm_campaign_action_send_message_form($context, $form_state);
+}
+
+/**
+ * Send message to contact: action form submit handler.
+ */
+function crm_campaign_contact_send_message_submit($form, &$form_state) {
   return crm_campaign_action_send_message_form_submit($form, $form_state);
 }
