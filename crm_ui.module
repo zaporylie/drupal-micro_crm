@@ -74,7 +74,7 @@ function crm_ui_views_bulk_operations_form_alter(&$form, &$form_state, $vbo) {
     $form['select']['submit']['#value'] = t('Apply');
     $form['select']['operation']['#options'][0] = t('Bulk operations');
     $form['select']['#weight'] = 99999;
-    $form['select']['#attached']['css'][] = drupal_get_path('module', 'crm_ui') . '/css/crm_ui.vbo.css';
+    $form['select']['#attached']['css'][] = drupal_get_path('module', 'crm_ui') . '/assets/crm_ui.vbo.css';
   }
 }
 
