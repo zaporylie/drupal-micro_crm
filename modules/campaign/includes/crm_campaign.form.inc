@@ -100,13 +100,20 @@ function crm_campaign_form($form, &$form_state, $campaign) {
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
+    '#ief_submit_all' => TRUE,
     '#weight' => -1,
   );
   $form['actions']['send'] = array(
     '#type' => 'submit',
     '#value' => t('Save & send'),
+    '#ief_submit_all' => TRUE,
     '#weight' => 99,
   );
+
+  // IEF workaround.
+  $form['#submit'][] = 'inline_entity_form_trigger_submit';
+  $form['#submit'][] = 'crm_campaign_form_submit';
+
   return $form;
 }
 
