@@ -86,7 +86,7 @@ function crm_message_template_ui_form($form, &$form_state, $template) {
     '#default_value' => isset($template->name) ? $template->name : NULL,
     '#disabled' => $template->locked ? TRUE : FALSE,
     '#machine_name' => array(
-      'exists' => 'crm_message_template_menu_name_exists',
+      'exists' => 'crm_message_template_exists_by_name',
     ),
   );
 

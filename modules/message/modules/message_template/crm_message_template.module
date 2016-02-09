@@ -177,10 +177,32 @@ function crm_message_template_type_get_name($type) {
 }
 
 /**
- * @todo Needs to be renamed.
+ * Message template exists or not.
+ *
+ * @param string $value
+ *    Template name.
+ *
+ * @return bool
+ *   True or False.
+ */
+function crm_message_template_exists_by_name($value) {
+  return db_query_range('SELECT 1 FROM {crm_message_template} WHERE name = :name', 0, 1, array(':name' => $value))->fetchField();
+}
+
+/**
+ * @param string $value
+ *    Template name.
+ *
+ * @return bool
+ *   True or False.
+ *
+ * @deprecated
+ *   This method is deprecated.
+ *
+ * @see crm_message_template_exists_by_name()
  */
 function crm_message_template_menu_name_exists($value) {
-  return db_query_range('SELECT 1 FROM {crm_message_template} WHERE name = :name', 0, 1, array(':name' => $value))->fetchField();
+  return crm_message_template_exists_by_name($value);
 }
 
 /**

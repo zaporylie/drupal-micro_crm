@@ -50,7 +50,7 @@ class CRMMessageTemplateInlineFormController extends EntityInlineEntityFormContr
       '#default_value' => isset($entity->name) ? $entity->name : NULL,
       '#disabled' => $entity->locked ? TRUE : FALSE,
       '#machine_name' => array(
-        'exists' => 'crm_message_template_menu_name_exists',
+        'exists' => 'crm_message_template_exists_by_name',
       ),
     );
     $entity_form['log'] = array(

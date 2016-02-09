@@ -73,7 +73,7 @@ function crm_campaign_ui_clone_form_submit($form, &$form_state) {
 
       do {
         $template->name = $template->name . '_clone';
-      } while(crm_message_template_menu_name_exists($template->name));
+      } while(crm_message_template_exists_by_name($template->name));
       $template->log = 'Template cloned along with campaign';
 
       $template_wrapper->save();
