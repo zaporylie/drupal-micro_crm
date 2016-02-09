@@ -61,3 +61,98 @@ function crm_index() {
 
   return $build;
 }
+
+/**
+ * Implements hook_views_bulk_operations_form_alter().
+ *
+ * Tweaks the appearance of the VBO selector.
+ */
+function crm_ui_views_bulk_operations_form_alter(&$form, &$form_state, $vbo) {
+  if ($form_state['step'] == 'views_form_views_form' && strpos($vbo->view->name, 'crm_') !== FALSE) {
+    $form['select']['#title'] = '';
+    $form['select']['#collapsible'] = FALSE;
+    $form['select']['submit']['#value'] = t('Apply');
+    $form['select']['operation']['#options'][0] = t('Bulk operations');
+    $form['select']['#weight'] = 99999;
+    $form['select']['#attached']['css'][] = drupal_get_path('module', 'crm_ui') . '/assets/crm_ui.vbo.css';
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function crm_ui_theme($existing, $type, $theme, $path) {
+
+  $themes['crm_ui_knob'] = array(
+    'variables' => array(
+      'label' => NULL,
+      'value' => 0,
+      'min' => 0,
+      'max' => 0,
+      'settings' => array(),
+    ),
+  );
+
+  return $themes;
+}
+
+/**
+ * @param $variables
+ * @return string
+ */
+function theme_crm_ui_knob($variables) {
+
+  libraries_load('jQuery-Knob');
+  drupal_add_css(drupal_get_path('module', 'crm_ui') . '/assets/crm_ui.knob.css');
+  drupal_add_js(drupal_get_path('module', 'crm_ui') . '/assets/crm_ui.knob.js');
+
+
+  if (!isset($variables['settings']) || !is_array($variables['settings'])) {
+    $variables['settings'] = array();
+  }
+
+  $variables['settings'] += array(
+    'width' => 150,
+    'height' => 150,
+    'readOnly' => TRUE,
+    'fgColor' => '#990000',
+    'skin' => 'tron',
+    'thickness' => '.5',
+    'angleOffset' => -125,
+    'angleArc' => 250,
+  );
+
+  $output = '<div class="crm-ui__knob-wrapper">';
+  $output .= '<div class="crm-ui__knob-wrapper__label">' . $variables['label'] . '</div>';
+  $output .= '<input type="text" value="' . $variables['value'] . '" data-min="' . $variables['min'] . '" data-max="' . $variables['max'] . '" ';
+  foreach ($variables['settings'] as $key => $value) {
+    $output .= "data-$key='$value' ";
+  }
+  $output .= 'class="crm-ui__knob-wrapper__knob">';
+  $output .='</div>';
+  drupal_add_js(array('crm_ui_knob' => $variables['settings']), 'setting');
+
+  return $output;
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function crm_ui_libraries_info() {
+  $libraries['jQuery-Knob'] = array(
+    'name' => 'jQuery Knob',
+    'vendor url' => 'https://github.com/aterrien/jQuery-Knob',
+    'download url' => 'https://github.com/aterrien/jQuery-Knob/archive/master.zip',
+    'version arguments' => array(
+      'file' => 'package.json',
+      // Best practice: Document the actual version strings for later reference.
+      // 1.x: Version 1.0
+      'pattern' => '/"version": "(\d+\.+\d+.+\d+)"/',
+      'lines' => 3,
+    ),
+    'files' => array(
+      'js' => array('dist/jquery.knob.min.js'),
+    ),
+  );
+  return $libraries;
+}

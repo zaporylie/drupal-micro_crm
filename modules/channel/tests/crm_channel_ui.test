@@ -15,16 +15,12 @@ class CRMChannelUITestCase extends CRMBaseTestCase {
   }
 
   function setUp() {
-    $admin_permissions = array(
-      'crm channel overview',
-      'crm channel create',
-      'crm channel update',
-      'crm channel delete',
-      'crm channel view',
-    );
-    $this->admin_permissions = $this->mergePermissions($this->admin_permissions, $admin_permissions);
+    $modules = parent::setUpHelper('ui');
+    parent::setUp($modules);
 
-    parent::setUp('crm_channel_ui', 'crm_email');
+    $this->admin = $this->createAdmin();
+    $this->user = $this->createUser();
+    cache_clear_all(); // Just in case
   }
 
   /**
@@ -54,7 +50,7 @@ class CRMChannelUITestCase extends CRMBaseTestCase {
 
     $this->drupalGet('admin/crm/channel/add');
     $this->assertResponse(200, t('Admin user is not able to access the add page'));
-    $this->assertText(t('Add new channel'), t('%title title present in the add page', array('%title' => t('Add new channel'))));
+    $this->assertText(t('Channel'), t('%title title present in the add page', array('%title' => t('Channel'))));
   }
 
 }

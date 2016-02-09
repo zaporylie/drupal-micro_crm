@@ -5,7 +5,7 @@
  */
 
 /**
- * Implements hook_views_data()
+ * Implements hook_views_data().
  */
 function crm_campaign_views_data() {
   $data = array();
@@ -44,6 +44,25 @@ function crm_campaign_views_data() {
       'name field' => 'campaign_id',
       'numeric' => TRUE,
       'validate type' => 'campaign_id',
+    ),
+  );
+
+  // Expose the message type.
+  $data['crm_campaign']['title'] = array(
+    'title' => t('Title'),
+    'help' => t('Title.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
     ),
   );
 
@@ -132,4 +151,30 @@ function crm_campaign_views_data() {
   );
 
   return $data;
+}
+
+/**
+ * Implements hook_views_default_views_alter().
+ */
+function crm_campaign_views_default_views_alter(&$views) {
+  if (isset($views['crm_channel'])) {
+    $handler =& $views['crm_channel']->display['default']->handler;
+    $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations']['action::crm_campaign_channel_send_message'] = array(
+      'selected' => 1,
+      'postpone_processing' => 0,
+      'skip_confirmation' => 0,
+      'override_label' => 0,
+      'label' => '',
+    );
+  }
+  if (isset($views['crm_contact'])) {
+    $handler =& $views['crm_contact']->display['default']->handler;
+    $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations']['action::crm_campaign_contact_send_message'] = array(
+      'selected' => 1,
+      'postpone_processing' => 0,
+      'skip_confirmation' => 0,
+      'override_label' => 0,
+      'label' => '',
+    );
+  }
 }

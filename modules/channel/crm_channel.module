@@ -14,6 +14,44 @@ define('CRM_CHANNEL_TOKEN_VALIDATION_INTERVAL', 86400);
 module_load_include('inc', 'crm_channel', 'crm_channel.entity');
 
 /**
+ * Implements hook_menu().
+ */
+function crm_channel_menu() {
+
+  $items['admin/crm/config/channel'] = array(
+    'title' => 'Channel',
+    'description' => 'Manage Channel configuration',
+    'page callback' => 'crm_index',
+    'page arguments' => array(),
+    'access arguments' => array('crm administer'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  foreach (crm_channel_type_option_list() as $type => $name) {
+    $type_arg = strtr($type, '_', '-');
+    $items['admin/crm/config/channel/' . $type_arg] = array(
+      'title' => $name,
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('crm_channel_ui_settings', $type),
+      'access arguments' => array('crm administer'),
+      'type' => MENU_NORMAL_ITEM,
+    );
+  }
+
+  $items['admin/crm/channel/%crm_channel'] = array(
+    'title callback' => 'crm_channel_label',
+    'title arguments' => array(3),
+    'page callback' => 'crm_channel_view',
+    'page arguments' => array(3),
+    'access callback' => 'crm_channel_access',
+    'access arguments' => array('view', 3),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_hook_info().
  */
 function crm_channel_hook_info() {

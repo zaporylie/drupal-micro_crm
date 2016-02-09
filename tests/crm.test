@@ -3,19 +3,21 @@
 /**
  * Tests basic CRM functions.
  */
-class CRMChannelTestCase extends CRMBaseTestCase {
+class CRMTestCase extends CRMBaseTestCase {
 
 
   public static function getInfo() {
     return array(
-      'name' => 'CRM Channel',
-      'description' => 'CRM Channel.',
+      'name' => 'CRM',
+      'description' => 'CRM test.',
       'group' => 'crm',
     );
   }
 
   function setUp() {
-    $modules = parent::setUpHelper('api');
+    $other_modules = array();
+    $other_modules[] = 'crm';
+    $modules = parent::setUpHelper('dependencies', $other_modules);
     parent::setUp($modules);
 
     $this->admin = $this->createAdmin();

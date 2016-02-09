@@ -1,0 +1,142 @@
+<?php
+
+/**
+ * Tests basic CRM functions.
+ */
+class CRMCampaignUITestCase extends CRMBaseTestCase {
+
+
+  public static function getInfo() {
+    return array(
+      'name' => 'CRM Campaign UI',
+      'description' => 'CRM Campaign interface accessibility.',
+      'group' => 'crm',
+    );
+  }
+
+  function setUp() {
+    $modules = parent::setUpHelper('ui');
+    parent::setUp($modules);
+
+    $this->admin = $this->createAdmin();
+    $this->user = $this->createUser();
+    cache_clear_all(); // Just in case
+  }
+
+  /**
+   * Tests the admin links accessibility.
+   */
+  function testAdminAccessibility() {
+    // Login with normal user.
+    $this->drupalLogin($this->user);
+
+    $this->drupalGet('admin/crm/config/campaign/fields');
+    $this->assertResponse(403, t('Normal user can access fields page'));
+    $this->drupalGet('admin/crm/config/campaign/display');
+    $this->assertResponse(403, t('Normal user can access display page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->admin);
+
+    $this->drupalGet('admin/crm/config/campaign/fields');
+    $this->assertResponse(200, t('Admin user is not able to access the fields page'));
+    $this->assertText(t('Campaign'), t('%title title present in the admin list page', array('%title' => t('Campaign'))));
+
+    $this->drupalGet('admin/crm/config/campaign/display');
+    $this->assertResponse(200, t('Admin user is not able to access the display page'));
+    $this->assertText(t('Campaign'), t('%title title present in the admin list page', array('%title' => t('Campaign'))));
+  }
+
+  /**
+   * Tests add campaign links accessibility.
+   */
+  function testOverviewCampaignAccessibility() {
+
+    // Login with normal user.
+    $this->drupalLogin($this->user);
+
+    $this->drupalGet('admin/crm/campaign');
+    $this->assertResponse(403, t('Normal user can access add page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->admin);
+
+    $this->drupalGet('admin/crm/campaign');
+    $this->assertResponse(200, t('Admin user is not able to access the add page'));
+    $this->assertText(t('Campaign'), t('%title title present in the add page', array('%title' => t('Campaign'))));
+  }
+
+  /**
+   * Tests add campaign links accessibility.
+   */
+  function testAddCampaignAccessibility() {
+
+    // Login with normal user.
+    $this->drupalLogin($this->user);
+
+    $this->drupalGet('admin/crm/campaign/add');
+    $this->assertResponse(403, t('Normal user can access add page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->admin);
+
+    $this->drupalGet('admin/crm/campaign/add');
+    $this->assertResponse(200, t('Admin user is not able to access the add page'));
+    $this->assertText(t('Campaign'), t('%title title present in the add page', array('%title' => t('Campaign'))));
+
+    $this->drupalGet('admin/crm/campaign');
+    $this->assertText(t('Add campaign'), t('%title title present in the add page', array('%title' => t('Add campaign'))));
+  }
+
+  /**
+   * @todo: This test doesn't work right now.
+   */
+  function testAddCampaign() {
+
+    $this->drupalLogin($this->admin);
+
+    $text = $this->randomName(10);
+    $data = array(
+      'title' => $text,
+//      'crm_message_template[und][form][title]' =>
+    );
+    $this->drupalPost('admin/crm/campaign/add', $data, 'Save');
+
+    $this->drupalGet('admin/crm/campaign');
+    $this->assertResponse(200);
+//    $this->assertRaw($text);
+  }
+
+  /**
+   * @todo: This test doesn't work right now.
+   */
+  function testEditCampaign() {
+    // Login with admin.
+    $this->drupalLogin($this->admin);
+
+    $campaign = $this->createCampaign();
+
+    $this->drupalGet('admin/crm/campaign/' . $campaign->campaign_id . '/edit');
+    $this->assertResponse(200);
+
+    $text = $this->randomName(10);
+
+    $data = array(
+      'title' => $text,
+      'crm_message_template[und][form][name]' => $this->randomName(10),
+      'crm_message_template[und][form][crm_message_email_subject][und][0][value]' => $this->randomName(10),
+      'crm_message_template[und][form][crm_message_email_body][und][0][value]' => $this->randomName(100),
+      'crm_message_template[und][form][crm_message_email_body][und][0][format]' => 'plain_text',
+    );
+    $this->drupalPost('admin/crm/campaign/' . $campaign->campaign_id . '/edit', $data, 'Save');
+
+    $this->drupalGet('admin/crm/campaign');
+    $this->assertResponse(200);
+//    $this->assertRaw($text);
+  }
+
+  function testDeleteCampaign() {
+
+  }
+
+}

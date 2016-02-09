@@ -26,11 +26,6 @@ function crm_campaign_entity_info() {
     'bundles' => array(
       'crm_campaign' => array(
         'label' => t('Campaign', array(), array('context' => 'crm')),
-        'admin' => array(
-          'path' => 'admin/crm/config/campaign',
-          'real path' => 'admin/crm/config/campaign',
-          'access arguments' => array('crm administer'),
-        ),
       ),
     ),
     'view modes' => array(
@@ -87,11 +82,11 @@ function crm_campaign_delete_multiple($ids) {
  * @param $id
  * @return bool|mixed
  */
-function crm_campaign_view($campaign, $view_mode = 'administrator') {
+function crm_campaign_view($campaign, $view_mode = 'administrator', $language = NULL, $page = NULL) {
   if (!is_array($campaign)) {
     $campaign = array($campaign->campaign_id => $campaign);
   }
-  return entity_get_controller('crm_campaign')->view($campaign, $view_mode);
+  return entity_get_controller('crm_campaign')->view($campaign, $view_mode, $language, $page);
 }
 
 /**

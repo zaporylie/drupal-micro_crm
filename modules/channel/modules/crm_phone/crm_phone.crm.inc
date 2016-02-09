@@ -23,15 +23,17 @@ if (module_exists('sms')) {
    */
   function crm_phone_crm_message_send($message) {
     $wrapper = entity_metadata_wrapper('crm_message', $message);
-    if (!$wrapper->__isset('crm_channel_single') || !$wrapper->crm_channel_single->value()) {
-      return FALSE;
-    }
-    if (!$wrapper->__isset('crm_message_phone_body') || !($message = $wrapper->crm_message_phone_body->value())) {
-      return FALSE;
-    }
-    if (!$wrapper->__isset('crm_channel_single') || !($number = $wrapper->crm_channel_single->crm_phone->value())) {
-      return FALSE;
-    }
+//    if (!$wrapper->__isset('crm_channel_single') || !$wrapper->crm_channel_single->value()) {
+//      return FALSE;
+//    }
+//    if (!$wrapper->__isset('crm_message_phone_body') || !($message = $wrapper->crm_message_phone_body->value())) {
+//      return FALSE;
+//    }
+    $message = $wrapper->crm_message_phone_body->value();
+//    if (!$wrapper->__isset('crm_channel_single') || !($number = $wrapper->crm_channel_single->crm_phone->value())) {
+//      return FALSE;
+//    }
+    $number = $wrapper->crm_channel_single->crm_phone->value();
     return sms_send($number, $message, array('message_id' => $wrapper->getIdentifier()));
   }
 }

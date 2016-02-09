@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ */
+
+class CRMCampaignTestCase extends CRMBaseTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'CRM Campaign',
+      'description' => 'CRM Campaign tests.',
+      'group' => 'crm',
+    );
+  }
+
+  function setUp() {
+    $modules = parent::setUpHelper('api');
+    parent::setUp($modules);
+
+    $this->admin = $this->createAdmin();
+    $this->user = $this->createUser();
+    cache_clear_all(); // Just in case
+  }
+
+  /**
+   * Tests the admin links accessibility.
+   */
+  function testAdminAccessibility() {
+    // Login with normal user.
+    $this->drupalLogin($this->user);
+
+    $this->drupalGet('admin/crm/config/campaign');
+    $this->assertResponse(403, t('Normal user can access admin page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->admin);
+
+    $this->drupalGet('admin/crm/config/campaign');
+    $this->assertResponse(200, t('Admin user is not able to access the admin page'));
+    $this->assertText(t('Campaign'), t('%title title present in the admin list page', array('%title' => t('Campaign'))));
+  }
+
+}

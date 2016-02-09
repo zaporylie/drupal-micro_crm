@@ -115,6 +115,16 @@ function crm_message_template_crm_channel_fields_info() {
 }
 
 /**
+ * Implements hook_form_alter().
+ */
+function crm_message_template_form_alter(&$form, &$form_state, $form_id) {
+  if (isset($form['crm_message_template_single']) && isset($form['#entity_type']) && $form['#entity_type'] == 'crm_message') {
+    // Hide all occurrences of crm_message_template field.
+    $form['crm_message_template_single']['#access'] = FALSE;
+  }
+}
+
+/**
  * Returns boolean value if channel is supported by message module or not.
  *
  * @param $type
@@ -167,7 +177,7 @@ function crm_message_template_type_get_name($type) {
 }
 
 /**
- *
+ * @todo Needs to be renamed.
  */
 function crm_message_template_menu_name_exists($value) {
   return db_query_range('SELECT 1 FROM {crm_message_template} WHERE name = :name', 0, 1, array(':name' => $value))->fetchField();
@@ -196,7 +206,7 @@ function crm_message_template_entity_translation_supported_type($type) {
  *
  * @todo Add antiflood check?
  */
-function crm_message_template_apply($template, $channel, $context = array()) {
+function crm_message_template_apply($template, $channel, $context = array(), $save = TRUE) {
   $message = crm_message_create(array(
     'channel' => $channel,
   ), 'crm_message');
@@ -231,6 +241,8 @@ function crm_message_template_apply($template, $channel, $context = array()) {
 
   $message_wrapper->crm_message_template_single->set($template);
   $message->log = 'New message created from template ' . $template->template_id;
-  entity_save('crm_message', $message);
+  if ($save) {
+    entity_save('crm_message', $message);
+  }
   return $message;
 }

@@ -1,0 +1,8 @@
+name = Campaign UI
+description = UI for Campaign module.
+core = 7.x
+
+dependencies[] = crm_campaign
+dependencies[] = views_bulk_operations
+
+files[] = tests/crm_campaign_ui.test

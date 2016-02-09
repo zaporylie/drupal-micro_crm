@@ -1,0 +1,10 @@
+.crm-ui__knob-wrapper {
+  display: inline-block;
+  padding: 10px;
+}
+
+.crm-ui__knob-wrapper .crm-ui__knob-wrapper__label {
+  text-align: center;
+  font-size: 1.5em;
+  line-height: 1.5em;
+}

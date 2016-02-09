@@ -90,6 +90,18 @@ function crm_message_ui_menu() {
     'weight' => 99,
   );
 
+  $items['admin/crm/message/%crm_message/cancel'] = array(
+    'title' => 'Cancel',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_message_ui_cancel', 3),
+    'access callback' => 'crm_message_access',
+    'access arguments' => array('cancel', 3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/crm_message_ui.form.inc',
+    'weight' => 99,
+  );
+
   $items['admin/crm/message/add'] = array(
     'title' => 'Add message',
     'page callback' => 'crm_message_ui_add',
