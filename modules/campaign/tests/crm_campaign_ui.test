@@ -20,7 +20,7 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
 
     $this->admin = $this->createAdmin();
     $this->user = $this->createUser();
-    cache_clear_all(); // Just in case
+//    cache_clear_all(); // Just in case
   }
 
   /**
@@ -89,7 +89,7 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
   }
 
   /**
-   * @todo: This test doesn't work right now.
+   * Add Campaign.
    */
   function testAddCampaign() {
 
@@ -98,17 +98,20 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
     $text = $this->randomName(10);
     $data = array(
       'title' => $text,
-//      'crm_message_template[und][form][title]' =>
+      'crm_message_template[und][form][name]' => strtolower($this->randomName(10)),
+      'crm_message_template[und][form][crm_message_email_subject][und][0][value]' => $this->randomString(10),
+      'crm_message_template[und][form][crm_message_email_body][und][0][value]' => $this->randomString(255),
+      'crm_message_template[und][form][crm_message_email_body][und][0][format]' => 'plain_text',
     );
     $this->drupalPost('admin/crm/campaign/add', $data, 'Save');
 
     $this->drupalGet('admin/crm/campaign');
     $this->assertResponse(200);
-//    $this->assertRaw($text);
+    $this->assertRaw($text);
   }
 
   /**
-   * @todo: This test doesn't work right now.
+   * Edit campaign.
    */
   function testEditCampaign() {
     // Login with admin.
@@ -123,20 +126,32 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
 
     $data = array(
       'title' => $text,
-      'crm_message_template[und][form][name]' => $this->randomName(10),
-      'crm_message_template[und][form][crm_message_email_subject][und][0][value]' => $this->randomName(10),
-      'crm_message_template[und][form][crm_message_email_body][und][0][value]' => $this->randomName(100),
+      'crm_message_template[und][form][name]' => strtolower($this->randomName(10)),
+      'crm_message_template[und][form][crm_message_email_subject][und][0][value]' => $this->randomString(10),
+      'crm_message_template[und][form][crm_message_email_body][und][0][value]' => $this->randomString(255),
       'crm_message_template[und][form][crm_message_email_body][und][0][format]' => 'plain_text',
     );
     $this->drupalPost('admin/crm/campaign/' . $campaign->campaign_id . '/edit', $data, 'Save');
 
     $this->drupalGet('admin/crm/campaign');
     $this->assertResponse(200);
-//    $this->assertRaw($text);
+    $this->assertRaw($text);
   }
 
+  /**
+   * Delete Campaign.
+   */
   function testDeleteCampaign() {
+    // Login with admin.
+    $this->drupalLogin($this->admin);
 
+    $campaign = $this->createCampaign();
+    $data = array();
+    $this->drupalPost('admin/crm/campaign/' . $campaign->campaign_id . '/delete', $data, 'Confirm');
+    $this->assertRaw(t('Campaign @campaign has been deleted', array('@campaign' => $campaign->campaign_id)));
+
+    $this->drupalGet('admin/crm/campaign/' . $campaign->campaign_id);
+    $this->assertResponse(403);
   }
 
 }

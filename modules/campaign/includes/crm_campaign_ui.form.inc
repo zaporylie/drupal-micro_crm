@@ -156,6 +156,7 @@ function crm_campaign_ui_delete_form_submit($form, &$form_state) {
   $campaign_id = entity_id('crm_campaign', $form_state['values']['campaign']);
   if (entity_delete('crm_campaign', $campaign_id) !== FALSE) {
     drupal_set_message(t('Campaign @campaign has been deleted', array('@campaign' => $campaign_id)));
+    $form_state['redirect'] = 'admin/crm/campaign';
   }
 }
 
