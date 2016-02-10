@@ -151,7 +151,7 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
     $this->assertRaw(t('Campaign @campaign has been deleted', array('@campaign' => $campaign->campaign_id)));
 
     $this->drupalGet('admin/crm/campaign/' . $campaign->campaign_id);
-    $this->assertResponse(404);
+    $this->assertResponse(403);
   }
 
 }
