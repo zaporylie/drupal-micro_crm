@@ -250,7 +250,7 @@ function crm_campaign_ui_views_default_views() {
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
     'action::crm_campaign_ui_add_to_campaign_action' => array(
       'selected' => 1,
-      'skip_confirmation' => 0,
+      'skip_confirmation' => 1,
       'override_label' => 0,
       'label' => '',
     ),
@@ -299,7 +299,7 @@ function crm_campaign_ui_views_default_views() {
     ),
     'action::crm_campaign_ui_remove_from_campaign_action' => array(
       'selected' => 1,
-      'skip_confirmation' => 0,
+      'skip_confirmation' => 1,
       'override_label' => 0,
       'label' => '',
     ),
@@ -358,6 +358,9 @@ function crm_campaign_ui_views_default_views() {
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'crm_channel';
   $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = array(
+    'registered' => 'registered',
+  );
   $handler->display->display_options['filters']['status']['exposed'] = TRUE;
   $handler->display->display_options['filters']['status']['expose']['operator_id'] = 'status_op';
   $handler->display->display_options['filters']['status']['expose']['label'] = 'Status';
@@ -367,6 +370,7 @@ function crm_campaign_ui_views_default_views() {
     2 => '2',
     1 => 0,
     3 => 0,
+    4 => 0,
   );
   /* Filter criterion: Channel: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
