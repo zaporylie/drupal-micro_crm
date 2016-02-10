@@ -20,7 +20,7 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
 
     $this->admin = $this->createAdmin();
     $this->user = $this->createUser();
-    cache_clear_all(); // Just in case
+//    cache_clear_all(); // Just in case
   }
 
   /**
