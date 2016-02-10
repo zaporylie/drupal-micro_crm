@@ -98,6 +98,10 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
     $text = $this->randomName(10);
     $data = array(
       'title' => $text,
+      'crm_message_template[und][form][name]' => strtolower($this->randomName(10)),
+      'crm_message_template[und][form][crm_message_email_subject][und][0][value]' => $this->randomString(10),
+      'crm_message_template[und][form][crm_message_email_body][und][0][value]' => $this->randomString(255),
+      'crm_message_template[und][form][crm_message_email_body][und][0][format]' => 'plain_text',
 //      'crm_message_template[und][form][title]' =>
     );
     $this->drupalPost('admin/crm/campaign/add', $data, 'Save');
@@ -123,16 +127,16 @@ class CRMCampaignUITestCase extends CRMBaseTestCase {
 
     $data = array(
       'title' => $text,
-      'crm_message_template[und][form][name]' => $this->randomName(10),
-      'crm_message_template[und][form][crm_message_email_subject][und][0][value]' => $this->randomName(10),
-      'crm_message_template[und][form][crm_message_email_body][und][0][value]' => $this->randomName(100),
+      'crm_message_template[und][form][name]' => strtolower($this->randomName(10)),
+      'crm_message_template[und][form][crm_message_email_subject][und][0][value]' => $this->randomString(10),
+      'crm_message_template[und][form][crm_message_email_body][und][0][value]' => $this->randomString(255),
       'crm_message_template[und][form][crm_message_email_body][und][0][format]' => 'plain_text',
     );
     $this->drupalPost('admin/crm/campaign/' . $campaign->campaign_id . '/edit', $data, 'Save');
 
     $this->drupalGet('admin/crm/campaign');
     $this->assertResponse(200);
-//    $this->assertRaw($text);
+    $this->assertRaw($text);
   }
 
   function testDeleteCampaign() {
