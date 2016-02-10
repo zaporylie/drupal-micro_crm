@@ -250,7 +250,7 @@ function crm_campaign_ui_views_default_views() {
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
     'action::crm_campaign_ui_add_to_campaign_action' => array(
       'selected' => 1,
-      'skip_confirmation' => 0,
+      'skip_confirmation' => 1,
       'override_label' => 0,
       'label' => '',
     ),
@@ -299,7 +299,7 @@ function crm_campaign_ui_views_default_views() {
     ),
     'action::crm_campaign_ui_remove_from_campaign_action' => array(
       'selected' => 1,
-      'skip_confirmation' => 0,
+      'skip_confirmation' => 1,
       'override_label' => 0,
       'label' => '',
     ),

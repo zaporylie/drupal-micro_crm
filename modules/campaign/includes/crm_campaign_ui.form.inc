@@ -167,6 +167,25 @@ function crm_campaign_ui_send_form($form, &$form_state, $campaign) {
     '#type' => 'value',
     '#value' => $campaign,
   );
+
+  $form['stats'] = array(
+    '#type' => 'container',
+    '#attributes' => array(),
+    _crm_campaign_ui_statistics($campaign),
+  );
+
+  $form['preview'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Preview'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
+  foreach ($wrapper->crm_message_template->getIterator() as $template) {
+    $form['preview'][$template->getIdentifier()] = $template->view();
+  }
+
   return confirm_form(
     $form,
     t('Do you really want to send campaign?'),
@@ -185,7 +204,7 @@ function crm_campaign_ui_send_form_submit($form, &$form_state) {
 
   foreach ($channels as $channel) {
     $batch_operations[] = array(
-      'crm_campaign_ui_prepare_batch_item',
+      'crm_campaign_batch_prepare_item',
       array(
         $campaign,
         $channel,
@@ -206,116 +225,10 @@ function crm_campaign_ui_send_form_submit($form, &$form_state) {
 
   $batch = array(
     'operations' => $batch_operations,
-    'finished' => 'crm_campaign_ui_send_batch_finished',
-    'file' => drupal_get_path('module', 'crm_campaign') . '/includes/crm_campaign_ui.form.inc',
+    'finished' => 'crm_campaign_batch_send_finished',
+//    'file' => drupal_get_path('module', 'crm_campaign') . '/includes/crm_campaign_ui.form.inc',
   );
   $uri = entity_uri('crm_campaign', $campaign);
   $form_state['redirect'] = $uri['path'];
   batch_set($batch);
-}
-
-/**
- * @param $campaign
- * @param $channel
- * @param $context
- */
-function crm_campaign_ui_prepare_batch_item($campaign, $channel, &$context) {
-  $context['results']['campaign'] = $campaign->campaign_id;
-  $queue_mode = variable_get('crm_campaign_queue', FALSE);
-
-  if ($queue_mode) {
-    $queue = DrupalQueue::get('crm_message_queue');
-    $queue->createQueue();
-  }
-
-  $message = _crm_campaign_message_exists($campaign, $channel);
-  if (is_object($message) && $message->status == CRM_MESSAGE_STATUS_SENT) {
-    return;
-  }
-
-  if (is_object($message) && $message->status <> CRM_MESSAGE_STATUS_QUEUED) {
-    try {
-      $message->status = CRM_MESSAGE_STATUS_QUEUED;
-      $message->revision = TRUE;
-      $message->log = format_string('Message (message_id: @message_id) has been queued.', array('@message_id' => $message->message_id));
-      entity_save('crm_message', $message);
-    }
-    catch (Exception $e) {
-      // @todo Do something with exceptions!
-    }
-  }
-  elseif (!$message && $message = crm_campaign_channel_create_message($campaign, $channel)) {
-    // Message created and queued.
-  }
-  else {
-    watchdog('crm_message', 'Unable to create message for channel_id @channel_id, campaign_id @campaign_id.', array('@channel_id' => $channel->channel_id, '@campaign_id' => $campaign->campaign_id), WATCHDOG_ERROR);
-    return FALSE;
-  }
-
-  if ($queue_mode) {
-    $queue->createItem($message->message_id);
-    $context['results']['iterations'][] = array(
-      'message_id' => $message->message_id,
-      'status' => $message->status,
-    );
-  }
-  else {
-    crm_campaign_ui_send_batch_item($message->message_id, $context);
-  }
-
-}
-
-/**
- * @param $message_id
- * @param $context
- */
-function crm_campaign_ui_send_batch_item($message_id, &$context) {
-  crm_message_send_worker_callback_batch_wrapper($message_id, $context);
-}
-
-/**
- * @param $success
- * @param $results
- * @param $operations
- */
-function crm_campaign_ui_send_batch_finished($success, $results, $operations) {
-  if ($success) {
-    if (isset($results['iterations'])) {
-      $sent = array_filter($results['iterations'], function ($value) {
-        return $value['status'] == CRM_MESSAGE_STATUS_SENT;
-      });
-      $queued = array_filter($results['iterations'], function ($value) {
-        return $value['status'] == CRM_MESSAGE_STATUS_QUEUED;
-      });
-      drupal_set_message(t('@sent messages has been sent. @queued messages has been queued and will be sent later.', array(
-        '@sent' => count($sent),
-        '@queued' => count($queued),
-      )));
-    }
-    else {
-      drupal_set_message(t('Nothing to send'));
-    }
-    $campaign = entity_load_single('crm_campaign', $results['campaign']);
-    if (_crm_campaign_is_sent($campaign->campaign_id)) {
-      $campaign->log = 'Campaign has been sent';
-      $campaign->revision = TRUE;
-      $campaign->status = CRM_CAMPAIGN_STATUS_SENT;
-      entity_save('crm_campaign', $campaign);
-      drupal_set_message(t('Campaign has been sent'));
-    }
-  }
-  else {
-    // An error occurred.
-    // $operations contains the operations that remained unprocessed.
-    $error_operation = reset($operations);
-    drupal_set_message(
-      t('An error occurred while processing @operation with arguments: @args',
-        array(
-          '@operation' => $error_operation[0],
-          '@args' => print_r($error_operation[0], TRUE),
-        )
-      ),
-      'error'
-    );
-  }
 }
