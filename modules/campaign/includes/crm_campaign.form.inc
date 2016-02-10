@@ -33,8 +33,21 @@ function crm_campaign_form($form, &$form_state, $campaign) {
     '#default_value' => isset($campaign->title) ? $campaign->title : '',
   );
 
-  field_attach_form('crm_campaign', $campaign, $form, $form_state);
-  $form['crm_channel']['#access'] = FALSE;
+  $instances = _field_invoke_get_instances('crm_campaign', 'crm_campaign', array(
+    'default' => FALSE,
+    'deleted' => FALSE,
+    'language' => NULL,
+  ));
+
+  foreach ($instances as $field_name => $instance) {
+    if ($field_name === 'crm_channel') {
+      continue;
+    }
+    field_attach_form('crm_campaign', $campaign, $form, $form_state, NULL, array(
+      'field_name' => $field_name,
+    ));
+  }
+//  $form['crm_channel']['#access'] = FALSE;
 
   $form['settings'] = array(
     '#type' => 'vertical_tabs',
@@ -131,7 +144,9 @@ function crm_campaign_form_submit($form, &$form_state) {
   $campaign = $form_state['crm_campaign'];
   $campaign->title = $form_state['values']['title'];
   $campaign->log = $form_state['values']['log'];
-  $campaign->data['manage_recipients'] = $form_state['values']['manage_recipients'];
+  if (isset($form_state['values']['manage_recipients'])) {
+    $campaign->data['manage_recipients'] = $form_state['values']['manage_recipients'];
+  }
 
   if (isset($form_state['values']['status'])) {
     $campaign->status = $form_state['values']['status'];
