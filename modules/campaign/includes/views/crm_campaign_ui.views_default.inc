@@ -389,5 +389,94 @@ function crm_campaign_ui_views_default_views() {
 
   $views[$view->name] = $view;
 
+  $view = new view();
+  $view->name = 'crm_campaign_channels';
+  $view->description = '';
+  $view->tag = 'crm';
+  $view->base_table = 'crm_channel';
+  $view->human_name = 'CRM Campaign Channels';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['use_ajax'] = TRUE;
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['group_by'] = TRUE;
+  $handler->display->display_options['access']['type'] = 'none';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'mini';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '50';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['columns'] = array(
+    'channel_id' => 'channel_id',
+    'label' => 'label',
+    'type' => 'type',
+  );
+  $handler->display->display_options['style_options']['default'] = 'channel_id';
+  $handler->display->display_options['style_options']['info'] = array(
+    'channel_id' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'label' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'type' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+  );
+  /* No results behavior: Global: Unfiltered text */
+  $handler->display->display_options['empty']['area_text_custom']['id'] = 'area_text_custom';
+  $handler->display->display_options['empty']['area_text_custom']['table'] = 'views';
+  $handler->display->display_options['empty']['area_text_custom']['field'] = 'area_text_custom';
+  $handler->display->display_options['empty']['area_text_custom']['empty'] = TRUE;
+  $handler->display->display_options['empty']['area_text_custom']['content'] = 'This view is empty.';
+  /* Relationship: Entity Reference: Referencing entity */
+  $handler->display->display_options['relationships']['reverse_crm_channel_crm_campaign']['id'] = 'reverse_crm_channel_crm_campaign';
+  $handler->display->display_options['relationships']['reverse_crm_channel_crm_campaign']['table'] = 'crm_channel';
+  $handler->display->display_options['relationships']['reverse_crm_channel_crm_campaign']['field'] = 'reverse_crm_channel_crm_campaign';
+  $handler->display->display_options['relationships']['reverse_crm_channel_crm_campaign']['required'] = TRUE;
+  /* Field: Channel: Channel ID */
+  $handler->display->display_options['fields']['channel_id']['id'] = 'channel_id';
+  $handler->display->display_options['fields']['channel_id']['table'] = 'crm_channel';
+  $handler->display->display_options['fields']['channel_id']['field'] = 'channel_id';
+  /* Field: Channel: Label */
+  $handler->display->display_options['fields']['label']['id'] = 'label';
+  $handler->display->display_options['fields']['label']['table'] = 'crm_channel';
+  $handler->display->display_options['fields']['label']['field'] = 'label';
+  /* Field: Channel: Type */
+  $handler->display->display_options['fields']['type']['id'] = 'type';
+  $handler->display->display_options['fields']['type']['table'] = 'crm_channel';
+  $handler->display->display_options['fields']['type']['field'] = 'type';
+  $handler->display->display_options['fields']['type']['link_to_channel'] = 0;
+  $handler->display->display_options['fields']['type']['use_raw_value'] = 0;
+  /* Contextual filter: Campaign: Campaign ID */
+  $handler->display->display_options['arguments']['campaign_id']['id'] = 'campaign_id';
+  $handler->display->display_options['arguments']['campaign_id']['table'] = 'crm_campaign';
+  $handler->display->display_options['arguments']['campaign_id']['field'] = 'campaign_id';
+  $handler->display->display_options['arguments']['campaign_id']['relationship'] = 'reverse_crm_channel_crm_campaign';
+  $handler->display->display_options['arguments']['campaign_id']['default_action'] = 'empty';
+  $handler->display->display_options['arguments']['campaign_id']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['campaign_id']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['campaign_id']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['campaign_id']['summary_options']['items_per_page'] = '25';
+
+  $views[$view->name] = $view;
+
   return $views;
 }

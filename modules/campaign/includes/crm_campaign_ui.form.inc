@@ -169,23 +169,15 @@ function crm_campaign_ui_send_form($form, &$form_state, $campaign) {
     '#value' => $campaign,
   );
 
-  $form['stats'] = array(
-    '#type' => 'container',
-    '#attributes' => array(),
-    _crm_campaign_ui_statistics($campaign),
-  );
+  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
 
   $form['preview'] = array(
     '#type' => 'fieldset',
     '#title' => t('Preview'),
     '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
+    '#collapsed' => FALSE,
+    'entity' => $wrapper->view(),
   );
-
-  $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
-  foreach ($wrapper->crm_message_template->getIterator() as $template) {
-    $form['preview'][$template->getIdentifier()] = $template->view();
-  }
 
   return confirm_form(
     $form,

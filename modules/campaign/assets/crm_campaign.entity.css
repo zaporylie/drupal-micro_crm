@@ -1,0 +1,13 @@
+.entity-crm-campaign {
+
+}
+
+.entity-crm-campaign .content .left{
+  width: 60%;
+  float: left;
+}
+
+.entity-crm-campaign .content .right{
+  width: 40%;
+  float: right;
+}
