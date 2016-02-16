@@ -173,3 +173,18 @@ function crm_contact_ui_field_widget_form_alter(&$element, &$form_state, $contex
     $element['#access'] = FALSE;
   }
 }
+
+/**
+ * Implements hook_entity_view().
+ */
+function crm_contact_ui_entity_view($entity, $type, $view_mode, $langcode) {
+  if ($type == 'crm_campaign') {
+    $view = views_get_view('crm_campaign_channels');
+    $entity->content['crm_channel'] = array(
+      'stats' => _crm_campaign_ui_statistics($entity),
+      'recipients' => array(
+        '#markup' => $view->preview(NULL, array($entity->campaign_id)),
+      ),
+    );
+  }
+}

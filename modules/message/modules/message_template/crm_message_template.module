@@ -115,6 +115,19 @@ function crm_message_template_crm_channel_fields_info() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function crm_message_template_theme($existing, $type, $theme, $path) {
+  return array(
+    'crm_message_template' => array(
+      'variables' => array('element' => null),
+      'path' => $path . '/theme',
+      'template' => 'crm-message-template',
+    ),
+  );
+}
+
+/**
  * Implements hook_form_alter().
  */
 function crm_message_template_form_alter(&$form, &$form_state, $form_id) {
