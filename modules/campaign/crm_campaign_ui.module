@@ -304,7 +304,7 @@ function _crm_campaign_ui_statistics($campaign) {
         'fgColor' => $exists ? '#009900' : '#eeeeee',
       ),
     );
-    if (!$exists) {
+    if (!$exists && $results['value']) {
       $build[$name]['text'] = array(
         '#markup' => t('@number recipients would not get your campaign. Missing message template.', array('@number' => $results['value'])),
       );
