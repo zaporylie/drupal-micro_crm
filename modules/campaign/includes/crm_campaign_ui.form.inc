@@ -192,15 +192,15 @@ function crm_campaign_ui_send_form($form, &$form_state, $campaign) {
 function crm_campaign_ui_send_form_submit($form, &$form_state) {
   $campaign = $form_state['values']['campaign'];
   $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
-  $channels = $wrapper->crm_channel->value();
+  $channels = $wrapper->crm_channel->raw();
   $batch_operations = array();
 
-  foreach ($channels as $channel) {
+  foreach ($channels as $channel_id) {
     $batch_operations[] = array(
       'crm_campaign_batch_prepare_item',
       array(
         $campaign,
-        $channel,
+        $channel_id,
       ),
     );
   }
