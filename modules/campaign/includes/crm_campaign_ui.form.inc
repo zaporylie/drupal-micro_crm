@@ -199,7 +199,7 @@ function crm_campaign_ui_send_form_submit($form, &$form_state) {
     $batch_operations[] = array(
       'crm_campaign_batch_prepare_item',
       array(
-        $campaign,
+        $campaign->campaign_id,
         $channel_id,
       ),
     );

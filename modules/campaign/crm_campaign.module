@@ -603,11 +603,11 @@ function _crm_campaign_is_sent($campaign_id) {
  * @param $channel
  * @return bool|mixed
  */
-function _crm_campaign_message_exists($campaign, $channel_id) {
+function _crm_campaign_message_exists($campaign_id, $channel_id) {
   $query = new EntityFieldQuery();
 
   $query->entityCondition('entity_type', 'crm_message')
-    ->fieldCondition('crm_campaign_single', 'target_id', $campaign->campaign_id, '=')
+    ->fieldCondition('crm_campaign_single', 'target_id', $campaign_id, '=')
     ->fieldCondition('crm_channel_single', 'target_id', $channel_id, '=')
     ->range(0, 1);
 
@@ -815,7 +815,7 @@ function crm_campaign_channel_send_message($channels, &$context = array()) {
       $batch_operations[] = array(
         'crm_campaign_batch_prepare_item',
         array(
-          $campaign,
+          $context['crm_campaign']->campaign_id,
           $channel_id,
         ),
       );
@@ -914,15 +914,15 @@ function crm_campaign_user_send_message_submit($form, &$form_state) {
  * @param $channel
  * @param $context
  */
-function crm_campaign_batch_prepare_item($campaign, $channel_id, &$context) {
-  $context['results']['campaign'] = $campaign->campaign_id;
+function crm_campaign_batch_prepare_item($campaign_id, $channel_id, &$context) {
+  $context['results']['campaign'] = $campaign_id;
   $queue_mode = variable_get('crm_campaign_queue', FALSE);
 
   if ($queue_mode) {
     $queue = DrupalQueue::get('crm_message_queue');
     $queue->createQueue();
   }
-  $message = _crm_campaign_message_exists($campaign, $channel_id);
+  $message = _crm_campaign_message_exists($campaign_id, $channel_id);
   if (is_object($message) && $message->status == CRM_MESSAGE_STATUS_SENT) {
     return;
   }
@@ -942,6 +942,7 @@ function crm_campaign_batch_prepare_item($campaign, $channel_id, &$context) {
   else {
     try {
       $channel = entity_load_single('crm_channel', $channel_id);
+      $campaign = entity_load_single('crm_campaign', $campaign_id);
       // Create and queue message.
       $message = crm_campaign_channel_create_message($campaign, $channel);
     }
@@ -951,12 +952,12 @@ function crm_campaign_batch_prepare_item($campaign, $channel_id, &$context) {
   }
 
   if ($error) {
-    watchdog('crm_message', 'Unable to create message for channel_id @channel_id, campaign_id @campaign_id. Message: %message', array('@channel_id' => $channel_id, '@campaign_id' => $campaign->campaign_id, '%message' => $error), WATCHDOG_ERROR);
+    watchdog('crm_message', 'Unable to create message for channel_id @channel_id, campaign_id @campaign_id. Message: %message', array('@channel_id' => $channel_id, '@campaign_id' => $campaign_id, '%message' => $error), WATCHDOG_ERROR);
     return FALSE;
   }
 
   if ($queue_mode) {
-    $queue->createItem($message->message_id);
+//    $queue->createItem($message->message_id);
     $context['results']['iterations'][] = array(
       'message_id' => $message->message_id,
       'status' => $message->status,
