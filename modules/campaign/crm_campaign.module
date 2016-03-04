@@ -603,12 +603,12 @@ function _crm_campaign_is_sent($campaign_id) {
  * @param $channel
  * @return bool|mixed
  */
-function _crm_campaign_message_exists($campaign, $channel) {
+function _crm_campaign_message_exists($campaign, $channel_id) {
   $query = new EntityFieldQuery();
 
   $query->entityCondition('entity_type', 'crm_message')
     ->fieldCondition('crm_campaign_single', 'target_id', $campaign->campaign_id, '=')
-    ->fieldCondition('crm_channel_single', 'target_id', $channel->channel_id, '=')
+    ->fieldCondition('crm_channel_single', 'target_id', $channel_id, '=')
     ->range(0, 1);
 
   $result = $query->execute();
