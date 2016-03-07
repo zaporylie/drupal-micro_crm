@@ -28,6 +28,9 @@ class CRMMessageController extends EntityAPIController {
     if ($op !== 'create' && !$entity) {
       return FALSE;
     }
+    if (!in_array($op, array('create', 'view')) && $entity->status === CRM_MESSAGE_STATUS_FAILED) {
+      return FALSE;
+    }
     if (!in_array($op, array('create', 'view')) && $entity->status == CRM_MESSAGE_STATUS_SENT) {
       return FALSE;
     }
