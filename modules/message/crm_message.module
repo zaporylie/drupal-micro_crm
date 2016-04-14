@@ -8,6 +8,7 @@
 define('CRM_MESSAGE_STATUS_DRAFT', 'draft');
 define('CRM_MESSAGE_STATUS_QUEUED', 'queued');
 define('CRM_MESSAGE_STATUS_SENT', 'sent');
+define('CRM_MESSAGE_STATUS_FAILED', 'failed');
 
 define('CRM_MESSAGE_QUEUE_FATAL_ERROR', -1);
 define('CRM_MESSAGE_QUEUE_ERROR', FALSE);
@@ -184,6 +185,12 @@ function crm_message_crm_message_insert($message) {
 function crm_message_crm_message_status_info() {
   $status = array();
 
+  $status[CRM_MESSAGE_STATUS_FAILED] = array(
+    'title' => t('Failed'),
+    'description' => t('Message failed'),
+    'weight' => 0,
+  );
+
   $status[CRM_MESSAGE_STATUS_DRAFT] = array(
     'title' => t('Draft'),
     'description' => t('Draft message'),
@@ -270,6 +277,14 @@ function crm_message_send(&$message) {
   }
   $module = $entity['bundles'][$type]['module'];
 
+  // Check if message has been already sent or failed.
+  if (in_array($message->status, array(CRM_MESSAGE_STATUS_SENT))) {
+    return TRUE;
+  }
+  elseif (in_array($message->status, array(CRM_MESSAGE_STATUS_FAILED))) {
+    return FALSE;
+  }
+
   // First set status to send and if it fails rollback.
   $transaction = db_transaction();
   try {
@@ -288,6 +303,27 @@ function crm_message_send(&$message) {
   }
   catch (Exception $e) {
     $transaction->rollback();
+    watchdog_exception('crm_message', $e);
+  }
+
+  try {
+    $message->status = CRM_MESSAGE_STATUS_QUEUED;
+    $message->revision = TRUE;
+    $message->log = 'Attempt to send message failed';
+    if (isset($message->data['attempt']) && is_numeric($message->data['attempt'])) {
+      $message->data['attempt']++;
+      if ($message->data['attempt'] >= variable_get('crm_message_threshold', 5)) {
+        $message->log = 'Status of the message has been changed to failed due to to many send attempts';
+        $message->status = CRM_MESSAGE_STATUS_FAILED;
+      }
+    }
+    else {
+      $message->data['attempt'] = 1;
+    }
+
+    entity_save('crm_message', $message);
+  }
+  catch (Exception $e) {
     watchdog_exception('crm_message', $e);
   }
   return FALSE;

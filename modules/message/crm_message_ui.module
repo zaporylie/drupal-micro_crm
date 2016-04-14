@@ -14,10 +14,11 @@ function crm_message_ui_menu() {
   $items['admin/crm/config/message'] = array(
     'title' => 'Message',
     'description' => 'Manage Message configuration',
-    'page callback' => 'crm_index',
-    'page arguments' => array(),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_message_ui_settings_form'),
     'access arguments' => array('crm administer'),
     'type' => MENU_NORMAL_ITEM,
+    'file' => 'crm_message_ui.admin.inc',
   );
 
   foreach (crm_message_types() as $type => $bundle) {
@@ -190,6 +191,24 @@ function crm_message_ui_channel_access($op, $channel) {
     return FALSE;
   }
   return crm_message_access($op);
+}
+
+/**
+ * Thresholds helper.
+ */
+function _crm_message_ui_threshold_option_list() {
+  return array(
+    1 => 1,
+    2 => 2,
+    3 => 3,
+    4 => 4,
+    5 => 5,
+    6 => 6,
+    7 => 7,
+    8 => 8,
+    9 => 9,
+    10 => 10,
+  );
 }
 
 if (module_exists('crm_contact')) {
