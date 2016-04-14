@@ -588,7 +588,7 @@ function _crm_campaign_is_sent($campaign_id) {
   $query = new EntityFieldQuery();
 
   $query->entityCondition('entity_type', 'crm_message')
-    ->propertyCondition('status', CRM_CAMPAIGN_STATUS_SENT, '<>')
+    ->propertyCondition('status', array(CRM_MESSAGE_STATUS_FAILED, CRM_MESSAGE_STATUS_SENT), 'NOT IN')
     ->fieldCondition('crm_campaign_single', 'target_id', $campaign_id, '=');
 
   $result = $query->execute();
