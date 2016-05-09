@@ -156,3 +156,15 @@ function crm_ui_libraries_info() {
   );
   return $libraries;
 }
+
+/**
+ * Implements hook_form_alter().
+ */
+function crm_ui_form_alter(&$form, &$form_state, $form_id) {
+  if (strpos($form_id, 'crm_') !== FALSE) {
+    if (!isset($form['#attached']['css'])) {
+      $form['#attached']['css'] = array();
+    }
+    $form['#attached']['css'][] = drupal_get_path('module', 'crm_ui') . '/assets/crm_ui.form.css';
+  }
+}

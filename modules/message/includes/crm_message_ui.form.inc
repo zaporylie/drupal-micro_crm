@@ -107,14 +107,28 @@ function crm_message_ui_form($form, &$form_state, $message) {
   );
 
   $form['actions'] = array('#type' => 'actions');
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save as Draft'),
-  );
   $form['actions']['send'] = array(
     '#type' => 'submit',
     '#value' => t('Save & send'),
     '#ief_submit_all' => TRUE,
+  );
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save as Draft'),
+    '#attributes' => array(
+      'class' => array(
+        'text',
+      ),
+    ),
+  );
+  $form['actions']['queue'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save & queue'),
+    '#attributes' => array(
+      'class' => array(
+        'text',
+      ),
+    ),
   );
   return $form;
 }
@@ -130,7 +144,7 @@ function crm_message_ui_form_validate($form, &$form_state) {
  * Message form submit callback.
  */
 function crm_message_ui_form_submit($form, &$form_state) {
-  $message = $form_state['values']['message'];
+  $message = &$form_state['values']['message'];
 
   $message->status = $form_state['values']['status'];
   $message->language = $form_state['values']['language'];
@@ -142,12 +156,26 @@ function crm_message_ui_form_submit($form, &$form_state) {
     field_attach_submit('crm_message', $message, $form, $form_state);
     entity_save('crm_message', $message);
     $uri = entity_uri('crm_message', $message);
-    drupal_set_message(t('Message has been saved'));
-    if ($form_state['triggering_element']['#value'] == t('Save & send')) {
-      if (isset($_GET['destination'])) {
-        unset($_GET['destination']);
-      }
-      $form_state['redirect'] = $uri['path'] . '/send';
+
+    $options = array();
+    if (isset($_GET['destination'])) {
+      $options['query'] = $_GET['destination'];
+      unset($_GET['destination']);
+    }
+    if ($form_state['triggering_element']['#value'] == t('Save as Draft')) {
+      drupal_set_message(t('Message saved as draft.'));
+    }
+    elseif ($form_state['triggering_element']['#value'] == t('Save & send')) {
+      $form_state['values']['method'] = CRM_MESSAGE_STATUS_SENT;
+      crm_message_ui_send_submit($form, $form_state);
+    }
+    elseif ($form_state['triggering_element']['#value'] == t('Save & queue')) {
+      $form_state['values']['method'] = CRM_MESSAGE_STATUS_QUEUED;
+      crm_message_ui_send_submit($form, $form_state);
+    }
+
+    if (isset($options['query'])) {
+      $form_state['redirect'] = $options['query'];
     }
     else {
       $form_state['redirect'] = $uri['path'];
