@@ -90,12 +90,13 @@ function crm_channel_ui_views_default_views() {
       'empty_column' => 0,
     ),
   );
+  $handler->display->display_options['style_options']['empty_table'] = TRUE;
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'No registered channels.';
+  $handler->display->display_options['empty']['area']['content'] = 'This view is empty.';
   $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   /* Field: Bulk operations: Channel */
   $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';

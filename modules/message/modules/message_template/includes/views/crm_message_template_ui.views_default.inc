@@ -75,12 +75,13 @@ function crm_message_template_ui_views_default_views() {
       'empty_column' => 0,
     ),
   );
+  $handler->display->display_options['style_options']['empty_table'] = TRUE;
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'No templates found.';
+  $handler->display->display_options['empty']['area']['content'] = 'This view is empty.';
   $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   /* Field: Message template: Message template ID */
   $handler->display->display_options['fields']['template_id']['id'] = 'template_id';
