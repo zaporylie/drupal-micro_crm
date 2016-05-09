@@ -11,11 +11,15 @@
 function crm_message_template_ui_add() {
   $build = array();
   $items = array();
+  $options = array();
+  if (isset($_GET['destination'])) {
+    $options['query'] = drupal_get_destination();
+  }
 
   foreach (crm_message_template_types() as $type => $name) {
     $type_arg = strtr($type, '_', '-');
     $items[] = array(
-      'data' => l($name, 'admin/crm/message/template/add/' . $type_arg),
+      'data' => l($name, 'admin/crm/message/template/add/' . $type_arg, $options),
       'class' => array('crm-channel', $type_arg),
     );
   }
