@@ -22,23 +22,9 @@ function crm_email_crm_channel_label($channel) {
  */
 function crm_email_crm_message_send($message) {
   $wrapper = entity_metadata_wrapper('crm_message', $message);
-  // @todo ensure all fields exists and was filled.
-//  if (!$wrapper->__isset('crm_channel_single') || !$wrapper->crm_channel_single->value() || !$wrapper->crm_channel_single->__isset('crm_email')) {
-//    return FALSE;
-//  }
-//  if (!$wrapper->__isset('crm_message_email_subject') || !($subject = $wrapper->crm_message_email_subject->value())) {
-//    return FALSE;
-//  }
   $subject = $wrapper->crm_message_email_subject->value();
-//  if (!$wrapper->__isset('crm_message_email_body') || !($body = $wrapper->crm_message_email_body->value())) {
-//    return FALSE;
-//  }
   $body = $wrapper->crm_message_email_body->value();
   $key = 'crm_message';
-//  if ($wrapper->__isset('crm_message_template_single') && $template = $wrapper->crm_message_template_single->label()) {
-//    $key = $template;
-//  }
-  $template = $wrapper->crm_message_template_single->label();
   $params['subject'] = $subject;
   $params['body'] = $body;
 

@@ -346,12 +346,14 @@ function crm_email_views_default_views_alter(&$views) {
  * Implements hook_mail().
  */
 function crm_email_mail($key, &$message, $params) {
-  $message['subject'] = $params['subject'];
-  $formatted_text = $params['body'];
-  if (isset($formatted_text['value']) && isset($formatted_text['format'])) {
-    $message['body'] = check_markup($formatted_text['value'], $formatted_text['format']);
-  }
-  elseif (is_string($formatted_text)) {
-    $message['body'] = $formatted_text;
+  if ($key == 'crm_message') {
+    $message['subject'] = $params['subject'];
+    $formatted_text = $params['body'];
+    if (isset($formatted_text['value']) && isset($formatted_text['format'])) {
+      $message['body'][] = check_markup($formatted_text['value'], $formatted_text['format']);
+    }
+    elseif (is_string($formatted_text)) {
+      $message['body'][] = $formatted_text;
+    }
   }
 }
