@@ -13,10 +13,6 @@ function crm_channel_ui_menu() {
 
   $items['admin/crm/channel/%crm_channel/view'] = array(
     'title' => 'View',
-    'page callback' => 'crm_channel_view',
-    'page arguments' => array(3),
-    'access callback' => 'crm_channel_access',
-    'access arguments' => array('view', 3),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'weight' => -2,
