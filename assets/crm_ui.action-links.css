@@ -1,0 +1,15 @@
+ul.action-links a.update {
+  position: relative;
+  background: transparent;
+}
+
+ul.action-links a.update:before {
+  width: 16px;
+  height: 16px;
+  content: '';
+  z-index: 1;
+  position: absolute;
+  left: -15px;
+  top: 0.1em;
+  background: transparent url('/themes/seven/images/ui-icons-454545-256x240.png') no-repeat -64px -81px;
+}
