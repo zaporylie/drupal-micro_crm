@@ -114,7 +114,7 @@ function crm_message_ui_menu() {
   );
 
   $items['admin/crm/message/add/%'] = array(
-    'title' => 'Add message',
+    'title' => 'New message',
     'page callback' => 'crm_message_ui_form_wrapper',
     'page arguments' => array(NULL, FALSE, 4),
     'access callback' => 'crm_message_access',
@@ -124,7 +124,7 @@ function crm_message_ui_menu() {
   );
 
   $items['admin/crm/channel/%crm_channel/message/send'] = array(
-    'title' => 'Send',
+    'title' => 'New message',
     'page callback' => 'crm_message_ui_send_channel_form_wrapper',
     'page arguments' => array(3),
     'access callback' => 'crm_message_ui_channel_access',
@@ -136,7 +136,7 @@ function crm_message_ui_menu() {
 
   if (module_exists('crm_contact')) {
     $items['admin/crm/contact/%crm_contact/send'] = array(
-      'title' => 'Send',
+      'title' => 'New message',
       'page callback' => 'crm_message_ui_send_contact_form_wrapper',
       'page arguments' => array(3),
       'access callback' => 'crm_message_ui_contact_access',
