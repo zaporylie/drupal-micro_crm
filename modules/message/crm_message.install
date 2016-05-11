@@ -195,3 +195,15 @@ function crm_message_uninstall() {
   field_delete_field('crm_message');
   field_delete_field('crm_message_single');
 }
+
+/**
+ * Change label for crm_channel_single field instances.
+ */
+function crm_message_update_7000() {
+  $instances = field_read_instances(array('entity_type' => 'crm_message', 'field_name' => 'crm_channel_single'));
+  foreach ($instances as $instance) {
+    $instance['label'] = t('To');
+    $instance['description'] = t('Message recipient.');
+    field_update_instance($instance);
+  }
+}

@@ -112,7 +112,7 @@ function crm_message_crm_channel_fields_info() {
   $array = array();
   foreach ($types as $key => $bundle) {
     $array['instances'][$key . '_crm_channel_single'] = array(
-      'label' => t('Recipient (Channel)'),
+      'label' => t('To'),
       'widget' => array(
         'weight' => -99,
         'type' => 'entityreference_autocomplete',
@@ -139,7 +139,7 @@ function crm_message_crm_channel_fields_info() {
         ),
       ),
       'required' => 1,
-      'description' => t('Recipient has to be registered and valid channel.'),
+      'description' => t('Message recipient.'),
       'default_value' => NULL,
       'field_name' => 'crm_channel_single',
       'entity_type' => 'crm_message',
