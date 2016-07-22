@@ -30,6 +30,16 @@ function crm_ui_menu() {
     'weight' => 99,
   );
 
+  // Megarow callback.
+  $items['admin/crm/%/%/%'] = array(
+    'title' => 'Preview',
+    'page callback' => 'crm_ui_entity_preview',
+    'page arguments' => array(2, 3, 4),
+    'delivery callback' => 'ajax_deliver',
+    'access callback' => 'crm_ui_entity_preview_access',
+    'access arguments' => array('view', 2, 3),
+  );
+
   return $items;
 }
 
@@ -167,4 +177,40 @@ function crm_ui_form_alter(&$form, &$form_state, $form_id) {
     }
     $form['#attached']['css'][] = drupal_get_path('module', 'crm_ui') . '/assets/crm_ui.form.css';
   }
+}
+
+/**
+ * Displays the given entity using the default view mode, in a megarow.
+ */
+function crm_ui_entity_preview($entity_type, $entity_id, $display_id) {
+  $entity = entity_load_single($entity_type, $entity_id);
+  $title = entity_label($entity_type, $entity);
+  $view = entity_view($entity_type, array($entity_id => $entity), 'default', NULL, FALSE);
+  $view = $view[$entity_type][$entity_id];
+  $output = drupal_render($view);
+
+  $return = views_megarow_display($title, $output, $entity_id);
+  if (!empty($view['#megarow_refresh_parent'])) {
+    $return['#commands'][] = views_megarow_command_refresh_parent($entity_id, $display_id);
+  }
+
+  return $return;
+}
+
+/**
+ * Megarow preview access.
+ *
+ * @param string $op
+ * @param string $entity_type
+ * @param integer $entity_id
+ * @param object|null $account
+ *
+ * @return bool
+ */
+function crm_ui_entity_preview_access($op, $entity_type, $entity_id, $account = NULL) {
+  $entity = entity_load_single($entity_type, $entity_id);
+  if (!$entity) {
+    return FALSE;
+  }
+  return entity_access($op, $entity_type, $entity, $account);
 }

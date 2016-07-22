@@ -6,5 +6,7 @@ package = CRM
 dependencies[] = crm
 dependencies[] = views
 dependencies[] = views_bulk_operations
+dependencies[] = views_megarow
 
 files[] = tests/crm_ui.test
+files[] = includes/handlers/crm_ui_handler_operations.inc

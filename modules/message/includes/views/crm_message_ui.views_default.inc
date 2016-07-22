@@ -32,9 +32,12 @@ function crm_message_ui_views_default_views() {
   $handler->display->display_options['exposed_form']['options']['submit_button'] = 'Filter';
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '25';
-  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_plugin'] = 'table_megarows';
   $handler->display->display_options['style_options']['columns'] = array(
     'message_id' => 'message_id',
+    'label' => 'label',
+    'type' => 'type',
+    'status' => 'status',
     'created' => 'created',
     'changed' => 'changed',
     'operations' => 'operations',
@@ -43,6 +46,25 @@ function crm_message_ui_views_default_views() {
   $handler->display->display_options['style_options']['info'] = array(
     'message_id' => array(
       'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'label' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'type' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'status' => array(
+      'sortable' => 0,
       'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
@@ -68,7 +90,8 @@ function crm_message_ui_views_default_views() {
       'empty_column' => 0,
     ),
   );
-  $handler->display->display_options['style_options']['empty_table'] = TRUE;
+  $handler->display->display_options['style_options']['scroll_padding'] = '120';
+  $handler->display->display_options['row_plugin'] = 'fields';
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
@@ -185,6 +208,36 @@ function crm_message_ui_views_default_views() {
   $handler->display->display_options['menu']['name'] = 'management';
   $handler->display->display_options['menu']['context'] = 1;
   $handler->display->display_options['menu']['context_only_inline'] = 0;
+  $translatables['crm_message'] = array(
+    t('Master'),
+    t('Message'),
+    t('more'),
+    t('Filter'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('Items per page'),
+    t('- All -'),
+    t('Offset'),
+    t('« first'),
+    t('‹ previous'),
+    t('next ›'),
+    t('last »'),
+    t('This view is empty.'),
+    t('Channel entity referenced from crm_channel_single'),
+    t('Message ID'),
+    t('To'),
+    t('Type'),
+    t('Status'),
+    t('Created date'),
+    t('Updated date'),
+    t('Operations links'),
+    t('Messages'),
+    t('Channel messages'),
+    t('All'),
+  );
+
 
   $views[$view->name] = $view;
 
