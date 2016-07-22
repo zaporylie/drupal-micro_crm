@@ -62,7 +62,7 @@ before_script:
   - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --db-url=mysql://root:@127.0.0.1/crm testing
 
   # Reference and enable rules in build site.
-  - drush --yes pm-download smsframework entityreference entity inline_entity_form ctools views email telephone views_bulk_operations libraries token
+  - drush --yes pm-download smsframework entityreference entity inline_entity_form ctools views email telephone views_bulk_operations libraries token views_megarow
   - ln -s $TESTDIR sites/all/modules/crm
   - drush --yes pm-enable simpletest
 

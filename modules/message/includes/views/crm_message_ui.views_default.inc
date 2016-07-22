@@ -238,7 +238,6 @@ function crm_message_ui_views_default_views() {
     t('All'),
   );
 
-
   $views[$view->name] = $view;
 
   return $views;
