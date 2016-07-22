@@ -32,8 +32,9 @@ function crm_channel_ui_views_default_views() {
   $handler->display->display_options['exposed_form']['options']['submit_button'] = 'Filter';
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '25';
-  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_plugin'] = 'table_megarows';
   $handler->display->display_options['style_options']['columns'] = array(
+    'views_bulk_operations' => 'views_bulk_operations',
     'channel_id' => 'channel_id',
     'label' => 'label',
     'type' => 'type',
@@ -44,6 +45,11 @@ function crm_channel_ui_views_default_views() {
   );
   $handler->display->display_options['style_options']['default'] = 'changed';
   $handler->display->display_options['style_options']['info'] = array(
+    'views_bulk_operations' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
     'channel_id' => array(
       'sortable' => 1,
       'default_sort_order' => 'asc',
@@ -90,7 +96,8 @@ function crm_channel_ui_views_default_views() {
       'empty_column' => 0,
     ),
   );
-  $handler->display->display_options['style_options']['empty_table'] = TRUE;
+  $handler->display->display_options['style_options']['scroll_padding'] = '120';
+  $handler->display->display_options['row_plugin'] = 'fields';
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
@@ -206,6 +213,35 @@ function crm_channel_ui_views_default_views() {
   $handler->display->display_options['tab_options']['description'] = 'List of all Channels registered in CRM system.';
   $handler->display->display_options['tab_options']['weight'] = '0';
   $handler->display->display_options['tab_options']['name'] = 'management';
+  $translatables['crm_channel'] = array(
+    t('Master'),
+    t('Channel'),
+    t('more'),
+    t('Filter'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('Items per page'),
+    t('- All -'),
+    t('Offset'),
+    t('« first'),
+    t('‹ previous'),
+    t('next ›'),
+    t('last »'),
+    t('This view is empty.'),
+    t('- Choose an operation -'),
+    t('ID'),
+    t('Label'),
+    t('Type'),
+    t('Status'),
+    t('Created date'),
+    t('Updated date'),
+    t('Operations links'),
+    t('Search'),
+    t('Page'),
+  );
+
 
   $views[$view->name] = $view;
 
