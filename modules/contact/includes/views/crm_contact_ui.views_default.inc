@@ -32,17 +32,31 @@ function crm_contact_ui_views_default_views() {
   $handler->display->display_options['exposed_form']['options']['submit_button'] = 'Filter';
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '25';
-  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_plugin'] = 'table_megarows';
   $handler->display->display_options['style_options']['columns'] = array(
+    'views_bulk_operations' => 'views_bulk_operations',
     'contact_id' => 'contact_id',
+    'crm_channel' => 'crm_channel',
+    'status' => 'status',
     'created' => 'created',
     'changed' => 'changed',
+    'operations' => 'operations',
   );
   $handler->display->display_options['style_options']['default'] = 'changed';
   $handler->display->display_options['style_options']['info'] = array(
+    'views_bulk_operations' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
     'contact_id' => array(
       'sortable' => 1,
       'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'crm_channel' => array(
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
@@ -68,8 +82,14 @@ function crm_contact_ui_views_default_views() {
       'separator' => '',
       'empty_column' => 0,
     ),
+    'operations' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
   );
-  $handler->display->display_options['style_options']['empty_table'] = TRUE;
+  $handler->display->display_options['style_options']['scroll_padding'] = '120';
+  $handler->display->display_options['row_plugin'] = 'fields';
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
@@ -85,17 +105,24 @@ function crm_contact_ui_views_default_views() {
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['enable_select_all_pages'] = 1;
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['force_single'] = 0;
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['entity_load_capacity'] = '10';
-  $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array();
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
+    'action::crm_campaign_contact_send_message' => array(
+      'selected' => 1,
+      'postpone_processing' => 0,
+      'skip_confirmation' => 1,
+      'override_label' => 0,
+      'label' => '',
+    ),
+  );
   /* Field: Contact: Contact ID */
   $handler->display->display_options['fields']['contact_id']['id'] = 'contact_id';
   $handler->display->display_options['fields']['contact_id']['table'] = 'crm_contact';
   $handler->display->display_options['fields']['contact_id']['field'] = 'contact_id';
   $handler->display->display_options['fields']['contact_id']['label'] = 'ID';
-  /* Field: Field: Recipients (Channels) */
+  /* Field: Field: Channels */
   $handler->display->display_options['fields']['crm_channel']['id'] = 'crm_channel';
   $handler->display->display_options['fields']['crm_channel']['table'] = 'field_data_crm_channel';
   $handler->display->display_options['fields']['crm_channel']['field'] = 'crm_channel';
-  $handler->display->display_options['fields']['crm_channel']['label'] = 'Channels';
   $handler->display->display_options['fields']['crm_channel']['settings'] = array(
     'link' => 0,
   );
@@ -153,6 +180,32 @@ function crm_contact_ui_views_default_views() {
   $handler->display->display_options['tab_options']['description'] = 'List of all Contacts registered in CRM system.';
   $handler->display->display_options['tab_options']['weight'] = '0';
   $handler->display->display_options['tab_options']['name'] = 'management';
+  $translatables['crm_contact'] = array(
+    t('Master'),
+    t('Contact'),
+    t('more'),
+    t('Filter'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('Items per page'),
+    t('- All -'),
+    t('Offset'),
+    t('« first'),
+    t('‹ previous'),
+    t('next ›'),
+    t('last »'),
+    t('This view is empty.'),
+    t('- Choose an operation -'),
+    t('ID'),
+    t('Channels'),
+    t('Status'),
+    t('Created date'),
+    t('Updated date'),
+    t('Operations links'),
+    t('Page'),
+  );
 
   $views[$view->name] = $view;
 
