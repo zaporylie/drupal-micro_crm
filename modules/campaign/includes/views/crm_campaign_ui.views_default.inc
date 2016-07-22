@@ -33,7 +33,7 @@ function crm_campaign_ui_views_default_views() {
   $handler->display->display_options['exposed_form']['options']['submit_button'] = 'Filter';
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '25';
-  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_plugin'] = 'table_megarows';
   $handler->display->display_options['style_options']['columns'] = array(
     'campaign_id' => 'campaign_id',
     'title' => 'title',
@@ -68,14 +68,14 @@ function crm_campaign_ui_views_default_views() {
     ),
     'crm_channel' => array(
       'sortable' => 1,
-      'default_sort_order' => 'desc',
+      'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
     ),
     'created' => array(
       'sortable' => 1,
-      'default_sort_order' => 'desc',
+      'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
@@ -93,7 +93,8 @@ function crm_campaign_ui_views_default_views() {
       'empty_column' => 0,
     ),
   );
-  $handler->display->display_options['style_options']['empty_table'] = TRUE;
+  $handler->display->display_options['style_options']['scroll_padding'] = '120';
+  $handler->display->display_options['row_plugin'] = 'fields';
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
@@ -120,7 +121,7 @@ function crm_campaign_ui_views_default_views() {
   $handler->display->display_options['fields']['status']['field'] = 'status';
   $handler->display->display_options['fields']['status']['link_to_campaign'] = 0;
   $handler->display->display_options['fields']['status']['use_raw_value'] = 0;
-  /* Field: COUNT(Campaign: Recipients (Channels)) */
+  /* Field: COUNT(Field: Channels) */
   $handler->display->display_options['fields']['crm_channel']['id'] = 'crm_channel';
   $handler->display->display_options['fields']['crm_channel']['table'] = 'field_data_crm_channel';
   $handler->display->display_options['fields']['crm_channel']['field'] = 'crm_channel';
@@ -159,6 +160,34 @@ function crm_campaign_ui_views_default_views() {
   $handler->display->display_options['tab_options']['description'] = 'List of all Campaigns registered in CRM system.';
   $handler->display->display_options['tab_options']['weight'] = '0';
   $handler->display->display_options['tab_options']['name'] = 'management';
+  $translatables['crm_campaign'] = array(
+    t('Master'),
+    t('Campaign'),
+    t('more'),
+    t('Filter'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('Items per page'),
+    t('- All -'),
+    t('Offset'),
+    t('« first'),
+    t('‹ previous'),
+    t('next ›'),
+    t('last »'),
+    t('This view is empty.'),
+    t('Channel entity referenced from crm_channel'),
+    t('ID'),
+    t('Title'),
+    t('Status'),
+    t('Channels'),
+    t('Created date'),
+    t('Updated date'),
+    t('Operations links'),
+    t('Page'),
+  );
+
 
   $views[$view->name] = $view;
 
