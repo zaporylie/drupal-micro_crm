@@ -251,10 +251,10 @@ function crm_message_ui_send_submit($form, &$form_state) {
   $message->revision = TRUE;
   $message->log = 'Message has been queued.';
   entity_save('crm_message', $message);
-
+  $label = entity_label('crm_message', $message);
   switch ($form_state['values']['method']) {
     case CRM_MESSAGE_STATUS_QUEUED:
-      drupal_set_message(t('Message (message_id: @message_id) has been queued', array('@message_id' => $message_id)));
+      drupal_set_message(t('@label has been queued', array('@label' => $label, '@message_id' => $message_id)));
       break;
 
     case CRM_MESSAGE_STATUS_SENT:
@@ -262,10 +262,10 @@ function crm_message_ui_send_submit($form, &$form_state) {
       $result = crm_message_send($message);
 
       if ($result === TRUE) {
-        drupal_set_message(t('Message (message_id: @message_id) has been sent', array('@message_id' => $message_id)));
+        drupal_set_message(t('@label has been sent', array('@label' => $label, '@message_id' => $message_id)));
       }
       else {
-        drupal_set_message(t('Unable to send message. Message (message_id: @message_id) has been queued', array('@message_id' => $message_id)), 'error');
+        drupal_set_message(t('Unable to send message. @label has been queued', array('@label' => $label, '@message_id' => $message_id)), 'error');
       }
       break;
   }
@@ -323,10 +323,10 @@ function crm_message_ui_resend_submit($form, &$form_state) {
   $message->revision = TRUE;
   $message->log = 'Message has been queued.';
   entity_save('crm_message', $message);
-
+  $label = entity_label('crm_message', $message);
   switch ($form_state['values']['method']) {
     case CRM_MESSAGE_STATUS_QUEUED:
-      drupal_set_message(t('Message (message_id: @message_id) has been queued', array('@message_id' => $message_id)));
+      drupal_set_message(t('@label has been queued', array('@label' => $label, '@message_id' => $message_id)));
       break;
 
     case CRM_MESSAGE_STATUS_SENT:
@@ -334,10 +334,10 @@ function crm_message_ui_resend_submit($form, &$form_state) {
       $result = crm_message_send($message);
 
       if ($result === TRUE) {
-        drupal_set_message(t('Message (message_id: @message_id) has been sent', array('@message_id' => $message_id)));
+        drupal_set_message(t('@label has been sent', array('@label' => $label, '@message_id' => $message_id)));
       }
       else {
-        drupal_set_message(t('Unable to send message. Message (message_id: @message_id) has been queued', array('@message_id' => $message_id)), 'error');
+        drupal_set_message(t('Unable to send message. @label has been queued', array('@label' => $label, '@message_id' => $message_id)), 'error');
       }
       break;
   }
