@@ -31,7 +31,7 @@ class CRMMessageController extends EntityAPIController {
     if (!in_array($op, array('create', 'view')) && $entity->status === CRM_MESSAGE_STATUS_FAILED) {
       return FALSE;
     }
-    if (!in_array($op, array('create', 'view')) && $entity->status == CRM_MESSAGE_STATUS_SENT) {
+    if (!in_array($op, array('create', 'view', 'resend')) && $entity->status == CRM_MESSAGE_STATUS_SENT) {
       return FALSE;
     }
     if (!in_array($op, array('create', 'view', 'cancel')) && $entity->status == CRM_MESSAGE_STATUS_QUEUED) {
@@ -48,6 +48,7 @@ class CRMMessageController extends EntityAPIController {
       case 'create':
         return user_access('crm message create');
       case 'send':
+      case 'resend':
         return user_access('crm message send');
       case 'cancel':
         return user_access('crm message cancel');

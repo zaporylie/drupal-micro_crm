@@ -274,6 +274,78 @@ function crm_message_ui_send_submit($form, &$form_state) {
 }
 
 /**
+ * Send message confirmation form.
+ */
+function crm_message_ui_resend($form, &$form_state, $message) {
+  $form['message'] = array(
+    '#type' => 'value',
+    '#value' => $message,
+  );
+  $form['method'] = array(
+    '#type' => 'radios',
+    '#required' => TRUE,
+    '#default_value' => CRM_MESSAGE_STATUS_SENT,
+    '#options' => array(
+      CRM_MESSAGE_STATUS_SENT => t('Send instantly'),
+      CRM_MESSAGE_STATUS_QUEUED => t('Queue, send with other queued messages'),
+    ),
+  );
+  $uri = entity_uri('crm_message', $message);
+  return confirm_form(
+    $form,
+    t('Do you want to send the message?'),
+    $uri['path']
+  );
+}
+
+/**
+ * Delete form submit handler.
+ */
+function crm_message_ui_resend_submit($form, &$form_state) {
+  $message = $form_state['values']['message'];
+  $message_id = entity_id('crm_message', $message);
+  // Create message.
+  unset(
+    $message->message_id,
+    $message->revision_id,
+    $message->created,
+    $message->changed,
+    $message->status,
+    $message->data
+  );
+  $message->is_new = TRUE;
+  $message->log = 'Resend message ' . $message_id;
+  entity_save('crm_message', $message);
+
+  // Get message ID.
+  $message_id = entity_id('crm_message', $message);
+  $message->status = CRM_MESSAGE_STATUS_QUEUED;
+  $message->revision = TRUE;
+  $message->log = 'Message has been queued.';
+  entity_save('crm_message', $message);
+
+  switch ($form_state['values']['method']) {
+    case CRM_MESSAGE_STATUS_QUEUED:
+      drupal_set_message(t('Message (message_id: @message_id) has been queued', array('@message_id' => $message_id)));
+      break;
+
+    case CRM_MESSAGE_STATUS_SENT:
+      // Try to send message.
+      $result = crm_message_send($message);
+
+      if ($result === TRUE) {
+        drupal_set_message(t('Message (message_id: @message_id) has been sent', array('@message_id' => $message_id)));
+      }
+      else {
+        drupal_set_message(t('Unable to send message. Message (message_id: @message_id) has been queued', array('@message_id' => $message_id)), 'error');
+      }
+      break;
+  }
+  $uri = entity_uri('crm_message', $message);
+  $form_state['redirect'] = $uri['path'];
+}
+
+/**
  * Delete confirmation form.
  */
 function crm_message_ui_delete_form($form, &$form_state, $message) {
