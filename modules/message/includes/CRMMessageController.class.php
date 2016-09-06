@@ -26,40 +26,39 @@ class CRMMessageController extends EntityAPIController {
    */
   public function access($op, $entity = NULL, $account = NULL) {
     if ($op !== 'create' && !$entity) {
-      return FALSE;
+      return CRM_ACCESS_IGNORE;
     }
     if (!in_array($op, array('create', 'view')) && $entity->status === CRM_MESSAGE_STATUS_FAILED) {
-      return FALSE;
+      return CRM_ACCESS_IGNORE;
     }
     if (!in_array($op, array('create', 'view', 'resend')) && $entity->status == CRM_MESSAGE_STATUS_SENT) {
-      return FALSE;
+      return CRM_ACCESS_IGNORE;
     }
     if (!in_array($op, array('create', 'view', 'cancel')) && $entity->status == CRM_MESSAGE_STATUS_QUEUED) {
-      return FALSE;
+      return CRM_ACCESS_IGNORE;
     }
     if (in_array($op, array('cancel')) && $entity->status !== CRM_MESSAGE_STATUS_QUEUED) {
-      return FALSE;
+      return CRM_ACCESS_IGNORE;
     }
     // The administer permission is a blanket override.
     if (user_access('crm bypass access')) {
-      return TRUE;
+      return CRM_ACCESS_ALLOW;
     }
     switch ($op) {
       case 'create':
-        return user_access('crm message create');
+        return user_access('crm message create') ? CRM_ACCESS_ALLOW : CRM_ACCESS_IGNORE;
       case 'send':
       case 'resend':
-        return user_access('crm message send');
+        return user_access('crm message send') ? CRM_ACCESS_ALLOW : CRM_ACCESS_IGNORE;
       case 'cancel':
-        return user_access('crm message cancel');
+        return user_access('crm message cancel') ? CRM_ACCESS_ALLOW : CRM_ACCESS_IGNORE;
       case 'view':
-        return user_access('crm message view');
+        return user_access('crm message view') ? CRM_ACCESS_ALLOW : CRM_ACCESS_IGNORE;
       case 'update':
-        return user_access('crm message update');
+        return user_access('crm message update') ? CRM_ACCESS_ALLOW : CRM_ACCESS_IGNORE;
       case 'delete':
-        return user_access('crm message delete');
+        return user_access('crm message delete') ? CRM_ACCESS_ALLOW : CRM_ACCESS_IGNORE;
     }
-    return FALSE;
   }
 
   /**

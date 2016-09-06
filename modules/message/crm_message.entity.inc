@@ -43,10 +43,17 @@ function crm_message_entity_info() {
 }
 
 /**
- *
+ * Check entity access.
  */
 function crm_message_access($op, $entity = NULL, $account = NULL) {
-  return entity_get_controller('crm_message')->access($op, $entity, $account);
+  if (is_null($account)) {
+    global $user;
+    $account = clone $user;
+  }
+  $access = array();
+  $access = array_merge_recursive($access, module_invoke_all('crm_message_access', $op, $entity, $account));
+  $access[] = entity_get_controller('crm_message')->access($op, $entity, $account);
+  return (in_array(CRM_ACCESS_ALLOW, $access, TRUE) && !in_array(CRM_ACCESS_DENY, $access, TRUE));
 }
 
 /**
