@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * Handles incoming messages.
+ */
+
+/**
+ * Incomming message status
+ */
+define('CRM_MESSAGE_INCOMING_STATUS', 'incoming');
+
+/**
+ * Implements hook_crm_message_status_info().
+ */
+function crm_message_incoming_crm_message_status_info() {
+  $statuses = [];
+
+  $statuses[CRM_MESSAGE_INCOMING_STATUS] = array(
+    'title' => t('Incoming'),
+    'description' => t('Incoming message'),
+    'weight' => 0,
+  );
+
+  return $statuses;
+}
+
+/**
+ * Implements hook_crm_message_access().
+ */
+function crm_message_incoming_crm_message_access($op, $entity = NULL, $account = NULL) {
+  if (isset($entity->status) && ($entity->status === CRM_MESSAGE_INCOMING_STATUS) && !in_array($op, array('view'))) {
+    return CRM_ACCESS_DENY;
+  }
+  return CRM_ACCESS_IGNORE;
+}

@@ -1,0 +1,5 @@
+name = CRM Message Incoming
+description = Provides API to allow 3rd party modules register incoming messages.
+core = 7.x
+
+dependencies[] = crm_message
