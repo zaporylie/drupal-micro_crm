@@ -2,4 +2,5 @@
 
 /**
  * @file
+ * CRM Message API hooks.
  */
