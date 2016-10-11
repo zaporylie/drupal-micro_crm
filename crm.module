@@ -6,6 +6,13 @@
  */
 
 /**
+ *
+ */
+define('CRM_ACCESS_DENY', FALSE);
+define('CRM_ACCESS_ALLOW', TRUE);
+define('CRM_ACCESS_IGNORE', NULL);
+
+/**
  * Implements hook_permission().
  */
 function crm_permission() {
