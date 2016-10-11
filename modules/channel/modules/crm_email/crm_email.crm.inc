@@ -27,6 +27,7 @@ function crm_email_crm_message_send($message) {
   $key = 'crm_message';
   $params['subject'] = $subject;
   $params['body'] = $body;
+  $params['message'] = $message;
 
   $result = drupal_mail('crm_email', $key, $wrapper->crm_channel_single->crm_email->value(), $wrapper->language->value(), $params);
   return $result['result'];
