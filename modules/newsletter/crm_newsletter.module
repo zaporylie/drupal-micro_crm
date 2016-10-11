@@ -494,7 +494,7 @@ function _crm_newsletter_set_and_send_message($channel) {
         $context['crm_contact'] = crm_contact_load_by_channels($channel->channel_id);
       }
 
-      if ((($template = crm_channel_template_name_load('unsubscribe_' . $channel->type)) && ($message = crm_message_template_apply($template, $channel, $context))) && crm_message_send($message)) {
+      if ((($template = crm_message_template_load_by_name('unsubscribe_' . $channel->type)) && ($message = crm_message_template_apply($template, $channel, $context))) && crm_message_send($message)) {
         drupal_set_message(t('!channel: Message has been sent. Click on the confirmation link to complete.', array('!channel' => crm_channel_label($channel))), 'warning');
       }
       else {
@@ -518,7 +518,7 @@ function _crm_newsletter_set_and_send_message($channel) {
         $context['crm_contact'] = crm_contact_load_by_channels($channel->channel_id);
       }
 
-      if ((($template = crm_channel_template_name_load('subscribe_' . $channel->type)) && ($message = crm_message_template_apply($template, $channel, $context))) && crm_message_send($message)) {
+      if ((($template = crm_message_template_load_by_name('subscribe_' . $channel->type)) && ($message = crm_message_template_apply($template, $channel, $context))) && crm_message_send($message)) {
         drupal_set_message(t('!channel: Message has been sent. Click on the confirmation link to complete.', array('!channel' => crm_channel_label($channel))), 'warning');
       }
       else {

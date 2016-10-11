@@ -77,9 +77,26 @@ function crm_message_template_load($id) {
 }
 
 /**
- * @param $machine_name
+ * Wrong name, use crm_message_template_load_by_name().
+ *
+ * @deprecated
+ *   This function is deprecated in favour of crm_message_template_load_by_name().
+ *
+ * @see crm_message_template_load_by_name().
  */
 function crm_channel_template_name_load($machine_name) {
+  return crm_message_template_load_by_name($machine_name);
+}
+
+/**
+ * Returns message template for machine name.
+ *
+ * @param string $machine_name
+ *
+ * @return object|null
+ *   Message template
+ */
+function crm_message_template_load_by_name($machine_name) {
   $id = db_query('SELECT template_id FROM {crm_message_template} WHERE name = :name', array(':name' => $machine_name))->fetchField();
   return crm_message_template_load($id);
 }
