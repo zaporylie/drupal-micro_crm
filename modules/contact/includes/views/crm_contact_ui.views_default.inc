@@ -90,13 +90,13 @@ function crm_contact_ui_views_default_views() {
   );
   $handler->display->display_options['style_options']['scroll_padding'] = '120';
   $handler->display->display_options['row_plugin'] = 'fields';
-  /* No results behavior: Global: Text area */
-  $handler->display->display_options['empty']['area']['id'] = 'area';
-  $handler->display->display_options['empty']['area']['table'] = 'views';
-  $handler->display->display_options['empty']['area']['field'] = 'area';
-  $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'This view is empty.';
-  $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
+  $handler->display->display_options['style_options']['empty_table'] = TRUE;
+  /* No results behavior: Global: Unfiltered text */
+  $handler->display->display_options['empty']['area_text_custom']['id'] = 'area_text_custom';
+  $handler->display->display_options['empty']['area_text_custom']['table'] = 'views';
+  $handler->display->display_options['empty']['area_text_custom']['field'] = 'area_text_custom';
+  $handler->display->display_options['empty']['area_text_custom']['empty'] = TRUE;
+  $handler->display->display_options['empty']['area_text_custom']['content'] = 'No results found.';
   /* Field: Bulk operations: Contact */
   $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
   $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'crm_contact';
