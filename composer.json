@@ -1,0 +1,13 @@
+{
+  "name": "nymediaas/crm",
+  "type": "drupal-module",
+  "description": "Manage all electronic communication in single subsystem.",
+  "license": "GPL-2.0",
+  "authors": [
+    {
+      "name": "Jakub Piasecki",
+      "email": "jakub@nymedia.no",
+      "role": "Project Lead"
+    }
+  ]
+}
