@@ -18,6 +18,7 @@ function crm_campaign_entity_info() {
     'uri callback' => 'crm_campaign_uri',
     'label callback' => 'crm_campaign_label',
     'fieldable' => TRUE,
+    'module' => 'crm_campaign',
     'entity keys' => array(
       'id' => 'campaign_id',
       'label' => 'title',

@@ -7,9 +7,9 @@
 /**
  * Implements hook_entity_property_info().
  */
-function crm_message_template_entity_property_info() {
+function crm_campaign_entity_property_info() {
   $info = array();
-  $properties = &$info['crm_message_template']['properties'];
+  $properties = &$info['crm_campaign']['properties'];
 
   $default_properties = array(
     'setter callback' => 'entity_property_verbatim_set',
@@ -21,10 +21,10 @@ function crm_message_template_entity_property_info() {
       'type' => 'boolean',
       'description' => t('Whether the entity is new and not saved to the database yet.'),
     ) + $default_properties;
-  $properties['template_id'] = array(
-    'label' => t('Message_template ID'),
+  $properties['campaign_id'] = array(
+    'label' => t('Message_campaign ID'),
     'type' => 'integer',
-    'schema field' => 'template_id',
+    'schema field' => 'campaign_id',
     'getter callback' => 'entity_property_verbatim_get',
   );
   $properties['revision_id'] = array(
@@ -33,19 +33,11 @@ function crm_message_template_entity_property_info() {
     'description' => t("The unique ID of the node's revision."),
     'schema field' => 'revision_id',
   );
-  $properties['name'] = array(
-      'label' => t('Name'),
-      'description' => t('One time token'),
+  $properties['title'] = array(
+      'label' => t('Title'),
+      'description' => t('Title'),
       'type' => 'text',
-      'schema field' => 'name',
-    ) + $default_properties;
-  $properties['type'] = array(
-      'label' => t('Type'),
-      'description' => t('Entity bundle'),
-      'type' => 'text',
-      'options list' => 'crm_message_template_types',
-      'required' => TRUE,
-      'schema field' => 'type',
+      'schema field' => 'title',
     ) + $default_properties;
   $properties['created'] = array(
       'label' => t('Date created'),
@@ -59,19 +51,14 @@ function crm_message_template_entity_property_info() {
       'schema field' => 'changed',
       'description' => t('The date when channel was most recently updated.'),
     ) + $default_properties;
-  $properties['language'] = array(
-      'label' => t("Language"),
-      'type' => 'token',
-      'description' => t("The language the node is written in."),
-      'options list' => 'entity_metadata_language_list',
-      'schema field' => 'language',
+  $properties['status'] = array(
+      'label' => t('Status'),
+      'description' => t('Entity status'),
+      'type' => 'text',
+      'options list' => 'crm_campaign_status_options_list',
+      'required' => TRUE,
+      'schema field' => 'status',
     ) + $default_properties;
-  $properties['locked'] = array(
-    'label' => t("Locked"),
-    'type' => 'boolean',
-    'description' => t("Whether removing this entity is allowed."),
-    'schema field' => 'locked',
-  ) + $default_properties;
 
   $properties['log'] = array(
     'label' => t("Revision log message"),

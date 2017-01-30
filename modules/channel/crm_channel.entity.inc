@@ -15,6 +15,7 @@ function crm_channel_entity_info() {
     'uri callback' => 'crm_channel_uri',
     'label callback' => 'crm_channel_label',
     'fieldable' => TRUE,
+    'module' => 'crm_channel',
     'entity keys' => array(
       'id' => 'channel_id',
       'bundle' => 'type',
