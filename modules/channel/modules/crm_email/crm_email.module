@@ -310,7 +310,8 @@ function crm_email_crm_message_create($values, $entity_type = 'crm_message') {
       $wrapper->crm_message_email_subject->set($values['subject']);
     }
     if (isset($values['body']) && $wrapper->__isset('crm_message_email_body')) {
-      $wrapper->crm_message_email_body->set(array('value' => $values['body'], 'format' => 'plain_text'));
+      $formats = entity_metadata_field_text_formats();
+      $wrapper->crm_message_email_body->set(array('value' => $values['body'], 'format' => key($formats)));
     }
     foreach ($values as $key => $value) {
       if ($wrapper->__isset($key)) {
