@@ -81,12 +81,12 @@ class CRMMessageController extends EntityAPIController {
       if (empty($entity->created)) {
         $entity->created = REQUEST_TIME;
       }
-      if (empty($entity->modified)) {
-        $entity->modified = REQUEST_TIME;
+      if (empty($entity->changed)) {
+        $entity->changed = REQUEST_TIME;
       }
     }
     else {
-      $entity->modified = REQUEST_TIME;
+      $entity->changed = REQUEST_TIME;
     }
 
     // Create new revision by default.
