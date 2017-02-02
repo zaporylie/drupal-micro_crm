@@ -33,31 +33,36 @@
 #  modules/contact/crm_contact.entity.inc: n/a
 #  modules/message/crm_message.entity.inc: n/a
 #  modules/message/modules/message_template/crm_message_template.entity.inc: n/a
+#  modules/campaign/crm_campaign.info.inc: n/a
+#  modules/channel/crm_channel.info.inc: n/a
+#  modules/contact/crm_contact.info.inc: n/a
+#  modules/message/crm_message.info.inc: n/a
+#  modules/message/modules/message_template/crm_message_template.info.inc: n/a
+#  modules/channel/crm_channel.tokens.inc: n/a
+#  modules/contact/crm_contact.tokens.inc: n/a
+#  modules/campaign/includes/crm_campaign.form.inc: n/a
+#  modules/campaignmonitor/crm_campaignmonitor.admin.inc: n/a
+#  modules/channel/includes/CRMChannelInlineFormController.class.php: n/a
+#  modules/channel/includes/crm_channel_ui.form.inc: n/a
+#  modules/channel/includes/views/crm_channel.views.inc: n/a
+#  modules/channel/includes/views/crm_channel_ui.views_default.inc: n/a
+#  modules/contact/includes/crm_contact_ui.form.inc: n/a
+#  modules/contact/includes/views/crm_contact.views.inc: n/a
+#  modules/contact/includes/views/crm_contact_ui.views_default.inc: n/a
+#  modules/message/includes/crm_message_ui.form.inc: n/a
+#  modules/message/includes/views/crm_message.views.inc: n/a
+#  modules/message/includes/views/crm_message_ui.views_default.inc: n/a
 #  modules/contact/crm_contact.module: n/a
 #  modules/message/crm_message.module: n/a
-#  modules/campaign/includes/crm_campaign.form.inc: n/a
 #  modules/campaign/crm_campaign_ui.module: n/a
 #  modules/channel/crm_channel_ui.module: n/a
 #  modules/contact/crm_contact_ui.module: n/a
 #  modules/message/crm_message_ui.module: n/a
 #  modules/message/modules/message_template/crm_message_template_ui.module: n/a
-#  modules/campaignmonitor/crm_campaignmonitor.admin.inc: n/a
 #  modules/campaign/crm_campaign.install: n/a
 #  modules/message/modules/message_template/crm_message_template.module: n/a
 #  modules/campaign/crm_campaign_ui.info: n/a
 #  modules/campaign/includes/CRMCampaignController.class.php: n/a
-#  modules/channel/includes/crm_channel_ui.form.inc: n/a
-#  modules/contact/includes/crm_contact_ui.form.inc: n/a
-#  modules/message/includes/crm_message_ui.form.inc: n/a
-#  modules/channel/crm_channel.tokens.inc: n/a
-#  modules/channel/includes/CRMChannelInlineFormController.class.php: n/a
-#  modules/channel/includes/views/crm_channel.views.inc: n/a
-#  modules/channel/includes/views/crm_channel_ui.views_default.inc: n/a
-#  modules/contact/crm_contact.tokens.inc: n/a
-#  modules/contact/includes/views/crm_contact.views.inc: n/a
-#  modules/contact/includes/views/crm_contact_ui.views_default.inc: n/a
-#  modules/message/includes/views/crm_message.views.inc: n/a
-#  modules/message/includes/views/crm_message_ui.views_default.inc: n/a
 #  modules/message/modules/message_template/includes/crm_message_template_ui.form.inc: n/a
 #  modules/message/modules/message_template/includes/views/crm_message_template.views.inc: n/a
 #  modules/contact/crm_contact.install: n/a
@@ -80,9 +85,7 @@
 #  modules/message/includes/views/handlers/crm_message_handler_filter_message_status.inc: n/a
 #  modules/newsletter/crm_newsletter.module: n/a
 #  modules/campaignmonitor/crm_campaignmonitor.module: n/a
-#  modules/channel/crm_channel.info.inc: n/a
 #  modules/channel/crm_channel.module: n/a
-#  modules/contact/crm_contact.info.inc: n/a
 #  modules/channel/includes/views/handlers/crm_channel_handler_filter_channel_type.inc: n/a
 #  modules/channel/includes/CRMChannelController.class.php: n/a
 #  modules/channel/modules/crm_email/crm_email.module: n/a
@@ -114,8 +117,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2017-01-26 10:57+0100\n"
-"PO-Revision-Date: 2017-01-26 10:57+0100\n"
+"POT-Creation-Date: 2017-02-02 09:10+0100\n"
+"PO-Revision-Date: 2017-02-02 09:10+0100\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Norwegian Bokmål <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
@@ -187,7 +190,7 @@ msgstr ""
 msgid "If this settings is set to TRUE all messages generated for campaign will be queued and send by cron job runner. If FALSE - Batch API."
 msgstr ""
 
-#: modules/campaign/crm_campaign.entity.inc:13;28 modules/campaign/includes/views/crm_campaign.views.inc:17
+#: modules/campaign/crm_campaign.entity.inc:13;29 modules/campaign/includes/views/crm_campaign.views.inc:17
 msgctxt "crm"
 msgid "Campaign"
 msgstr ""
@@ -196,9 +199,73 @@ msgstr ""
 msgid "Campaign"
 msgstr ""
 
-#: modules/campaign/crm_campaign.entity.inc:33 modules/channel/crm_channel.entity.inc:29 modules/contact/crm_contact.entity.inc:31 modules/message/crm_message.entity.inc:32 modules/message/modules/message_template/crm_message_template.entity.inc:34
+#: modules/campaign/crm_campaign.entity.inc:34 modules/channel/crm_channel.entity.inc:30 modules/contact/crm_contact.entity.inc:32 modules/message/crm_message.entity.inc:33 modules/message/modules/message_template/crm_message_template.entity.inc:35
 msgid "Administrator"
 msgstr "Administrator"
+
+#: modules/campaign/crm_campaign.info.inc:20 modules/channel/crm_channel.info.inc:20 modules/contact/crm_contact.info.inc:18 modules/message/crm_message.info.inc:20 modules/message/modules/message_template/crm_message_template.info.inc:20
+msgid "Is new"
+msgstr ""
+
+#: modules/campaign/crm_campaign.info.inc:22 modules/channel/crm_channel.info.inc:22 modules/contact/crm_contact.info.inc:20 modules/message/crm_message.info.inc:22 modules/message/modules/message_template/crm_message_template.info.inc:22
+msgid "Whether the entity is new and not saved to the database yet."
+msgstr ""
+
+#: modules/campaign/crm_campaign.info.inc:25
+msgid "Message_campaign ID"
+msgstr ""
+
+#: modules/campaign/crm_campaign.info.inc:31 modules/channel/crm_channel.info.inc:37 modules/channel/crm_channel.tokens.inc:24 modules/contact/crm_contact.info.inc:42 modules/contact/crm_contact.tokens.inc:24 modules/message/crm_message.info.inc:31 modules/message/modules/message_template/crm_message_template.info.inc:31
+msgid "Revision ID"
+msgstr "ID for revisjonen"
+
+#: modules/campaign/crm_campaign.info.inc:33 modules/channel/crm_channel.info.inc:39 modules/contact/crm_contact.info.inc:44 modules/message/crm_message.info.inc:33 modules/message/modules/message_template/crm_message_template.info.inc:33
+msgid "The unique ID of the node's revision."
+msgstr ""
+
+#: modules/campaign/crm_campaign.info.inc:37;38 modules/campaign/crm_campaign.module:692 modules/campaign/includes/crm_campaign.form.inc:30 modules/campaign/includes/views/crm_campaign.views.inc:52 modules/campaign/includes/views/crm_campaign_ui.views_default.inc:182
+msgid "Title"
+msgstr "Tittel"
+
+#: modules/campaign/crm_campaign.info.inc:43 modules/channel/crm_channel.info.inc:83 modules/channel/crm_channel.tokens.inc:52 modules/contact/crm_contact.info.inc:76 modules/contact/crm_contact.tokens.inc:44 modules/message/crm_message.info.inc:45 modules/message/modules/message_template/crm_message_template.info.inc:51
+msgid "Date created"
+msgstr "Dato opprettet"
+
+#: modules/campaign/crm_campaign.info.inc:45 modules/channel/crm_channel.info.inc:85 modules/message/modules/message_template/crm_message_template.info.inc:53
+msgid "The date when channel was posted."
+msgstr ""
+
+#: modules/campaign/crm_campaign.info.inc:49 modules/channel/crm_channel.info.inc:89 modules/channel/crm_channel.tokens.inc:57 modules/contact/crm_contact.info.inc:82 modules/contact/crm_contact.tokens.inc:49 modules/message/crm_message.info.inc:51 modules/message/modules/message_template/crm_message_template.info.inc:57
+msgid "Date changed"
+msgstr "Dato endret"
+
+#: modules/campaign/crm_campaign.info.inc:52 modules/channel/crm_channel.info.inc:92 modules/message/modules/message_template/crm_message_template.info.inc:60
+msgid "The date when channel was most recently updated."
+msgstr ""
+
+#: modules/campaign/crm_campaign.info.inc:55 modules/campaign/includes/crm_campaign.form.inc:64 modules/campaign/includes/views/crm_campaign.views.inc:99 modules/campaign/includes/views/crm_campaign_ui.views_default.inc:183 modules/campaignmonitor/crm_campaignmonitor.admin.inc:180 modules/channel/crm_channel.info.inc:51 modules/channel/crm_channel.tokens.inc:36 modules/channel/includes/CRMChannelInlineFormController.class.php:37;64 modules/channel/includes/crm_channel_ui.form.inc:54 modules/channel/includes/views/crm_channel.views.inc:80 modules/channel/includes/views/crm_channel_ui.views_default.inc:237 modules/contact/crm_contact.info.inc:49 modules/contact/crm_contact.tokens.inc:28 modules/contact/includes/crm_contact_ui.form.inc:52 modules/contact/includes/views/crm_contact.views.inc:80 modules/contact/includes/views/crm_contact_ui.views_default.inc:195 modules/message/crm_message.info.inc:57 modules/message/includes/crm_message_ui.form.inc:84 modules/message/includes/views/crm_message.views.inc:109 modules/message/includes/views/crm_message_ui.views_default.inc:232
+msgid "Status"
+msgstr "Status"
+
+#: modules/campaign/crm_campaign.info.inc:56 modules/channel/crm_channel.info.inc:52 modules/contact/crm_contact.info.inc:50 modules/message/crm_message.info.inc:58
+msgid "Entity status"
+msgstr ""
+
+#: modules/campaign/crm_campaign.info.inc:64 modules/channel/crm_channel.info.inc:71 modules/contact/crm_contact.info.inc:23 modules/message/crm_message.info.inc:73 modules/message/modules/message_template/crm_message_template.info.inc:77
+msgid "Revision log message"
+msgstr "Meldinger for versjonsloggen"
+
+#: modules/campaign/crm_campaign.info.inc:66 modules/channel/crm_channel.info.inc:73 modules/contact/crm_contact.info.inc:25 modules/message/crm_message.info.inc:75 modules/message/modules/message_template/crm_message_template.info.inc:79
+msgid "In case a new revision is to be saved, the log entry explaining the changes for this version."
+msgstr ""
+
+#: modules/campaign/crm_campaign.info.inc:70 modules/channel/crm_channel.info.inc:77 modules/contact/crm_contact.info.inc:29 modules/message/crm_message.info.inc:79 modules/message/modules/message_template/crm_message_template.info.inc:83
+msgid "Creates revision"
+msgstr ""
+
+#: modules/campaign/crm_campaign.info.inc:72 modules/channel/crm_channel.info.inc:79 modules/contact/crm_contact.info.inc:31 modules/message/crm_message.info.inc:81 modules/message/modules/message_template/crm_message_template.info.inc:85
+msgid "Whether saving this entity creates a new revision."
+msgstr ""
 
 #: modules/campaign/crm_campaign.module:61
 msgid "Access to campaign list"
@@ -234,7 +301,7 @@ msgstr ""
 
 #: modules/campaign/crm_campaign.module:260 modules/message/crm_message.module:201
 msgid "Queued"
-msgstr ""
+msgstr "Behandles"
 
 #: modules/campaign/crm_campaign.module:261
 msgid "Campaign queued to send."
@@ -255,10 +322,6 @@ msgstr ""
 #: modules/campaign/crm_campaign.module:673
 msgid "Choose message type"
 msgstr ""
-
-#: modules/campaign/crm_campaign.module:692 modules/campaign/includes/crm_campaign.form.inc:30 modules/campaign/includes/views/crm_campaign.views.inc:52 modules/campaign/includes/views/crm_campaign_ui.views_default.inc:182
-msgid "Title"
-msgstr "Tittel"
 
 #: modules/campaign/crm_campaign.module:694
 msgid "This value won't be exposed to end user."
@@ -387,10 +450,6 @@ msgstr ""
 #: modules/campaign/includes/crm_campaign.form.inc:58 modules/channel/includes/crm_channel_ui.form.inc:48 modules/contact/includes/crm_contact_ui.form.inc:46 modules/message/includes/crm_message_ui.form.inc:78
 msgid "Options"
 msgstr "Valg"
-
-#: modules/campaign/includes/crm_campaign.form.inc:64 modules/campaign/includes/views/crm_campaign.views.inc:99 modules/campaign/includes/views/crm_campaign_ui.views_default.inc:183 modules/campaignmonitor/crm_campaignmonitor.admin.inc:180 modules/channel/crm_channel.tokens.inc:36 modules/channel/includes/CRMChannelInlineFormController.class.php:37;64 modules/channel/includes/crm_channel_ui.form.inc:54 modules/channel/includes/views/crm_channel.views.inc:80 modules/channel/includes/views/crm_channel_ui.views_default.inc:237 modules/contact/crm_contact.tokens.inc:28 modules/contact/includes/crm_contact_ui.form.inc:52 modules/contact/includes/views/crm_contact.views.inc:80 modules/contact/includes/views/crm_contact_ui.views_default.inc:195 modules/message/includes/crm_message_ui.form.inc:84 modules/message/includes/views/crm_message.views.inc:109 modules/message/includes/views/crm_message_ui.views_default.inc:232
-msgid "Status"
-msgstr "Status"
 
 #: modules/campaign/includes/crm_campaign.form.inc:71 modules/channel/includes/crm_channel_ui.form.inc:62 modules/contact/includes/crm_contact_ui.form.inc:67 modules/message/includes/crm_message_ui.form.inc:100 modules/message/modules/message_template/includes/crm_message_template_ui.form.inc:122
 msgid "Revision"
@@ -762,51 +821,23 @@ msgctxt "crm"
 msgid "Channel"
 msgstr ""
 
-#: modules/channel/crm_channel.info.inc:23 modules/channel/crm_channel.tokens.inc:13 modules/channel/crm_channel.module:22 modules/channel/crm_channel.info:0 modules/channel/includes/CRMChannelInlineFormController.class.php:15;31 modules/channel/includes/views/crm_channel.views.inc:13 modules/channel/includes/views/crm_channel_ui.views_default.inc:218
+#: modules/channel/crm_channel.info.inc:25 modules/channel/crm_channel.tokens.inc:13 modules/channel/crm_channel.module:22 modules/channel/crm_channel.info:0 modules/channel/includes/CRMChannelInlineFormController.class.php:15;31 modules/channel/includes/views/crm_channel.views.inc:13 modules/channel/includes/views/crm_channel_ui.views_default.inc:218
 msgid "Channel"
 msgstr ""
 
-#: modules/channel/crm_channel.entity.inc:33 modules/contact/crm_contact.entity.inc:35 modules/message/crm_message.entity.inc:36
+#: modules/channel/crm_channel.entity.inc:34 modules/contact/crm_contact.entity.inc:36 modules/message/crm_message.entity.inc:37
 msgid "Customer"
 msgstr "Kunde"
 
-#: modules/channel/crm_channel.entity.inc:114 modules/contact/includes/crm_contact_ui.form.inc:63 modules/message/includes/crm_message_ui.form.inc:96
+#: modules/channel/crm_channel.entity.inc:115 modules/contact/includes/crm_contact_ui.form.inc:63 modules/message/includes/crm_message_ui.form.inc:96
 msgid "Undefined"
 msgstr ""
 
-#: modules/channel/crm_channel.info.inc:18 modules/contact/crm_contact.info.inc:18
-msgid "Is new"
-msgstr ""
-
-#: modules/channel/crm_channel.info.inc:20 modules/contact/crm_contact.info.inc:20
-msgid "Whether the entity is new and not saved to the database yet."
-msgstr ""
-
-#: modules/channel/crm_channel.info.inc:25
+#: modules/channel/crm_channel.info.inc:27
 msgid "General value."
 msgstr ""
 
-#: modules/channel/crm_channel.info.inc:34 modules/contact/crm_contact.info.inc:23
-msgid "Revision log message"
-msgstr "Meldinger for versjonsloggen"
-
-#: modules/channel/crm_channel.info.inc:36 modules/contact/crm_contact.info.inc:25
-msgid "In case a new revision is to be saved, the log entry explaining the changes for this version."
-msgstr ""
-
-#: modules/channel/crm_channel.info.inc:40
-msgid "Creates revision"
-msgstr ""
-
-#: modules/channel/crm_channel.info.inc:42
-msgid "Whether saving this entity creates a new revision."
-msgstr ""
-
-#: modules/channel/crm_channel.tokens.inc:14
-msgid "Tokens related to individual crm channel items."
-msgstr ""
-
-#: modules/channel/crm_channel.tokens.inc:20
+#: modules/channel/crm_channel.info.inc:31 modules/channel/crm_channel.tokens.inc:20
 msgid "Channel ID"
 msgstr ""
 
@@ -815,13 +846,37 @@ msgctxt "crm"
 msgid "Channel ID"
 msgstr ""
 
+#: modules/channel/crm_channel.info.inc:43 modules/channel/includes/CRMChannelInlineFormController.class.php:43 modules/channel/includes/views/crm_channel.views.inc:61 modules/channel/includes/views/crm_channel_ui.views_default.inc:236 modules/message/crm_message.info.inc:37 modules/message/includes/views/crm_message.views.inc:91 modules/message/includes/views/crm_message_ui.views_default.inc:231 modules/message/modules/message_template/crm_message_template.info.inc:43 modules/message/modules/message_template/includes/views/crm_message_template.views.inc:110
+msgid "Type"
+msgstr "Type"
+
+#: modules/channel/crm_channel.info.inc:44 modules/message/crm_message.info.inc:38 modules/message/modules/message_template/crm_message_template.info.inc:44
+msgid "Entity bundle"
+msgstr ""
+
+#: modules/channel/crm_channel.info.inc:59 modules/channel/crm_channel.tokens.inc:44 modules/contact/crm_contact.info.inc:57 modules/contact/crm_contact.tokens.inc:36
+msgid "Token"
+msgstr ""
+
+#: modules/channel/crm_channel.info.inc:60 modules/contact/crm_contact.info.inc:58 modules/message/modules/message_template/crm_message_template.info.inc:38
+msgid "One time token"
+msgstr ""
+
+#: modules/channel/crm_channel.info.inc:65 modules/contact/crm_contact.info.inc:63
+msgid "Token created"
+msgstr ""
+
+#: modules/channel/crm_channel.info.inc:66 modules/contact/crm_contact.info.inc:64
+msgid "When one time token was generated"
+msgstr ""
+
+#: modules/channel/crm_channel.tokens.inc:14
+msgid "Tokens related to individual crm channel items."
+msgstr ""
+
 #: modules/channel/crm_channel.tokens.inc:21
 msgid "The unique ID of the channel."
 msgstr ""
-
-#: modules/channel/crm_channel.tokens.inc:24 modules/contact/crm_contact.tokens.inc:24
-msgid "Revision ID"
-msgstr "ID for revisjonen"
 
 #: modules/channel/crm_channel.tokens.inc:25
 msgid "The unique ID of the channel's latest revision."
@@ -855,10 +910,6 @@ msgstr ""
 msgid "The human-readable status of the channel."
 msgstr ""
 
-#: modules/channel/crm_channel.tokens.inc:44 modules/contact/crm_contact.tokens.inc:36
-msgid "Token"
-msgstr ""
-
 #: modules/channel/crm_channel.tokens.inc:45 modules/contact/crm_contact.tokens.inc:37
 msgid "One-time confirmation token."
 msgstr ""
@@ -867,17 +918,9 @@ msgstr ""
 msgid "The URL of the channel."
 msgstr ""
 
-#: modules/channel/crm_channel.tokens.inc:52 modules/contact/crm_contact.tokens.inc:44
-msgid "Date created"
-msgstr "Dato opprettet"
-
 #: modules/channel/crm_channel.tokens.inc:53 modules/contact/crm_contact.tokens.inc:45
 msgid "The date the node was posted."
 msgstr "Datoen innlegget ble lagt inn."
-
-#: modules/channel/crm_channel.tokens.inc:57 modules/contact/crm_contact.tokens.inc:49
-msgid "Date changed"
-msgstr "Dato endret"
 
 #: modules/channel/crm_channel.tokens.inc:58 modules/contact/crm_contact.tokens.inc:50
 msgid "The date the node was most recently updated."
@@ -966,10 +1009,6 @@ msgstr ""
 #: modules/channel/includes/CRMChannelController.class.php:97
 msgid "Channel (channel: @id) has been saved."
 msgstr ""
-
-#: modules/channel/includes/CRMChannelInlineFormController.class.php:43 modules/channel/includes/views/crm_channel.views.inc:61 modules/channel/includes/views/crm_channel_ui.views_default.inc:236 modules/message/includes/views/crm_message.views.inc:91 modules/message/includes/views/crm_message_ui.views_default.inc:231 modules/message/modules/message_template/includes/views/crm_message_template.views.inc:110
-msgid "Type"
-msgstr "Type"
 
 #: modules/channel/includes/crm_channel_ui.form.inc:102
 msgid "Channel @label has been saved."
@@ -1083,7 +1122,7 @@ msgstr ""
 msgid "Number of messages:"
 msgstr ""
 
-#: modules/contact/crm_contact.entity.inc:13;26 modules/contact/includes/views/crm_contact.views.inc:17
+#: modules/contact/crm_contact.entity.inc:13;27 modules/contact/includes/views/crm_contact.views.inc:17
 msgctxt "crm"
 msgid "Contact"
 msgstr "Kontakt"
@@ -1092,17 +1131,33 @@ msgstr "Kontakt"
 msgid "Contact"
 msgstr "Kontakt"
 
-#: modules/contact/crm_contact.tokens.inc:14
-msgid "Tokens related to individual crm contact items."
-msgstr ""
-
-#: modules/contact/crm_contact.tokens.inc:20
+#: modules/contact/crm_contact.info.inc:36 modules/contact/crm_contact.tokens.inc:20
 msgid "Contact ID"
 msgstr ""
 
 #: modules/contact/includes/views/crm_contact.views.inc:30
 msgctxt "crm"
 msgid "Contact ID"
+msgstr ""
+
+#: modules/contact/crm_contact.info.inc:69 modules/contact/includes/crm_contact_ui.form.inc:60 modules/message/crm_message.info.inc:65 modules/message/includes/crm_message_ui.form.inc:93 modules/message/modules/message_template/crm_message_template.info.inc:63
+msgid "Language"
+msgstr "Språk"
+
+#: modules/contact/crm_contact.info.inc:71 modules/message/crm_message.info.inc:67 modules/message/modules/message_template/crm_message_template.info.inc:65
+msgid "The language the node is written in."
+msgstr "Språket noden er skrevet på."
+
+#: modules/contact/crm_contact.info.inc:78
+msgid "The date when contact was posted."
+msgstr ""
+
+#: modules/contact/crm_contact.info.inc:85
+msgid "The date when contact was most recently updated."
+msgstr ""
+
+#: modules/contact/crm_contact.tokens.inc:14
+msgid "Tokens related to individual crm contact items."
 msgstr ""
 
 #: modules/contact/crm_contact.tokens.inc:21
@@ -1213,10 +1268,6 @@ msgstr ""
 msgid "Contact (contact: @id) has been saved."
 msgstr ""
 
-#: modules/contact/includes/crm_contact_ui.form.inc:60 modules/message/includes/crm_message_ui.form.inc:93
-msgid "Language"
-msgstr "Språk"
-
 #: modules/contact/includes/crm_contact_ui.form.inc:108
 msgid "Contact has been saved"
 msgstr ""
@@ -1326,8 +1377,25 @@ msgstr "Melding"
 msgid "Message"
 msgstr "Melding"
 
-#: modules/message/crm_message.entity.inc:118
+#: modules/message/crm_message.entity.inc:119
 msgid "Message to @channel"
+msgstr ""
+
+#: modules/message/crm_message.info.inc:25 modules/message/includes/views/crm_message_ui.views_default.inc:229
+msgid "Message ID"
+msgstr "Melding ID"
+
+#: modules/message/includes/views/crm_message.views.inc:30
+msgctxt "crm"
+msgid "Message ID"
+msgstr "Melding ID"
+
+#: modules/message/crm_message.info.inc:47
+msgid "The date when message was posted."
+msgstr ""
+
+#: modules/message/crm_message.info.inc:54
+msgid "The date when message was most recently updated."
 msgstr ""
 
 #: modules/message/crm_message_ui.admin.inc:14
@@ -1376,7 +1444,7 @@ msgstr ""
 
 #: modules/message/crm_message.module:189
 msgid "Failed"
-msgstr ""
+msgstr "Feilet"
 
 #: modules/message/crm_message.module:190
 msgid "Message failed"
@@ -1384,7 +1452,7 @@ msgstr ""
 
 #: modules/message/crm_message.module:195
 msgid "Draft"
-msgstr ""
+msgstr "Utkast"
 
 #: modules/message/crm_message.module:196
 msgid "Draft message"
@@ -1420,7 +1488,7 @@ msgstr ""
 
 #: modules/message/crm_message_ui.module:95
 msgid "Resend"
-msgstr ""
+msgstr "Send på nytt"
 
 #: modules/message/crm_message_ui.module:107
 msgid "Cancel"
@@ -1504,15 +1572,6 @@ msgstr ""
 
 #: modules/message/includes/views/crm_message.views.inc:18
 msgid "Message stored in system."
-msgstr ""
-
-#: modules/message/includes/views/crm_message.views.inc:30
-msgctxt "crm"
-msgid "Message ID"
-msgstr ""
-
-#: modules/message/includes/views/crm_message_ui.views_default.inc:229
-msgid "Message ID"
 msgstr ""
 
 #: modules/message/includes/views/crm_message.views.inc:31 modules/message/modules/message_template/includes/views/crm_message_template.views.inc:31
@@ -1600,6 +1659,22 @@ msgstr ""
 msgid "Message template"
 msgstr ""
 
+#: modules/message/modules/message_template/crm_message_template.info.inc:25
+msgid "Message_template ID"
+msgstr ""
+
+#: modules/message/modules/message_template/crm_message_template.info.inc:37 modules/message/modules/message_template/includes/CRMMessageTemplateInlineFormController.class.php:31 modules/message/modules/message_template/includes/views/crm_message_template.views.inc:91
+msgid "Name"
+msgstr "Navn"
+
+#: modules/message/modules/message_template/crm_message_template.info.inc:70
+msgid "Locked"
+msgstr "Låst"
+
+#: modules/message/modules/message_template/crm_message_template.info.inc:72
+msgid "Whether removing this entity is allowed."
+msgstr ""
+
 #: modules/message/modules/message_template/crm_message_template_ui.module:15 modules/message/modules/message_template/includes/CRMMessageTemplateInlineFormController.class.php:15
 msgid "Template"
 msgstr ""
@@ -1627,10 +1702,6 @@ msgstr ""
 #: modules/message/modules/message_template/includes/CRMMessageTemplateInlineFormController.class.php:16
 msgid "Templates"
 msgstr ""
-
-#: modules/message/modules/message_template/includes/CRMMessageTemplateInlineFormController.class.php:31 modules/message/modules/message_template/includes/views/crm_message_template.views.inc:91
-msgid "Name"
-msgstr "Navn"
 
 #: modules/message/modules/message_template/includes/CRMMessageTemplateInlineFormController.class.php:48 modules/message/modules/message_template/includes/crm_message_template_ui.form.inc:88
 msgid "Template name"

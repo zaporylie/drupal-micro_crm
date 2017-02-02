@@ -113,7 +113,7 @@ function crm_message_template_load_multiple($ids) {
  * @param $ids
  */
 function crm_message_template_delete($id) {
-  crm_message_template_delete(array($id));
+  crm_message_template_delete_multiple(array($id));
 }
 
 /**
