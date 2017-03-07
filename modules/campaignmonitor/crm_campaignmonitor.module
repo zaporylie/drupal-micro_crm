@@ -284,6 +284,7 @@ function crm_campaignmonitor_webhook($type) {
     $channel->revision = TRUE;
     $channel->log = 'Channel updated by Campaign Monitor webhook';
     $channel->preserve_token = TRUE;
+    $channel->skip_confirmation = TRUE;
 
     if ($item->Type == 'Subscribe') {
       $channel->status = CRM_NEWSLETTER_CHANNEL_STATUS;
