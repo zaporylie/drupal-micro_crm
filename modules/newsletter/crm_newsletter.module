@@ -422,8 +422,10 @@ function crm_newsletter_subscribe_confirmation($channel) {
 function crm_newsletter_crm_channel_presave($channel) {
   if (isset($channel->skip_confirmation) && $channel->skip_confirmation == TRUE) {
     // If it's confirmation - skip confirmation logic.
+    return;
   }
-  elseif (!isset($channel->original) && $channel->status == CRM_NEWSLETTER_CHANNEL_STATUS) {
+
+  if (!isset($channel->original) && $channel->status == CRM_NEWSLETTER_CHANNEL_STATUS) {
     $channel->newsletter = TRUE;
   }
   elseif (isset($channel->original) && $channel->original->status == CRM_NEWSLETTER_CHANNEL_STATUS && $channel->status <> $channel->original->status) {
@@ -432,8 +434,12 @@ function crm_newsletter_crm_channel_presave($channel) {
   elseif (isset($channel->original) && $channel->status == CRM_NEWSLETTER_CHANNEL_STATUS && $channel->status <> $channel->original->status) {
     $channel->newsletter = TRUE;
   }
+  else {
+    // We don't have to do anything.
+    return;
+  }
 
-  if (isset($channel->newsletter) && $channel->newsletter == FALSE) {
+  if ($channel->newsletter == FALSE) {
     $method = variable_get('crm_channel_ui_' . $channel->type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
     if ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT && function_exists('_crm_message_channel_supported') && _crm_message_channel_supported($channel->type)) {
       _crm_channel_generate_token($channel);
@@ -446,7 +452,7 @@ function crm_newsletter_crm_channel_presave($channel) {
       $channel->log = 'Channel does not want to receive newsletter messages';
     }
   }
-  elseif (isset($channel->newsletter) && $channel->newsletter == TRUE) {
+  elseif ($channel->newsletter == TRUE) {
     $method = variable_get('crm_channel_ui_' . $channel->type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
     if ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT && function_exists('_crm_message_channel_supported') && _crm_message_channel_supported($channel->type)) {
       _crm_channel_generate_token($channel);
@@ -481,7 +487,12 @@ function crm_newsletter_crm_channel_update($channel) {
  * @param $channel
  */
 function _crm_newsletter_set_and_send_message($channel) {
-  if (isset($channel->newsletter) && $channel->newsletter == FALSE) {
+
+  if (!isset($channel->newsletter)) {
+    return;
+  }
+
+  if ($channel->newsletter == FALSE) {
     $method = variable_get('crm_channel_ui_' . $channel->type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
     if ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT && function_exists('_crm_message_channel_supported') && _crm_message_channel_supported($channel->type)) {
 
@@ -505,7 +516,7 @@ function _crm_newsletter_set_and_send_message($channel) {
       drupal_set_message(t('You will not receive newsletter messages any more.'));
     }
   }
-  elseif (isset($channel->newsletter) && $channel->newsletter == TRUE) {
+  elseif ($channel->newsletter == TRUE) {
     $method = variable_get('crm_channel_ui_' . $channel->type . '_newsletter', CRM_NEWSLETTER_SUBSCRIBE_SINGLE_OPT);
     if ($method == CRM_NEWSLETTER_SUBSCRIBE_DOUBLE_OPT && function_exists('_crm_message_channel_supported') && _crm_message_channel_supported($channel->type)) {
 

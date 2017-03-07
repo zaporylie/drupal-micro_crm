@@ -260,6 +260,7 @@ function crm_campaignmonitor_webhook($type) {
         $channel->log = 'Default e-mail address for campaign monitor campaign has been changed';
         $channel->status = CRM_CHANNEL_STATUS_REGISTERED;
         $channel->revision = TRUE;
+        $channel->campaignmonitor_webhook = TRUE;
         entity_save('crm_channel', $channel);
         // @todo: merge if different contact.
       }
@@ -269,6 +270,7 @@ function crm_campaignmonitor_webhook($type) {
         $new_entity->log = 'New email address came from Campaign Monitor';
         $new_entity->status = CRM_CHANNEL_STATUS_REGISTERED;
         $new_entity->revision = TRUE;
+        $new_entity->campaignmonitor_webhook = TRUE;
         entity_save('crm_channel', $new_entity);
       }
     }
@@ -282,6 +284,7 @@ function crm_campaignmonitor_webhook($type) {
     $channel->revision = TRUE;
     $channel->log = 'Channel updated by Campaign Monitor webhook';
     $channel->preserve_token = TRUE;
+
     if ($item->Type == 'Subscribe') {
       $channel->status = CRM_NEWSLETTER_CHANNEL_STATUS;
     }
