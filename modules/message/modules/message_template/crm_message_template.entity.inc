@@ -18,6 +18,7 @@ function crm_message_template_entity_info() {
     'uri callback' => 'crm_message_template_uri',
     'label callback' => 'crm_message_template_label',
     'fieldable' => TRUE,
+    'module' => 'crm_message_template',
     'entity keys' => array(
       'id' => 'template_id',
       'bundle' => 'type',
@@ -112,7 +113,7 @@ function crm_message_template_load_multiple($ids) {
  * @param $ids
  */
 function crm_message_template_delete($id) {
-  crm_message_template_delete(array($id));
+  crm_message_template_delete_multiple(array($id));
 }
 
 /**

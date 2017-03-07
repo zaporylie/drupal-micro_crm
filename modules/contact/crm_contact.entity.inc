@@ -17,6 +17,7 @@ function crm_contact_entity_info() {
     'load hook' => 'crm_contact_load',
     'label callback' => 'crm_contact_label',
     'fieldable' => TRUE,
+    'module' => 'crm_contact',
     'entity keys' => array(
       'id' => 'contact_id',
       'revision' => 'revision_id',

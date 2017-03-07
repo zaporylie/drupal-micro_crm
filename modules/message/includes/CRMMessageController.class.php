@@ -77,13 +77,17 @@ class CRMMessageController extends EntityAPIController {
    */
   public function save($entity) {
 
-    // If we are going to save new message data needs to be validated against
-    // uniqueness.
-    if (isset($entity->is_new) && $entity->is_new == TRUE && !isset($entity->message_id)) {
-      $entity->created = REQUEST_TIME;
+    if (!empty($entity->is_new)) {
+      if (empty($entity->created)) {
+        $entity->created = REQUEST_TIME;
+      }
+      if (empty($entity->changed)) {
+        $entity->changed = REQUEST_TIME;
+      }
     }
-    // Set changed time arbitrary.
-    $entity->changed = REQUEST_TIME;
+    else {
+      $entity->changed = REQUEST_TIME;
+    }
 
     // Create new revision by default.
     if (!isset($entity->revision)) {

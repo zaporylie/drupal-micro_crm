@@ -33,14 +33,18 @@ function crm_user_menu() {
  * Implements hook_user_insert().
  */
 function crm_user_user_insert(&$edit, $account, $category) {
-  _crm_user_account_process($account);
+  if (empty($account->skip_crm_import)) {
+    _crm_user_account_process($account);
+  }
 }
 
 /**
  * Implements hook_user_update().
  */
 function crm_user_user_update(&$edit, $account, $category) {
-  _crm_user_account_process($account);
+  if (empty($account->skip_crm_import)) {
+    _crm_user_account_process($account);
+  }
 }
 
 /**

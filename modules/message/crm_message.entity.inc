@@ -17,6 +17,7 @@ function crm_message_entity_info() {
     'load hook' => 'crm_message_load',
     'uri callback' => 'crm_message_uri',
     'label callback' => 'crm_message_label',
+    'module' => 'crm_message',
     'fieldable' => TRUE,
     'entity keys' => array(
       'id' => 'message_id',
