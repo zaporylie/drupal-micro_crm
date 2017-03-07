@@ -303,7 +303,7 @@ function crm_campaignmonitor_webhook($type) {
     $wrapper = entity_metadata_wrapper('crm_contact', $contact);
 
     if (isset($map['Name']['field']) && $wrapper->__isset($map['Name']['field']) && $item->Name) {
-      $wrapper->$map['Name']['field']->set($item->Name);
+      $wrapper->{$map['Name']['field']}->set($item->Name);
     }
     foreach (_crm_campaignmonitor_keyed_custom_fields($item->CustomFields) as $custom_field => $value) {
       $field_key = NULL;
@@ -423,8 +423,8 @@ function _crm_campaignmonitor_prepare_custom_fields($list_id, $contact) {
     if (!$wrapper->__isset($field['field'])) {
       continue;
     }
-    if (is_array($wrapper->$field['field']->raw())) {
-      foreach($wrapper->$field['field']->getIterator() as $value) {
+    if (is_array($wrapper->{$field['field']}->raw())) {
+      foreach($wrapper->{$field['field']}->getIterator() as $value) {
         $output[] = array(
           'Key' => $field_name,
           'Value' => isset($field['map']) ? _crm_campaignmonitor_map_replace($field['map'], $value->raw()) : $value->raw(),
@@ -434,7 +434,7 @@ function _crm_campaignmonitor_prepare_custom_fields($list_id, $contact) {
     else {
       $output[] = array(
         'Key' => $field_name,
-        'Value' => isset($field['map']) ? _crm_campaignmonitor_map_replace($field['map'], $wrapper->$field['field']->raw()) : $wrapper->$field['field']->raw(),
+        'Value' => isset($field['map']) ? _crm_campaignmonitor_map_replace($field['map'], $wrapper->{$field['field']}->raw()) : $wrapper->{$field['field']}->raw(),
       );
     }
   }
