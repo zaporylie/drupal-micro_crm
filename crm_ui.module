@@ -44,35 +44,6 @@ function crm_ui_menu() {
 }
 
 /**
- * Renders index based on current parent element.
- *
- * @return array
- *   Returns renderable array.
- */
-function crm_index() {
-  $build = array();
-  $parent = menu_link_get_preferred(current_path());
-  $parameters = array(
-    'active_trail' => array($parent['plid']),
-    'only_active_trail' => FALSE,
-    'min_depth' => $parent['depth'] + 1,
-    'max_depth' => $parent['depth'] + 1,
-    'conditions' => array('plid' => $parent['mlid']),
-  );
-
-  $children = menu_build_tree($parent['menu_name'], $parameters);
-
-  foreach ($children as $child) {
-    $build[$child['link']['mlid']] = array(
-      '#theme' => 'admin_block_content',
-      '#content' => array($child['link']),
-    );
-  }
-
-  return $build;
-}
-
-/**
  * Implements hook_views_bulk_operations_form_alter().
  *
  * Tweaks the appearance of the VBO selector.
