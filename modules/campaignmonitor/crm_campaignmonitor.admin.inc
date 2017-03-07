@@ -34,7 +34,7 @@ function crm_campaignmonitor_settings($form, &$form_state) {
   $form['crm_campaignmonitor']['#prefix'] = '<div id="crm-campaignmonitor-settings-form">';
   $form['crm_campaignmonitor']['#suffix'] = '</div>';
   $lists = $cm->getLists();
-  foreach ($lists as $list_id => $list) {
+  foreach ($lists ?: array() as $list_id => $list) {
     if (in_array($list_id, $available_lists, TRUE)) {
       $list = $cm->getExtendedList($list_id);
       $form['crm_campaignmonitor'][$list_id] = array(
