@@ -4,6 +4,7 @@ core = 7.x
 package = CRM
 
 dependencies[] = crm_message_template
+dependencies[] = crm_ui
 dependencies[] = inline_entity_form
 
 files[] = includes/CRMCampaignController.class.php
