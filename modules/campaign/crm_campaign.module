@@ -518,6 +518,8 @@ function crm_campaign_add_channel_to_campaign(&$campaign, $channel) {
  *
  * @deprecated
  *   Use crm_campaign_remove_channel instead.
+ *
+ * @see crm_campaign_remove_channel()
  */
 function crm_campaign_remove_channel_from_campaign(&$campaign, $channel) {
   $wrapper = entity_metadata_wrapper('crm_campaign', $campaign);
@@ -528,7 +530,7 @@ function crm_campaign_remove_channel_from_campaign(&$campaign, $channel) {
   $keys = array_keys($channel);
   $values = array_diff($values, $keys);
   asort($values);
-  $wrapper->crm_channel->set($values);
+  $wrapper->crm_channel->set($values ?: array('target_id' => NULL));
 }
 
 /**
