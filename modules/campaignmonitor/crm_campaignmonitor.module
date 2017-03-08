@@ -152,6 +152,11 @@ function crm_campaignmonitor_sync($channel_old) {
   // Load the latest version of channel.
   $channel = crm_channel_load($channel_old->channel_id);
 
+  if (!$channel) {
+    // Channel doesn't exist anymore.
+    return FALSE;
+  }
+
   // Compare if channel in queue is the latest one.
   if ($channel->revision_id > $channel_old->revision_id) {
     return FALSE;
