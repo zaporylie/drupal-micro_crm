@@ -182,7 +182,7 @@ function crm_campaign_ui_remove_from_campaign_action(&$entities, &$context) {
   }
   catch (Exception $e) {
     watchdog_exception('crm_campaign', $e);
-    drupal_set_message('Unable to add channels to campaign.', 'error');
+    drupal_set_message('Unable to remove channels from campaign.', 'error');
     return FALSE;
   }
 }
