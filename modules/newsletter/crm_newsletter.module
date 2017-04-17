@@ -190,12 +190,12 @@ function crm_newsletter_form_validate(&$form, &$form_state) {
   foreach ($channels as $channel) {
     $entity = entity_create('crm_channel', array('type' => $channel));
     field_attach_form_validate('crm_channel', $entity, $form, $form_state);
-//    field_attach_submit('crm_channel', $entity, $form, $form_state);
+    // field_attach_submit('crm_channel', $entity, $form, $form_state);.
     if (crm_channel_is_empty($channel, $entity)) {
       $empty += 1;
     }
   }
-    form_set_error(NULL, t('At least one channel field has to be filled'));
+  form_set_error(NULL, t('At least one channel field has to be filled'));
   if ($empty == count(_crm_newsletter_get_channels())) {
   }
 }
@@ -257,7 +257,7 @@ function crm_newsletter_form_submit($form, &$form_state) {
       $entity = crm_contact_merge($entity);
     }
     elseif (is_array($entity)) {
-      // If array contains only one
+      // If array contains only one.
       $entity = reset($entity);
     }
 
