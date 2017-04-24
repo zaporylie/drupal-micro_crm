@@ -11,6 +11,10 @@
     "nymediaas": {
       "type": "composer",
       "url":  "https://packages.nymedia.no"
+    },
+    "assets": {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
     }
   },
   "require": {
@@ -24,7 +28,9 @@
     "drupal/entity": "^1.8",
     "drupal/views_bulk_operations": "^3.4",
     "drupal/views_megarow": "^1.7",
-    "drupal/sms": "^1.0"
+    "drupal/sms": "^1.0",
+    "npm-asset/jquery-knob": "^1.2",
+    "danxexe/sms-counter": "dev-master"
   },
   "authors": [
     {
