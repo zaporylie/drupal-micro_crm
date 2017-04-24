@@ -3,6 +3,29 @@
   "type": "drupal-module",
   "description": "Manage all electronic communication in single subsystem.",
   "license": "GPL-2.0",
+  "repositories": {
+    "drupal": {
+      "type": "composer",
+      "url":  "https://packages.drupal.org/7"
+    },
+    "nymediaas": {
+      "type": "composer",
+      "url":  "https://packages.nymedia.no"
+    }
+  },
+  "require": {
+    "drupal/email": "^1.0",
+    "drupal/telephone_validation": "@beta",
+    "drupal/telephone": "@alpha",
+    "drupal/token": "^1.7",
+    "drupal/inline_entity_form": "^1.8",
+    "drupal/entityreference": "^1.2",
+    "drupal/views": "^3.16",
+    "drupal/entity": "^1.8",
+    "drupal/views_bulk_operations": "^3.4",
+    "drupal/views_megarow": "^1.7",
+    "drupal/sms": "^1.0"
+  },
   "authors": [
     {
       "name": "Jakub Piasecki",
