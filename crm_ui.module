@@ -120,7 +120,7 @@ function theme_crm_ui_knob($variables) {
  * Implements hook_libraries_info().
  */
 function crm_ui_libraries_info() {
-  $libraries['jQuery-Knob'] = array(
+  $libraries['jquery-knob'] = array(
     'name' => 'jQuery Knob',
     'vendor url' => 'https://github.com/aterrien/jQuery-Knob',
     'download url' => 'https://github.com/aterrien/jQuery-Knob/archive/master.zip',
