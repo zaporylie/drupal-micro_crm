@@ -76,7 +76,7 @@ function crm_channel_load_multiple($ids) {
  * @param $ids
  */
 function crm_channel_delete($id) {
-  crm_channel_delete(array($id));
+  crm_channel_delete_multiple(array($id));
 }
 
 /**
